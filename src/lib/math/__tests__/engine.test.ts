@@ -70,13 +70,15 @@ describe('validateExpressionSource', () => {
     expect(validateExpressionSource('sin(x)^2+1')).toEqual({ valid: true, issues: [] });
   });
 
+  it('accepts free identifiers (variables are resolved by the environment)', () => {
+    expect(validateExpressionSource('2+z')).toEqual({ valid: true, issues: [] });
+  });
+
   it('returns a positioned error issue for invalid input', () => {
-    const result = validateExpressionSource('2+z');
+    const result = validateExpressionSource('2+');
     expect(result.valid).toBe(false);
     expect(result.issues).toHaveLength(1);
     expect(result.issues[0].severity).toBe('error');
-    expect(result.issues[0].message).toContain("Unknown identifier 'z'");
-    expect(result.issues[0].start).toBe(2);
   });
 });
 

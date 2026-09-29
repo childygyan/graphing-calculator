@@ -19,7 +19,6 @@
 
 import type { AstNode, BinaryOperator, SourceSpan } from './ast.js';
 import { getFunctionSpec, isConstantName, isFunctionName } from './functions.js';
-import { VARIABLE_NAME } from './functions.js';
 import { ParseError } from './tokenizer.js';
 import type { Token, TokenKind } from './tokenizer.js';
 
@@ -174,13 +173,15 @@ class Parser {
     if (isFunctionName(name)) {
       return this.parseCall(token, name);
     }
-    if (name.toLowerCase() === VARIABLE_NAME) {
-      return { kind: 'variable', name: VARIABLE_NAME, span: spanOf(token.start, token.end) };
-    }
     if (isConstantName(name)) {
       return { kind: 'constant', name: name.toLowerCase(), span: spanOf(token.start, token.end) };
     }
-    throw new ParseError(`Unknown identifier '${name}'`, token.start);
+    // Any other identifier is a variable reference. The single bound
+    // parameter (x, t, theta — depending on the expression kind) is
+    // resolved by the compiler; every other name is looked up in the
+    // variable environment, and an unbound name evaluates to NaN so the
+    // editor can report an honest "undefined variable" error.
+    return { kind: 'variable', name: name.toLowerCase(), span: spanOf(token.start, token.end) };
   }
 
   private parseCall(nameToken: Token, name: string): AstNode {

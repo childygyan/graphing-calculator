@@ -76,10 +76,15 @@ describe('parser', () => {
     expect(x).toMatchObject({ kind: 'variable', name: 'x' });
   });
 
-  it('rejects unknown identifiers with position', () => {
-    const error = parseError('2+z');
-    expect(error.message).toContain("Unknown identifier 'z'");
-    expect(error.position).toBe(2);
+  it('parses unknown identifiers as variable references (Phase 5)', () => {
+    const node = parseSource('2+z');
+    expect(node.kind).toBe('binary');
+    if (node.kind !== 'binary') throw new Error('unreachable');
+    expect(node.right).toMatchObject({ kind: 'variable', name: 'z' });
+  });
+
+  it('lowercases variable names for case-insensitive binding', () => {
+    expect(parseSource('A')).toMatchObject({ kind: 'variable', name: 'a' });
   });
 
   it('rejects empty input', () => {

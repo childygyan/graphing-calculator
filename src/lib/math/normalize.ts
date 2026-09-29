@@ -67,6 +67,7 @@ export function normalizeExpressionSource(raw: string): string {
     .replace(/÷/g, '/')
     .replace(/[−–—]/g, '-')
     .replace(/π/g, 'pi')
+    .replace(/[θΘ]/g, 'theta')
     .replace(/∛/g, 'cbrt ')
     .replace(/√/g, 'sqrt ');
 

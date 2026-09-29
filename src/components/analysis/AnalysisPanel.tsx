@@ -19,7 +19,9 @@ import type { CalculatorAction } from '../calculator/CalculatorStore.js';
 import { Panel } from '../ui/Panel.js';
 import { Button } from '../ui/Button.js';
 import { TextInput } from '../ui/TextInput.js';
-import { compileExpression } from '../../lib/math/engine.js';
+import { compileExpressionScoped } from '../../lib/math/engine.js';
+import { CARTESIAN_PARAMETER } from '../../lib/math/variables.js';
+import { useVariableEnvironment } from '../variables/useVariableEnvironment.js';
 import {
   adaptiveSimpson,
   centralDerivative,
@@ -391,6 +393,7 @@ function IntersectionsSection({
   const { state } = useCalculator();
   const pinMarkers = usePinMarkers(expression);
   const clearMarkers = useClearMarkers(expression);
+  const env = useVariableEnvironment();
   const others = all.filter((e) => e.kind === 'cartesian' && e.id !== expression.id);
   const [otherId, setOtherId] = useState(others[0]?.id ?? '');
   const [points, setPoints] = useState<IntersectionPoint[] | null>(null);
@@ -402,7 +405,10 @@ function IntersectionsSection({
     if (!other) return [];
     let g: CompiledFunction;
     try {
-      g = compileExpression(other.definition.rhs).fn;
+      g = compileExpressionScoped(other.definition.rhs, {
+        parameter: CARTESIAN_PARAMETER,
+        env,
+      }).fn;
     } catch {
       return [];
     }
@@ -852,15 +858,26 @@ function ExpressionAnalysis({
   all: Expression[];
 }) {
   const { state } = useCalculator();
+  const env = useVariableEnvironment();
   const compiled = useMemo(() => {
     try {
-      return { fn: compileExpression(expression.definition.rhs).fn, error: null as string | null };
+      return {
+        fn: compileExpressionScoped(expression.definition.rhs, {
+          parameter: CARTESIAN_PARAMETER,
+          env,
+        }).fn,
+        error: null as string | null,
+      };
     } catch (error) {
       return {
         fn: null,
         error: error instanceof Error ? error.message : 'Could not parse this expression.',
       };
     }
+    // The compiled closure reads the environment's live values map at call
+    // time, so it stays valid across slider drags without recompilation.
+    // `env` is a stable per-component reference and intentionally excluded
+    // from the dependency list.
   }, [expression.definition.rhs]);
 
   return (

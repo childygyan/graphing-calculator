@@ -18,11 +18,13 @@
 import { collectVariables } from './ast.js';
 import type { AstNode } from './ast.js';
 import type { CompiledFunction } from './compiler.js';
+import { compileScopedAst } from './compiler.js';
 import { compileAst } from './compiler.js';
 import { normalizeExpressionSource } from './normalize.js';
 import { parse } from './parser.js';
 import { ParseError, tokenize } from './tokenizer.js';
 import { adaptiveSimpson, centralDerivative, findAllRoots, findIntersections } from './analysis.js';
+import type { VariableEnvironment } from './variables.js';
 import type {
   EngineNumber,
   MathEngine,
@@ -90,6 +92,83 @@ export function clearExpressionCache(): void {
 /** Current number of cached compilations. */
 export function getExpressionCacheSize(): number {
   return cache.size;
+}
+
+/**
+ * Options for compiling an expression against a variable environment.
+ */
+export interface ScopedCompileOptions {
+  /** Bound parameter name ('x' for cartesian, 't' for parametric, 'theta' for polar). */
+  parameter: string;
+  /** Environment whose live values map the compiled closure reads. */
+  env: VariableEnvironment;
+}
+
+/**
+ * Separate LRU for environment-scoped compilations. The cache key carries
+ * the environment's identity because the closure captures that
+ * environment's persistent values map by reference: two environments
+ * compiling the same source must not share a closure. Slider drags do not
+ * invalidate entries — the closure reads the map live, so fresh values
+ * flow through with zero recompilation.
+ */
+const scopedCache = new Map<string, CompiledExpression>();
+const SCOPED_CACHE_LIMIT = 500;
+
+function evictScoped(): void {
+  while (scopedCache.size > SCOPED_CACHE_LIMIT) {
+    const oldest = scopedCache.keys().next();
+    if (oldest.done) break;
+    scopedCache.delete(oldest.value);
+  }
+}
+
+/**
+ * Compile source with a bound parameter and variable bindings from `env`.
+ * The returned closure reads `env.values` live: call `env.resolve()`
+ * before evaluating/sampling, and later value changes need no
+ * recompilation. Throws ParseError on invalid input.
+ */
+export function compileExpressionScoped(
+  source: string,
+  options: ScopedCompileOptions
+): CompiledExpression {
+  const normalized = normalizeExpressionSource(source);
+  const key = `${options.env.envId}\n${options.parameter}\n${normalized}`;
+  const hit = scopedCache.get(key);
+  if (hit) {
+    scopedCache.delete(key);
+    scopedCache.set(key, hit);
+    return hit;
+  }
+  const ast = parse(tokenize(normalized));
+  const values = options.env.values;
+  const compiled: CompiledExpression = {
+    source: normalized,
+    normalized,
+    variables: [...collectVariables(ast)],
+    ast,
+    fn: compileScopedAst(ast, {
+      parameter: options.parameter,
+      resolveVariable: (name: string) => {
+        const value = values.get(name.toLowerCase());
+        return typeof value === 'number' ? value : NaN;
+      },
+    }),
+  };
+  scopedCache.set(key, compiled);
+  evictScoped();
+  return compiled;
+}
+
+/** Drop every cached scoped compilation (tests, memory hygiene). */
+export function clearScopedExpressionCache(): void {
+  scopedCache.clear();
+}
+
+/** Current number of cached scoped compilations. */
+export function getScopedExpressionCacheSize(): number {
+  return scopedCache.size;
 }
 
 function isCompiledExpression(value: ParsedExpression): value is CompiledExpression {

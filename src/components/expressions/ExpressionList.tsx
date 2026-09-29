@@ -1,8 +1,9 @@
 /**
  * ExpressionList — the ordered list of expressions in the calculator.
  * Shows an honest empty state when the user has removed every expression.
- * New expressions can be added as cartesian functions (y = f(x)) or
- * points; other kinds arrive in later phases.
+ * New expressions can be added as cartesian functions, parametric curves,
+ * polar curves, inequalities, or points; tables and text notes stay
+ * read-only for now.
  */
 
 import { useState } from 'react';
@@ -12,9 +13,12 @@ import { useCalculator } from '../calculator/CalculatorStore.js';
 import type { ExpressionKind } from '../../types/calculator.js';
 import { ExpressionRow } from './ExpressionRow.js';
 
-/** Expression kinds creatable in Phase 3. */
+/** Expression kinds creatable in Phase 5. */
 const ADDABLE_KINDS: Array<{ kind: ExpressionKind; label: string }> = [
   { kind: 'cartesian', label: 'Function y = f(x)' },
+  { kind: 'parametric', label: 'Parametric (x(t), y(t))' },
+  { kind: 'polar', label: 'Polar r(θ)' },
+  { kind: 'inequality', label: 'Inequality' },
   { kind: 'point', label: 'Point' },
 ];
 

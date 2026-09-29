@@ -28,7 +28,10 @@ import type {
   GraphDrawableBase,
   GraphRenderInput,
   GraphThemeMode,
+  InequalityDrawable,
+  ParametricDrawable,
   PointMarkerDrawable,
+  PolarDrawable,
   SegmentDrawable,
   WorldPoint,
 } from './types.js';
@@ -364,6 +367,8 @@ export class CanvasGraphRenderer implements GraphRenderer {
       if (!drawable || drawable.visible !== true) continue;
       switch (drawable.kind) {
         case 'function':
+        case 'parametric':
+        case 'polar':
           this.strokeFunctionDrawable(ctx, transform, drawable);
           break;
         case 'point':
@@ -374,6 +379,9 @@ export class CanvasGraphRenderer implements GraphRenderer {
           break;
         case 'area':
           this.fillArea(ctx, transform, drawable);
+          break;
+        case 'inequality-region':
+          this.drawInequalityRegion(ctx, transform, drawable);
           break;
         case 'annotation':
           this.drawAnnotation(ctx, transform, theme, drawable);
@@ -397,11 +405,65 @@ export class CanvasGraphRenderer implements GraphRenderer {
   private strokeFunctionDrawable(
     ctx: CanvasRenderingContext2D,
     transform: ViewportTransform,
-    drawable: FunctionDrawable
+    drawable: FunctionDrawable | ParametricDrawable | PolarDrawable
   ): void {
     this.applyStrokeStyle(ctx, drawable);
     const segments = Array.isArray(drawable.segments) ? drawable.segments : [];
     for (const segment of segments) {
+      this.strokePolyline(ctx, transform, Array.isArray(segment) ? segment : []);
+    }
+    ctx.setLineDash([]);
+  }
+
+  /**
+   * Inequality region: fill the shaded polygons, then stroke the boundary
+   * curve — dashed for strict inequalities (<, >), solid for ≤/≥.
+   */
+  private drawInequalityRegion(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: InequalityDrawable
+  ): void {
+    const opacity =
+      typeof drawable.fillOpacity === 'number' &&
+      drawable.fillOpacity >= 0 &&
+      drawable.fillOpacity <= 1
+        ? drawable.fillOpacity
+        : 0.25;
+    ctx.fillStyle = typeof drawable.color === 'string' ? drawable.color : '#000000';
+    ctx.globalAlpha = opacity;
+    const polygons = Array.isArray(drawable.polygons) ? drawable.polygons : [];
+    for (const polygon of polygons) {
+      if (!Array.isArray(polygon) || polygon.length < 3) continue;
+      ctx.beginPath();
+      let penDown = false;
+      for (const point of polygon) {
+        const wx = sanitizeNumber(point.x, Number.NaN);
+        const wy = sanitizeNumber(point.y, Number.NaN);
+        if (!Number.isFinite(wx) || !Number.isFinite(wy)) {
+          penDown = false;
+          continue;
+        }
+        const screen = transform.worldToScreen({ x: wx, y: wy });
+        if (!Number.isFinite(screen.x) || !Number.isFinite(screen.y)) {
+          penDown = false;
+          continue;
+        }
+        if (penDown) ctx.lineTo(screen.x, screen.y);
+        else {
+          ctx.moveTo(screen.x, screen.y);
+          penDown = true;
+        }
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // Boundary curve: dashed when the inequality is strict.
+    this.applyStrokeStyle(ctx, drawable);
+    ctx.setLineDash(drawable.boundaryDashed === true ? [7, 5] : []);
+    const boundary = Array.isArray(drawable.boundary) ? drawable.boundary : [];
+    for (const segment of boundary) {
       this.strokePolyline(ctx, transform, Array.isArray(segment) ? segment : []);
     }
     ctx.setLineDash([]);

@@ -23,6 +23,7 @@ import type {
   PointAnnotation,
   PrecisionSettings,
   TangentAnalysis,
+  VariableDefinition,
 } from '../../types/calculator.js';
 import {
   createExpression,
@@ -31,6 +32,8 @@ import {
   DEFAULT_VIEWPORT,
 } from '../../lib/expressions/expressions.js';
 import { sanitizeAnalysisState } from '../../lib/analysis/state.js';
+import { normalizeVariableName, validateVariableName } from '../../lib/math/variables.js';
+import { suggestVariableName } from '../../lib/math/variables.js';
 
 export type CalculatorAction =
   | { type: 'ADD_EXPRESSION'; kind: ExpressionKind }
@@ -57,7 +60,11 @@ export type CalculatorAction =
   | { type: 'TOGGLE_DERIVATIVE_PLOT'; expressionId: string }
   | { type: 'ADD_ANNOTATION'; annotation: PointAnnotation }
   | { type: 'UPDATE_ANNOTATION'; id: string; patch: Partial<PointAnnotation> }
-  | { type: 'REMOVE_ANNOTATION'; id: string };
+  | { type: 'REMOVE_ANNOTATION'; id: string }
+  | { type: 'ADD_VARIABLE'; name?: string }
+  | { type: 'UPDATE_VARIABLE'; name: string; patch: Partial<VariableDefinition> }
+  | { type: 'REMOVE_VARIABLE'; name: string }
+  | { type: 'SET_VARIABLE_VALUE'; name: string; value: number };
 
 function isFiniteViewport(value: unknown): value is GraphViewport {
   if (typeof value !== 'object' || value === null) return false;
@@ -78,6 +85,47 @@ function isThemeMode(value: unknown): value is ThemeMode {
   return value === 'light' || value === 'dark' || value === 'system';
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+/**
+ * Sanitize persisted variable definitions: drop invalid entries (bad
+ * names, non-string expressions, broken ranges) so corrupt localStorage
+ * data can never break the environment. Names are lowercased and
+ * deduplicated, keeping the first occurrence.
+ */
+function sanitizeVariables(value: unknown): VariableDefinition[] {
+  if (!Array.isArray(value)) return [];
+  const out: VariableDefinition[] = [];
+  const seen = new Set<string>();
+  for (const entry of value) {
+    if (typeof entry !== 'object' || entry === null) continue;
+    const record = entry as Record<string, unknown>;
+    if (typeof record.name !== 'string') continue;
+    if (validateVariableName(record.name) !== null) continue;
+    const name = normalizeVariableName(record.name);
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const expression = typeof record.expression === 'string' ? record.expression : '1';
+    let min = isFiniteNumber(record.min) ? record.min : -10;
+    let max = isFiniteNumber(record.max) ? record.max : 10;
+    if (!(min < max)) {
+      min = -10;
+      max = 10;
+    }
+    const step = isFiniteNumber(record.step) && record.step > 0 ? record.step : 0.1;
+    out.push({ name, expression, min, max, step });
+  }
+  return out;
+}
+
+/** Clamp a slider value into its range (NaN passes through untouched). */
+function clampVariableValue(def: VariableDefinition, value: number): number {
+  if (!Number.isFinite(value)) return value;
+  return Math.min(def.max, Math.max(def.min, value));
+}
+
 /**
  * Lazily build the provider's initial state: restore a previously persisted
  * state from localStorage when it has a recognizable shape, otherwise fall
@@ -95,6 +143,7 @@ function initializeState(initialTheme: ThemeMode | undefined): CalculatorState {
     if (!Array.isArray(p.expressions) || !isFiniteViewport(p.viewport)) return defaults;
     return {
       expressions: p.expressions as Expression[],
+      variables: sanitizeVariables(p.variables),
       viewport: p.viewport,
       settings: {
         ...defaults.settings,
@@ -286,6 +335,63 @@ function calculatorReducer(state: CalculatorState, action: CalculatorAction): Ca
           annotations: state.analysis.annotations.filter((a) => a.id !== action.id),
         },
       };
+    case 'ADD_VARIABLE': {
+      const taken = new Set(state.variables.map((v) => v.name));
+      const requested = action.name?.trim().toLowerCase();
+      const name =
+        requested && validateVariableName(requested) === null && !taken.has(requested)
+          ? requested
+          : suggestVariableName(taken);
+      return {
+        ...state,
+        variables: [...state.variables, { name, expression: '1', min: -10, max: 10, step: 0.1 }],
+      };
+    }
+    case 'UPDATE_VARIABLE': {
+      const target = normalizeVariableName(action.name);
+      const patch = { ...action.patch };
+      // A rename goes through the same validation as a fresh name.
+      if (patch.name !== undefined) {
+        const renamed = normalizeVariableName(patch.name);
+        if (validateVariableName(renamed) !== null) return state;
+        if (renamed !== target && state.variables.some((v) => v.name === renamed)) {
+          return state;
+        }
+        patch.name = renamed;
+      }
+      let changed = false;
+      const variables = state.variables.map((v) => {
+        if (v.name !== target) return v;
+        changed = true;
+        const next = { ...v, ...patch };
+        if (!(next.min < next.max)) {
+          next.min = v.min;
+          next.max = v.max;
+        }
+        if (!(next.step > 0)) next.step = v.step;
+        return next;
+      });
+      if (!changed) return state;
+      return { ...state, variables };
+    }
+    case 'REMOVE_VARIABLE': {
+      const target = normalizeVariableName(action.name);
+      const variables = state.variables.filter((v) => v.name !== target);
+      if (variables.length === state.variables.length) return state;
+      return { ...state, variables };
+    }
+    case 'SET_VARIABLE_VALUE': {
+      const target = normalizeVariableName(action.name);
+      let changed = false;
+      const variables = state.variables.map((v) => {
+        if (v.name !== target) return v;
+        changed = true;
+        // Slider drags write a numeric literal into the definition.
+        return { ...v, expression: String(clampVariableValue(v, action.value)) };
+      });
+      if (!changed) return state;
+      return { ...state, variables };
+    }
     case 'HYDRATE':
       return action.state;
   }

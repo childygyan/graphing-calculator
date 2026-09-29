@@ -217,6 +217,7 @@ export function createInitialCalculatorState(theme: ThemeMode): CalculatorState 
   const first = createExpression('cartesian', 0);
   return {
     expressions: [first],
+    variables: [],
     viewport: { ...DEFAULT_VIEWPORT },
     settings: { ...DEFAULT_GRAPH_SETTINGS },
     selectedExpressionId: first.id,

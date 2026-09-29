@@ -1,12 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { buildFunctionDrawables, DEFAULT_CURVE_LINE_WIDTH } from '../drawables.js';
+import { VariableEnvironment } from '../../../lib/math/variables.js';
 import type {
   CartesianExpression,
-  Expression,
   GraphViewport,
+  InequalityExpression,
+  InequalityOperator,
+  ParametricExpression,
   PointExpression,
+  PolarExpression,
 } from '../../../types/calculator.js';
-import type { CanvasSize, FunctionDrawable } from '../types.js';
+import type {
+  CanvasSize,
+  FunctionDrawable,
+  InequalityDrawable,
+  ParametricDrawable,
+  PolarDrawable,
+} from '../types.js';
 
 const VIEWPORT: GraphViewport = { xMin: -10, xMax: 10, yMin: -10, yMax: 10 };
 const SIZE: CanvasSize = { width: 800, height: 600 };
@@ -41,6 +51,59 @@ function point(x: string, y: string): PointExpression {
     updatedAt: 0,
     definition: { x, y },
   };
+}
+
+function parametric(xOfT: string, yOfT: string, tMin: string, tMax: string): ParametricExpression {
+  nextId += 1;
+  return {
+    id: `expr-${nextId}`,
+    kind: 'parametric',
+    label: `Parametric ${nextId}`,
+    visible: true,
+    color: '#7c3aed',
+    metadata: {},
+    createdAt: 0,
+    updatedAt: 0,
+    definition: { xOfT, yOfT, tMin, tMax },
+  };
+}
+
+function polar(rOfTheta: string): PolarExpression {
+  nextId += 1;
+  return {
+    id: `expr-${nextId}`,
+    kind: 'polar',
+    label: `Polar ${nextId}`,
+    visible: true,
+    color: '#0891b2',
+    metadata: {},
+    createdAt: 0,
+    updatedAt: 0,
+    definition: { rOfTheta },
+  };
+}
+
+function inequality(lhs: string, operator: InequalityOperator, rhs: string): InequalityExpression {
+  nextId += 1;
+  return {
+    id: `expr-${nextId}`,
+    kind: 'inequality',
+    label: `Inequality ${nextId}`,
+    visible: true,
+    color: '#059669',
+    metadata: {},
+    createdAt: 0,
+    updatedAt: 0,
+    definition: { lhs, operator, rhs },
+  };
+}
+
+function envWith(entries: [string, string][]): VariableEnvironment {
+  const env = new VariableEnvironment(
+    entries.map(([name, expression]) => ({ name, expression, min: -10, max: 10, step: 0.1 }))
+  );
+  env.resolve();
+  return env;
 }
 
 describe('buildFunctionDrawables', () => {
@@ -97,19 +160,14 @@ describe('buildFunctionDrawables', () => {
     expect(buildFunctionDrawables([point('1/0', '2')], VIEWPORT, SIZE)).toEqual([]);
   });
 
-  it('skips not-yet-supported kinds (parametric arrives in Phase 5)', () => {
-    const parametric = {
-      id: 'p1',
-      kind: 'parametric',
-      label: 'Parametric 1',
-      visible: true,
-      color: '#000000',
-      metadata: {},
-      createdAt: 0,
-      updatedAt: 0,
-      definition: { xOfT: 't', yOfT: 't', tMin: '0', tMax: '10' },
-    } as unknown as Expression;
-    expect(buildFunctionDrawables([parametric], VIEWPORT, SIZE)).toEqual([]);
+  it('builds a parametric drawable in Phase 5', () => {
+    const drawable = buildFunctionDrawables(
+      [parametric('t', 't', '0', '10')],
+      VIEWPORT,
+      SIZE
+    )[0] as ParametricDrawable;
+    expect(drawable.kind).toBe('parametric');
+    expect(drawable.segments.length).toBeGreaterThanOrEqual(1);
   });
 
   it('handles several expressions in order', () => {
@@ -119,6 +177,138 @@ describe('buildFunctionDrawables', () => {
       SIZE
     );
     expect(drawables).toHaveLength(3);
-    expect(drawables.map((d) => d.id)).toEqual(['expr-10', 'expr-11', 'expr-12']);
+    expect(drawables.map((d) => d.id)).toEqual(['expr-11', 'expr-12', 'expr-13']);
+  });
+});
+
+describe('buildFunctionDrawables — Phase 5 graph types', () => {
+  it('builds a parametric unit circle', () => {
+    const drawables = buildFunctionDrawables(
+      [parametric('cos(t)', 'sin(t)', '0', '2*pi')],
+      VIEWPORT,
+      SIZE
+    );
+    expect(drawables).toHaveLength(1);
+    const drawable = drawables[0] as ParametricDrawable;
+    expect(drawable.kind).toBe('parametric');
+    const points = drawable.segments.flat();
+    expect(points.length).toBeGreaterThan(50);
+    for (const p of points) {
+      expect(Math.hypot(p.x, p.y)).toBeCloseTo(1, 1);
+    }
+  });
+
+  it('binds variables inside parametric definitions', () => {
+    const env = envWith([['r', '2.5']]);
+    const drawable = buildFunctionDrawables(
+      [parametric('r*cos(t)', 'r*sin(t)', '0', '2*pi')],
+      VIEWPORT,
+      SIZE,
+      env
+    )[0] as ParametricDrawable;
+    for (const p of drawable.segments.flat()) {
+      expect(Math.hypot(p.x, p.y)).toBeCloseTo(2.5, 0);
+    }
+  });
+
+  it('skips parametric expressions with invalid t bounds', () => {
+    expect(buildFunctionDrawables([parametric('t', 't', '5', '5')], VIEWPORT, SIZE)).toEqual([]);
+    expect(buildFunctionDrawables([parametric('t', 't', '10', '0')], VIEWPORT, SIZE)).toEqual([]);
+    expect(buildFunctionDrawables([parametric('t', 't+', '0', '1')], VIEWPORT, SIZE)).toEqual([]);
+  });
+
+  it('builds a polar circle for r=2', () => {
+    const drawable = buildFunctionDrawables([polar('2')], VIEWPORT, SIZE)[0] as PolarDrawable;
+    expect(drawable.kind).toBe('polar');
+    const points = drawable.segments.flat();
+    expect(points.length).toBeGreaterThan(50);
+    for (const p of points) {
+      expect(Math.hypot(p.x, p.y)).toBeCloseTo(2, 1);
+    }
+  });
+
+  it('binds variables inside polar definitions', () => {
+    const env = envWith([['a', '3']]);
+    const drawable = buildFunctionDrawables([polar('a')], VIEWPORT, SIZE, env)[0] as PolarDrawable;
+    for (const p of drawable.segments.flat()) {
+      expect(Math.hypot(p.x, p.y)).toBeCloseTo(3, 0);
+    }
+  });
+
+  it('skips invalid polar expressions without throwing', () => {
+    expect(buildFunctionDrawables([polar('2+'), polar('1')], VIEWPORT, SIZE)).toHaveLength(1);
+  });
+
+  it('builds an inequality region with dashed strict boundary', () => {
+    const drawable = buildFunctionDrawables(
+      [inequality('y', '<', 'x')],
+      VIEWPORT,
+      SIZE
+    )[0] as InequalityDrawable;
+    expect(drawable.kind).toBe('inequality-region');
+    expect(drawable.boundaryDashed).toBe(true);
+    expect(drawable.fillOpacity).toBeGreaterThan(0);
+    expect(drawable.polygons.length).toBeGreaterThan(0);
+    expect(drawable.boundary.length).toBeGreaterThan(0);
+  });
+
+  it('uses a solid boundary for non-strict inequalities', () => {
+    const drawable = buildFunctionDrawables(
+      [inequality('y', '<=', 'x')],
+      VIEWPORT,
+      SIZE
+    )[0] as InequalityDrawable;
+    expect(drawable.boundaryDashed).toBe(false);
+    expect(drawable.polygons.length).toBeGreaterThan(0);
+  });
+
+  it('builds x-based inequality regions', () => {
+    const drawable = buildFunctionDrawables(
+      [inequality('x', '>=', '1')],
+      VIEWPORT,
+      SIZE
+    )[0] as InequalityDrawable;
+    expect(drawable.kind).toBe('inequality-region');
+    expect(drawable.polygons.length).toBeGreaterThan(0);
+    for (const polygon of drawable.polygons) {
+      for (const p of polygon) expect(p.x).toBeGreaterThanOrEqual(1 - 0.05);
+    }
+  });
+
+  it('skips inequalities with an invalid side', () => {
+    expect(buildFunctionDrawables([inequality('z', '<', 'x')], VIEWPORT, SIZE)).toEqual([]);
+  });
+
+  it('evaluates cartesian expressions with live variable values', () => {
+    const env = envWith([['a', '2']]);
+    const drawable = buildFunctionDrawables(
+      [cartesian('a*x')],
+      VIEWPORT,
+      SIZE,
+      env
+    )[0] as FunctionDrawable;
+    expect(drawable.kind).toBe('function');
+    for (const segment of drawable.segments) {
+      for (const p of segment) {
+        expect(p.y).toBeCloseTo(2 * p.x, 6);
+      }
+    }
+  });
+
+  it('treats undefined variables as gaps, not crashes', () => {
+    const env = envWith([]);
+    const drawable = buildFunctionDrawables(
+      [cartesian('zzz*x')],
+      VIEWPORT,
+      SIZE,
+      env
+    )[0] as FunctionDrawable;
+    // NaN everywhere samples to no visible segments, but the drawable exists.
+    expect(drawable.kind).toBe('function');
+    for (const segment of drawable.segments) {
+      for (const p of segment) {
+        expect(Number.isFinite(p.y)).toBe(true);
+      }
+    }
   });
 });

@@ -93,9 +93,54 @@ export interface AnnotationDrawable extends GraphDrawableBase {
   label: string;
 }
 
+/**
+ * Precomputed polyline data for a parametric (x(t), y(t)) curve, in world
+ * coordinates. Same shape as FunctionDrawable; a distinct kind so the
+ * renderer and future inspection tools can tell curve families apart.
+ */
+export interface ParametricDrawable extends GraphDrawableBase {
+  kind: 'parametric';
+  /** One or more disjoint polylines. Segments with < 2 finite points are skipped. */
+  segments: WorldPoint[][];
+}
+
+/**
+ * Precomputed polyline data for a polar r(theta) curve, sampled over
+ * theta in [0, 2π] and converted to Cartesian world coordinates.
+ */
+export interface PolarDrawable extends GraphDrawableBase {
+  kind: 'polar';
+  /** One or more disjoint polylines. Segments with < 2 finite points are skipped. */
+  segments: WorldPoint[][];
+}
+
+/**
+ * A shaded inequality region (y < f(x), y > f(x), x < g(y), …) plus its
+ * boundary curve. The boundary is dashed for strict inequalities
+ * (<, >) and solid for non-strict (≤, ≥).
+ */
+export interface InequalityDrawable extends GraphDrawableBase {
+  kind: 'inequality-region';
+  /** Filled region polygons in world coordinates (closed rings). */
+  polygons: WorldPoint[][];
+  /** Fill opacity 0–1. Default 0.25. */
+  fillOpacity?: number;
+  /** The boundary curve, in world coordinates. */
+  boundary: WorldPoint[][];
+  /** True for strict inequalities (<, >): the boundary renders dashed. */
+  boundaryDashed: boolean;
+}
+
 /** Drawable union — extended with new kinds in later phases. */
 export type GraphDrawable =
-  FunctionDrawable | PointMarkerDrawable | SegmentDrawable | AreaDrawable | AnnotationDrawable;
+  | FunctionDrawable
+  | ParametricDrawable
+  | PolarDrawable
+  | PointMarkerDrawable
+  | SegmentDrawable
+  | AreaDrawable
+  | InequalityDrawable
+  | AnnotationDrawable;
 
 export type GraphThemeMode = 'light' | 'dark';
 

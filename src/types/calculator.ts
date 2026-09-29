@@ -95,6 +95,8 @@ export interface GraphSettings {
 
 export interface CalculatorState {
   expressions: Expression[];
+  /** Named numeric variables (sliders) expressions can reference. */
+  variables: VariableDefinition[];
   viewport: GraphViewport;
   settings: GraphSettings;
   selectedExpressionId: string | null;
@@ -109,6 +111,24 @@ export interface InspectedPoint {
   expressionId: string;
   x: number;
   y: number;
+}
+
+/**
+ * A named numeric variable (slider) that expressions can reference, e.g.
+ * `a` in `y = a*sin(x)`.
+ *
+ * `expression` is the value source: usually a numeric literal, but it may
+ * reference other variables (`a = b + 1`) — the environment resolves the
+ * dependency graph, detects cycles, and evaluates in topological order.
+ * `min`/`max`/`step` drive the slider UI and animation range.
+ */
+export interface VariableDefinition {
+  /** Lowercase identifier; never x/t/theta or a function/constant name. */
+  name: string;
+  expression: string;
+  min: number;
+  max: number;
+  step: number;
 }
 
 /** How numbers are formatted across analysis readouts. */

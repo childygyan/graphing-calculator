@@ -17,7 +17,8 @@ import { GraphInteractionController } from '../../lib/graph/interaction.js';
 import { createTransform } from '../../lib/graph/coordinate-system.js';
 import { buildFunctionDrawables } from '../../lib/graph/drawables.js';
 import { buildAnalysisDrawables } from '../../lib/graph/analysisDrawables.js';
-import { compileExpression } from '../../lib/math/engine.js';
+import { compileExpressionScoped } from '../../lib/math/engine.js';
+import { CARTESIAN_PARAMETER, VariableEnvironment } from '../../lib/math/variables.js';
 import {
   createDefaultViewport,
   panViewport,
@@ -25,7 +26,7 @@ import {
   zoomViewport,
 } from '../../lib/graph/viewport.js';
 import type { GraphViewport as Viewport } from '../../types/calculator.js';
-import type { Expression } from '../../types/calculator.js';
+import type { Expression, VariableDefinition } from '../../types/calculator.js';
 import type {
   GraphDrawable,
   GraphRenderInput,
@@ -97,12 +98,20 @@ export function GraphViewport() {
   // not close over stale render-time state.
   const storeViewportRef = useRef(state.viewport);
   const expressionsRef = useRef<Expression[]>(state.expressions);
+  const variablesRef = useRef<VariableDefinition[]>(state.variables);
   const settingsRef = useRef(state.settings);
   const themeRef = useRef<GraphThemeMode>(graphTheme);
   const analysisRef = useRef(state.analysis);
+  // Persistent variable environment: compiled closures capture its live
+  // values map, so slider drags flow through with zero recompilation.
+  const envRef = useRef<VariableEnvironment | null>(null);
+  if (envRef.current === null) {
+    envRef.current = new VariableEnvironment([]);
+  }
   useEffect(() => {
     storeViewportRef.current = state.viewport;
     expressionsRef.current = state.expressions;
+    variablesRef.current = state.variables;
     settingsRef.current = state.settings;
     themeRef.current = graphTheme;
     analysisRef.current = state.analysis;
@@ -123,6 +132,9 @@ export function GraphViewport() {
     if (size.width <= 0 || size.height <= 0) return [];
     const viewport = renderer.getViewport();
     const expressions = expressionsRef.current;
+    const variables = variablesRef.current;
+    const env = envRef.current as VariableEnvironment;
+    env.setDefinitions(variables);
     const key = JSON.stringify([
       expressions.map((e) => [
         e.id,
@@ -134,8 +146,16 @@ export function GraphViewport() {
           ? e.definition.rhs
           : e.kind === 'point'
             ? [e.definition.x, e.definition.y]
-            : e.kind,
+            : e.kind === 'parametric'
+              ? [e.definition.xOfT, e.definition.yOfT, e.definition.tMin, e.definition.tMax]
+              : e.kind === 'polar'
+                ? e.definition.rOfTheta
+                : e.kind === 'inequality'
+                  ? [e.definition.lhs, e.definition.operator, e.definition.rhs]
+                  : e.kind,
       ]),
+      // Variable definitions (names, values, ranges) change the curves.
+      variables,
       viewport,
       size,
       // Analysis overlays are part of the drawable output, so they join the
@@ -145,8 +165,8 @@ export function GraphViewport() {
     const cached = drawablesCacheRef.current;
     if (cached.key === key) return cached.drawables;
     const drawables: GraphDrawable[] = [
-      ...buildFunctionDrawables(expressions, viewport, size),
-      ...buildAnalysisDrawables(expressions, analysisRef.current, viewport, size),
+      ...buildFunctionDrawables(expressions, viewport, size, env),
+      ...buildAnalysisDrawables(expressions, analysisRef.current, viewport, size, env),
     ];
     drawablesCacheRef.current = { key, drawables };
     return drawables;
@@ -274,11 +294,21 @@ export function GraphViewport() {
       }
       let best: Candidate | null = null;
 
+      const env = envRef.current as VariableEnvironment;
+      env.setDefinitions(variablesRef.current);
+      try {
+        env.resolve();
+      } catch {
+        // Hostile environment: tap inspection falls back to unbound (NaN) values.
+      }
       for (const expression of expressionsRef.current) {
         if (expression.kind !== 'cartesian' || expression.visible !== true) continue;
         let fn: (x: number) => number;
         try {
-          fn = compileExpression(expression.definition.rhs).fn;
+          fn = compileExpressionScoped(expression.definition.rhs, {
+            parameter: CARTESIAN_PARAMETER,
+            env,
+          }).fn;
         } catch {
           continue;
         }
@@ -419,15 +449,16 @@ export function GraphViewport() {
     if (input) renderer.render(input);
   }, [state.settings, graphTheme, buildInput]);
 
-  // Expression changes (add/edit/rename/color/visibility/delete) re-render
-  // the current view with freshly sampled drawables.
+  // Expression or variable changes (add/edit/rename/color/visibility/
+  // delete, or any variable edit) re-render the current view with freshly
+  // sampled drawables.
   useEffect(() => {
     if (!initializedRef.current) return;
     const renderer = canvasRef.current?.getRenderer();
     if (!renderer) return;
     const input = buildInput();
     if (input) renderer.render(input);
-  }, [state.expressions, buildInput]);
+  }, [state.expressions, state.variables, buildInput]);
 
   // Analysis overlay changes (markers, integrals, tangents, derivative
   // plots, annotations, precision) re-render with fresh overlay drawables.

@@ -14,8 +14,13 @@ import type {
   Expression,
   GraphViewport,
 } from '../../types/calculator.js';
-import { compileExpression } from '../math/engine.js';
+import { compileExpressionScoped } from '../math/engine.js';
 import type { CompiledFunction } from '../math/compiler.js';
+import type { VariableEnvironment } from '../math/variables.js';
+import {
+  CARTESIAN_PARAMETER,
+  VariableEnvironment as VariableEnvironmentImpl,
+} from '../math/variables.js';
 import { centralDerivative, tangentAt } from '../math/analysis.js';
 import type { LineSpec } from '../math/analysis.js';
 import { sampleCartesian } from './sampling.js';
@@ -134,13 +139,22 @@ function findCartesian(
   return found && found.kind === 'cartesian' ? found : null;
 }
 
-function compileRhs(expression: { definition: { rhs: string } }): CompiledFunction | null {
+function compileRhs(
+  expression: { definition: { rhs: string } },
+  env: VariableEnvironment
+): CompiledFunction | null {
   try {
-    return compileExpression(expression.definition.rhs).fn;
+    return compileExpressionScoped(expression.definition.rhs, {
+      parameter: CARTESIAN_PARAMETER,
+      env,
+    }).fn;
   } catch {
     return null;
   }
 }
+
+/** Default environment for callers that have no variables. */
+const defaultEnvironment = new VariableEnvironmentImpl([]);
 
 const MARKER_RADIUS: Record<AnalysisMarkerKind, number> = {
   root: 5,
@@ -172,13 +186,17 @@ function markerDrawables(analysis: AnalysisState): PointMarkerDrawable[] {
   return [...groups.values()];
 }
 
-function integralDrawables(expressions: Expression[], analysis: AnalysisState): AreaDrawable[] {
+function integralDrawables(
+  expressions: Expression[],
+  analysis: AnalysisState,
+  env: VariableEnvironment
+): AreaDrawable[] {
   const out: AreaDrawable[] = [];
   for (const integral of analysis.integrals) {
     if (integral.visible !== true) continue;
     const expression = findCartesian(expressions, integral.expressionId);
     if (!expression) continue;
-    const fn = compileRhs(expression);
+    const fn = compileRhs(expression, env);
     if (!fn) continue;
     const polygons = integralPolygons(fn, integral.a, integral.b);
     if (polygons.length === 0) continue;
@@ -198,14 +216,15 @@ function integralDrawables(expressions: Expression[], analysis: AnalysisState): 
 function tangentDrawables(
   expressions: Expression[],
   analysis: AnalysisState,
-  viewport: GraphViewport
+  viewport: GraphViewport,
+  env: VariableEnvironment
 ): SegmentDrawable[] {
   const out: SegmentDrawable[] = [];
   for (const item of analysis.tangents) {
     if (item.visible !== true) continue;
     const expression = findCartesian(expressions, item.expressionId);
     if (!expression) continue;
-    const fn = compileRhs(expression);
+    const fn = compileRhs(expression, env);
     if (!fn) continue;
     const info = tangentAt(fn, item.x);
     if (!info) continue;
@@ -247,14 +266,15 @@ function derivativeDrawables(
   expressions: Expression[],
   analysis: AnalysisState,
   viewport: GraphViewport,
-  size: CanvasSize
+  size: CanvasSize,
+  env: VariableEnvironment
 ): FunctionDrawable[] {
   const out: FunctionDrawable[] = [];
   for (const plot of analysis.derivativePlots) {
     if (plot.visible !== true) continue;
     const expression = findCartesian(expressions, plot.expressionId);
     if (!expression) continue;
-    const fn = compileRhs(expression);
+    const fn = compileRhs(expression, env);
     if (!fn) continue;
     const derivativeFn: CompiledFunction = (x: number) => centralDerivative(fn, x);
     const { segments } = sampleCartesian(
@@ -304,14 +324,20 @@ export function buildAnalysisDrawables(
   expressions: Expression[],
   analysis: AnalysisState,
   viewport: GraphViewport,
-  size: CanvasSize
+  size: CanvasSize,
+  env: VariableEnvironment = defaultEnvironment
 ): GraphDrawable[] {
+  try {
+    env.resolve();
+  } catch {
+    // A hostile environment never takes down the frame.
+  }
   try {
     return [
       ...markerDrawables(analysis),
-      ...integralDrawables(expressions, analysis),
-      ...tangentDrawables(expressions, analysis, viewport),
-      ...derivativeDrawables(expressions, analysis, viewport, size),
+      ...integralDrawables(expressions, analysis, env),
+      ...tangentDrawables(expressions, analysis, viewport, env),
+      ...derivativeDrawables(expressions, analysis, viewport, size, env),
       ...annotationDrawables(analysis),
     ];
   } catch {

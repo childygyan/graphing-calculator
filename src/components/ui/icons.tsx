@@ -275,3 +275,20 @@ export function PencilIcon({ className }: IconProps) {
     </Svg>
   );
 }
+
+export function PlayIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M7 4.5v15l13-7.5L7 4.5Z" />
+    </Svg>
+  );
+}
+
+export function PauseIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <rect x="6" y="4.5" width="4" height="15" rx="1" />
+      <rect x="14" y="4.5" width="4" height="15" rx="1" />
+    </Svg>
+  );
+}

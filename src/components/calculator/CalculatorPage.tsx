@@ -8,6 +8,7 @@
 import { CalculatorProvider } from './CalculatorStore.js';
 import { CalculatorToolbar } from './CalculatorToolbar.js';
 import { ExpressionPanel } from './ExpressionPanel.js';
+import { VariablePanel } from '../variables/VariablePanel.js';
 import { GraphPanel } from '../graph/GraphPanel.js';
 import { AiPanel } from '../ai/AiPanel.js';
 import { AnalysisPanel } from '../analysis/AnalysisPanel.js';
@@ -20,6 +21,7 @@ export function CalculatorPage() {
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
           <div className="order-2 min-h-0 flex-1 overflow-y-auto border-t border-slate-200 p-3 dark:border-slate-800 md:order-1 md:w-80 md:flex-none md:border-r md:border-t-0">
             <ExpressionPanel />
+            <VariablePanel />
             <AiPanel />
             <AnalysisPanel />
           </div>
