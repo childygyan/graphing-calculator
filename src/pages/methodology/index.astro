@@ -1,0 +1,223 @@
+---
+/**
+ * Methodology page: /methodology/.
+ *
+ * Explains how the site's math is computed and verified, how educational
+ * content is written and reviewed, and how the AI assistant is constrained.
+ * Everything claimed here is true of the shipped product — no invented
+ * reviewers, statistics, or credentials.
+ *
+ * This page is intentionally INDEXED (competitor graphingcalculator.us
+ * shows review methodology; this is our honest equivalent).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import FaqBlock from '../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { articleSchema, faqSchema } from '../../lib/seo/metadata.js';
+
+const title = 'Methodology — How Our Math and Content Are Verified | Graphing Calculator';
+const description =
+  'How Graphing Calculator verifies its math and content: a deterministic engine, hundreds of automated tests, engine-checked examples, and dated reviews.';
+const canonicalPath = '/methodology/';
+const heading = 'Our Methodology';
+
+const faqs = [
+  {
+    q: 'How are calculations verified?',
+    a: 'Every result comes from a deterministic math engine built into the site — expressions are tokenized, parsed into an abstract syntax tree, and compiled to closures, never eval\u2019d. Over 550 automated tests cover the engine, analysis methods, and UI, and they run before every release.',
+  },
+  {
+    q: 'Does the AI assistant do the math?',
+    a: 'No. The AI assistant explains concepts and issues calculator commands, but the calculator\u2019s own engine is always the source of truth for results. Until the site owner configures an API key, the assistant runs in a clearly labeled mock mode.',
+  },
+  {
+    q: 'How are the learn guides reviewed?',
+    a: 'Every guide is checked for mathematical accuracy before publication: the roots, domains, and example values it states are verified against the site\u2019s own expression engine. A human reviewer on the Graphing Calculator team then reads each guide for clarity and correctness, and the guide carries a \u201cLast reviewed\u201d date showing when that check happened.',
+  },
+  {
+    q: 'Who reviews the content?',
+    a: 'Content is reviewed by the Graphing Calculator team — the people who build and maintain this site. We do not invent reviewer names, photos, or credentials; the byline on every guide says exactly who reviewed it and when.',
+  },
+  {
+    q: 'What happens when an error is found?',
+    a: 'It is corrected, and the guide\u2019s \u201cLast reviewed\u201d date is updated. If you spot a mistake, you can report it through the contact page and it will be investigated against the math engine.',
+  },
+  {
+    q: 'Is numerical output exact?',
+    a: 'Numerical methods are approximations, and the calculator says so where it matters. When a root, derivative, or integral cannot be computed — a corner, a jump, a singularity — the tool reports that honestly instead of returning a misleading number.',
+  },
+];
+
+/** Review-methodology page schema (Article) plus FAQ. */
+---
+
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: heading,
+        description,
+      }),
+      faqSchema(faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Methodology' }]} />
+
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{heading}</h1>
+
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      A calculator is only useful if you can trust what it tells you. This page documents exactly
+      how{' '}
+      <a href="/graphing-calculator/" class="text-brand-700 hover:underline dark:text-brand-300">
+        Graphing Calculator
+      </a>{' '}
+      computes results, how its educational content is written and checked, and what we deliberately
+      do not do.
+    </p>
+
+    <div class="mt-10 space-y-10">
+      <section aria-labelledby="methodology-engine">
+        <h2
+          id="methodology-engine"
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
+          1. How calculations are computed and verified
+        </h2>
+        <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+          <p>
+            Every number on this site comes from a deterministic math engine written specifically
+            for it. An expression you type is tokenized, parsed into an abstract syntax tree, and
+            compiled into executable closures — it is never passed through <code>eval</code> or
+            generated code. Roots are found with Brent&rsquo;s method, derivatives with central
+            differences, integrals with adaptive Simpson&rsquo;s rule, and limits with two-sided
+            numerical estimation.
+          </p>
+          <p>
+            Over 550 automated tests cover the expression engine, the numerical methods, graph
+            state, the 3D plotter, and the scientific calculator. They run before every release, and
+            a release does not ship unless all of them pass. When a computation cannot be performed
+            reliably — a discontinuity, a non-converging integral, an out-of-domain evaluation — the
+            tool reports the failure honestly instead of inventing a number.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="methodology-content">
+        <h2
+          id="methodology-content"
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
+          2. How educational content is written and reviewed
+        </h2>
+        <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+          <p>
+            The{' '}
+            <a href="/learn/" class="text-brand-700 hover:underline dark:text-brand-300">
+              learn guides
+            </a>{' '}
+            teach graphing from the ground up: what functions are, how domains and ranges work, how
+            to read intercepts and asymptotes, and how to use each tool on this site. Every guide is
+            written from standard mathematics curriculum material, not scraped or spun from other
+            websites.
+          </p>
+          <p>
+            Before a guide is published, its mathematical claims are verified against the
+            site&rsquo;s own expression engine — the roots, example values, and domains stated in
+            the text must match what the calculator itself computes. A human reviewer on the
+            Graphing Calculator team then reads the guide for clarity and correctness. Each guide
+            carries a &ldquo;Last reviewed&rdquo; date and a byline naming the reviewer, so you can
+            see exactly when the check happened.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="methodology-ai">
+        <h2
+          id="methodology-ai"
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
+          3. How the AI assistant is constrained
+        </h2>
+        <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+          <p>
+            The built-in AI assistant can explain concepts, suggest expressions to plot, and help
+            you set up graphs. It operates through a strict command schema: it may only issue
+            calculator commands, and the calculator&rsquo;s engine — not the AI — performs every
+            computation. The assistant cannot change what the engine computes, and it cannot access
+            your saved graphs.
+          </p>
+          <p>
+            Until the site owner configures an AI provider key, the assistant runs in a clearly
+            labeled mock mode that says so on screen. It never pretends to be connected to a live
+            model when it is not.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="methodology-dont">
+        <h2
+          id="methodology-dont"
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
+          4. What we do not do
+        </h2>
+        <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+          <ul class="list-disc space-y-2 pl-6">
+            <li>
+              <strong class="text-slate-900 dark:text-white">No invented reviewers.</strong> We do
+              not publish fake names, photos, or credentials. Review bylines say exactly who
+              reviewed the content — the Graphing Calculator team — and when.
+            </li>
+            <li>
+              <strong class="text-slate-900 dark:text-white">No fabricated statistics.</strong> We
+              do not claim user counts, ratings, or &ldquo;best&rdquo; rankings we cannot verify.
+              Comparisons with other products state only publicly well-known facts.
+            </li>
+            <li>
+              <strong class="text-slate-900 dark:text-white">No copied interfaces.</strong> The
+              calculator is an independent implementation. It does not reproduce any other
+              product&rsquo;s branding, interface, or copyrighted material.
+            </li>
+            <li>
+              <strong class="text-slate-900 dark:text-white">No hidden data collection.</strong>{' '}
+              Graphs are stored in your browser; share links encode state in the URL. There are no
+              accounts and no tracking analytics enabled by default. See the{' '}
+              <a href="/privacy-policy/" class="text-brand-700 hover:underline dark:text-brand-300">
+                privacy policy
+              </a>{' '}
+              for details.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="methodology-corrections">
+        <h2
+          id="methodology-corrections"
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+        >
+          5. Corrections
+        </h2>
+        <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+          <p>
+            If you find an error in a calculation or a guide,{' '}
+            <a href="/contact/" class="text-brand-700 hover:underline dark:text-brand-300">
+              contact us
+            </a>{' '}
+            with the details. Reported errors are investigated against the math engine, corrected
+            when confirmed, and the guide&rsquo;s &ldquo;Last reviewed&rdquo; date is updated to
+            reflect the fix.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <FaqBlock faqs={faqs} />
+
+    <RelatedLinks paths={['/about/', '/learn/', '/graphing-calculator/', '/desmos-alternative/']} />
+  </div>
+</BaseLayout>

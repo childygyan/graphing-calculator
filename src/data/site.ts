@@ -53,6 +53,7 @@ export const siteConfig = {
         { label: 'Graphing Calculator', href: '/graphing-calculator/' },
         { label: 'Calculators', href: '/calculators/' },
         { label: 'About', href: '/about/' },
+        { label: 'Methodology', href: '/methodology/' },
       ] as NavLink[],
     },
     {

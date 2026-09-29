@@ -35,6 +35,7 @@ const staticPages: PageRegistryEntry[] = [
   { path: '/examples/', label: 'Graph Examples', section: 'Examples' },
   { path: '/learn/', label: 'Learn Graphing', section: 'Learn' },
   { path: '/about/', label: 'About', section: 'Site' },
+  { path: '/methodology/', label: 'Methodology', section: 'Site' },
   { path: '/contact/', label: 'Contact', section: 'Site' },
   { path: '/privacy-policy/', label: 'Privacy Policy', section: 'Site' },
   { path: '/terms/', label: 'Terms of Service', section: 'Site' },
