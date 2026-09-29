@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '../ui/index.js';
 import {
   BoltIcon,
@@ -36,12 +37,45 @@ function AddMenu({ strings }: { strings: CalculatorShellStrings }) {
   const menu = t.addMenu;
   const [open, setOpen] = useState(false);
   const [expressionOpen, setExpressionOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Position the dropdown via a portal so it escapes the scrollable
+  // expression panel (overflow-y-auto would clip an absolute child).
+  useEffect(() => {
+    if (!open) {
+      setMenuPos(null);
+      return;
+    }
+    const updatePosition = (): void => {
+      const rect = buttonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const menuWidth = 208; // w-52
+      const menuHeight = 320; // approx; clamped below
+      const top = Math.min(rect.bottom + 4, Math.max(8, window.innerHeight - menuHeight - 8));
+      const left = Math.max(8, Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8));
+      setMenuPos({ top, left });
+    };
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const handlePointerDown = (event: PointerEvent): void => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        buttonRef.current &&
+        !buttonRef.current.contains(target) &&
+        menuRef.current &&
+        !menuRef.current.contains(target)
+      ) {
         setOpen(false);
         setExpressionOpen(false);
       }
@@ -69,9 +103,99 @@ function AddMenu({ strings }: { strings: CalculatorShellStrings }) {
   const itemClass =
     'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800';
 
+  const dropdown =
+    open && menuPos
+      ? createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            aria-label={menu.buttonAriaLabel}
+            className="fixed z-50 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+            style={{ top: menuPos.top, left: menuPos.left }}
+          >
+            <div className="relative">
+              <button
+                type="button"
+                role="menuitem"
+                aria-haspopup="menu"
+                aria-expanded={expressionOpen}
+                aria-label={menu.expressionKindsAriaLabel}
+                className={itemClass}
+                onClick={() => setExpressionOpen((value) => !value)}
+              >
+                <FunctionIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <span className="flex-1">{menu.expression}</span>
+                <ChevronDownIcon className="h-3.5 w-3.5 -rotate-90 text-slate-400" />
+              </button>
+              {expressionOpen && (
+                <div
+                  role="menu"
+                  aria-label={menu.expressionKindsAriaLabel}
+                  className="absolute right-full top-0 z-50 mr-1 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                >
+                  {t.addKindOptions.map((option) => (
+                    <button
+                      key={option.kind}
+                      type="button"
+                      role="menuitem"
+                      className={itemClass}
+                      onClick={() => add(option.kind as ExpressionKind)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              role="menuitem"
+              className={itemClass}
+              onClick={() => add('table')}
+            >
+              <TableIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              {menu.table}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className={itemClass}
+              onClick={() => add('folder')}
+            >
+              <FolderIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              {menu.folder}
+            </button>
+            <button type="button" role="menuitem" className={itemClass} onClick={() => add('text')}>
+              <NoteIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              {menu.note}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className={itemClass}
+              onClick={() => add('image')}
+            >
+              <ImageIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              {menu.image}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className={itemClass}
+              onClick={() => add('action')}
+            >
+              <BoltIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              {menu.action}
+            </button>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
-    <div ref={rootRef} className="relative">
+    <>
       <Button
+        ref={buttonRef}
         size="sm"
         icon={<PlusIcon className="h-4 w-4" />}
         aria-haspopup="menu"
@@ -84,69 +208,8 @@ function AddMenu({ strings }: { strings: CalculatorShellStrings }) {
           <ChevronDownIcon className="h-3.5 w-3.5" />
         </span>
       </Button>
-      {open && (
-        <div
-          role="menu"
-          aria-label={menu.buttonAriaLabel}
-          className="absolute right-0 z-30 mt-1 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900"
-        >
-          <div className="relative">
-            <button
-              type="button"
-              role="menuitem"
-              aria-haspopup="menu"
-              aria-expanded={expressionOpen}
-              aria-label={menu.expressionKindsAriaLabel}
-              className={itemClass}
-              onClick={() => setExpressionOpen((value) => !value)}
-            >
-              <FunctionIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-              <span className="flex-1">{menu.expression}</span>
-              <ChevronDownIcon className="h-3.5 w-3.5 -rotate-90 text-slate-400" />
-            </button>
-            {expressionOpen && (
-              <div
-                role="menu"
-                aria-label={menu.expressionKindsAriaLabel}
-                className="absolute right-full top-0 z-30 mr-1 w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900"
-              >
-                {t.addKindOptions.map((option) => (
-                  <button
-                    key={option.kind}
-                    type="button"
-                    role="menuitem"
-                    className={itemClass}
-                    onClick={() => add(option.kind as ExpressionKind)}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <button type="button" role="menuitem" className={itemClass} onClick={() => add('table')}>
-            <TableIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            {menu.table}
-          </button>
-          <button type="button" role="menuitem" className={itemClass} onClick={() => add('folder')}>
-            <FolderIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            {menu.folder}
-          </button>
-          <button type="button" role="menuitem" className={itemClass} onClick={() => add('text')}>
-            <NoteIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            {menu.note}
-          </button>
-          <button type="button" role="menuitem" className={itemClass} onClick={() => add('image')}>
-            <ImageIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            {menu.image}
-          </button>
-          <button type="button" role="menuitem" className={itemClass} onClick={() => add('action')}>
-            <BoltIcon className="h-4 w-4 text-slate-500 dark:text-slate-400" />
-            {menu.action}
-          </button>
-        </div>
-      )}
-    </div>
+      {dropdown}
+    </>
   );
 }
 
