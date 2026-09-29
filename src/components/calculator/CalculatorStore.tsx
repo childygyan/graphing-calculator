@@ -6,7 +6,15 @@
  * there is no math computation in here, only state transitions.
  */
 
-import { createContext, useContext, useEffect, useReducer } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from 'react';
 import type { Dispatch, ReactNode } from 'react';
 import { siteConfig } from '../../data/site.js';
 import type { ThemeMode } from '../../data/site.js';
@@ -34,6 +42,17 @@ import {
 import { sanitizeAnalysisState } from '../../lib/analysis/state.js';
 import { normalizeVariableName, validateVariableName } from '../../lib/math/variables.js';
 import { suggestVariableName } from '../../lib/math/variables.js';
+import type { GraphDocument } from '../../lib/persistence/document.js';
+import { documentToState } from '../../lib/persistence/document.js';
+import {
+  clearHistory,
+  createHistory,
+  recordHistory,
+  redoHistory,
+  undoHistory,
+  type HistoryStacks,
+} from '../../lib/persistence/history.js';
+import { canonicalStringify } from '../../lib/persistence/dirty.js';
 
 export type CalculatorAction =
   | { type: 'ADD_EXPRESSION'; kind: ExpressionKind }
@@ -128,12 +147,26 @@ function clampVariableValue(def: VariableDefinition, value: number): number {
 }
 
 /**
- * Lazily build the provider's initial state: restore a previously persisted
- * state from localStorage when it has a recognizable shape, otherwise fall
- * back to defaults. Guards against SSR (no window) and corrupt payloads.
+ * Lazily build the provider's initial state. Priority: an explicit document
+ * (shared links, imports) first; otherwise a previously persisted state from
+ * localStorage when it has a recognizable shape; otherwise defaults. Guards
+ * against SSR (no window) and corrupt payloads.
  */
-function initializeState(initialTheme: ThemeMode | undefined): CalculatorState {
-  const defaults = createInitialCalculatorState(initialTheme ?? siteConfig.defaultTheme);
+interface InitializeArgs {
+  initialTheme?: ThemeMode;
+  /** When provided, the store starts from this document instead of storage. */
+  initialDocument?: GraphDocument | null;
+}
+
+function initializeState(args: InitializeArgs): CalculatorState {
+  const defaults = createInitialCalculatorState(args.initialTheme ?? siteConfig.defaultTheme);
+  if (args.initialDocument) {
+    try {
+      return documentToState(args.initialDocument);
+    } catch {
+      return defaults;
+    }
+  }
   if (typeof window === 'undefined') return defaults;
   try {
     const raw = window.localStorage.getItem(siteConfig.stateStorageKey);
@@ -164,7 +197,43 @@ function initializeState(initialTheme: ThemeMode | undefined): CalculatorState {
   }
 }
 
-function calculatorReducer(state: CalculatorState, action: CalculatorAction): CalculatorState {
+/**
+ * Actions that participate in undo/redo history. Deliberately excludes
+ * SET_VIEWPORT (gesture-driven floods; RESET_VIEWPORT is the undoable
+ * "viewport" action), selection, theme, transient inspection, and settings
+ * toggles — those are either not content or change too often to be useful
+ * as undo steps.
+ */
+const UNDOABLE_ACTION_TYPES: ReadonlySet<CalculatorAction['type']> = new Set([
+  'ADD_EXPRESSION',
+  'INSERT_EXPRESSION',
+  'UPDATE_EXPRESSION',
+  'REMOVE_EXPRESSION',
+  'DUPLICATE_EXPRESSION',
+  'TOGGLE_EXPRESSION_VISIBILITY',
+  'ADD_VARIABLE',
+  'UPDATE_VARIABLE',
+  'REMOVE_VARIABLE',
+  'SET_VARIABLE_VALUE',
+  'RESET_VIEWPORT',
+  'ADD_INTEGRAL',
+  'UPDATE_INTEGRAL',
+  'REMOVE_INTEGRAL',
+  'ADD_TANGENT',
+  'UPDATE_TANGENT',
+  'REMOVE_TANGENT',
+  'TOGGLE_DERIVATIVE_PLOT',
+  'ADD_ANNOTATION',
+  'UPDATE_ANNOTATION',
+  'REMOVE_ANNOTATION',
+  'SET_MARKERS',
+  'CLEAR_MARKERS',
+]);
+
+export function calculatorReducer(
+  state: CalculatorState,
+  action: CalculatorAction
+): CalculatorState {
   switch (action.type) {
     case 'ADD_EXPRESSION': {
       const expression = createExpression(action.kind);
@@ -411,9 +480,29 @@ function calculatorReducer(state: CalculatorState, action: CalculatorAction): Ca
   }
 }
 
+/** An editable element where the browser's native undo must win. */
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT' ||
+    target.isContentEditable
+  );
+}
+
 interface CalculatorContextValue {
   state: CalculatorState;
   dispatch: Dispatch<CalculatorAction>;
+  /** Undo/redo (Phase 7). */
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  /** Dirty-state tracking (Phase 7): true since the last save/load. */
+  isDirty: boolean;
+  /** Mark the current state as saved (clears the dirty flag). */
+  markSaved: () => void;
 }
 
 const CalculatorContext = createContext<CalculatorContextValue | null>(null);
@@ -421,20 +510,133 @@ const CalculatorContext = createContext<CalculatorContextValue | null>(null);
 export function CalculatorProvider({
   children,
   initialTheme,
+  initialDocument,
+  persist = true,
 }: {
   children: ReactNode;
   initialTheme?: ThemeMode;
+  initialDocument?: GraphDocument | null;
+  /**
+   * Write state changes to localStorage. Disable for the shared `/graph/`
+   * route so opening someone's link never clobbers the visitor's draft.
+   */
+  persist?: boolean;
 }): ReactNode {
-  const [state, dispatch] = useReducer(calculatorReducer, initialTheme, initializeState);
+  const [state, baseDispatch] = useReducer(
+    calculatorReducer,
+    { initialTheme, initialDocument },
+    initializeState
+  );
 
-  // Persist every state change to localStorage (best-effort).
+  // History + dirty baseline live in refs so the wrapped dispatch below
+  // stays referentially stable; canUndo/canRedo/isDirty mirror into React
+  // state for rendering.
+  const stateRef = useRef(state);
+  const historyRef = useRef<HistoryStacks<CalculatorState>>(createHistory());
+  const baselineRef = useRef<string>(canonicalStringify(state));
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  const syncHistoryFlags = useCallback(() => {
+    const history = historyRef.current;
+    setCanUndo(history.past.length > 0);
+    setCanRedo(history.future.length > 0);
+  }, []);
+
+  const undo = useCallback(() => {
+    const previous = undoHistory(historyRef.current, stateRef.current);
+    if (previous === null) return;
+    stateRef.current = previous;
+    syncHistoryFlags();
+    baseDispatch({ type: 'HYDRATE', state: previous });
+  }, [syncHistoryFlags]);
+
+  const redo = useCallback(() => {
+    const next = redoHistory(historyRef.current, stateRef.current);
+    if (next === null) return;
+    stateRef.current = next;
+    syncHistoryFlags();
+    baseDispatch({ type: 'HYDRATE', state: next });
+  }, [syncHistoryFlags]);
+
+  const markSaved = useCallback(() => {
+    baselineRef.current = canonicalStringify(stateRef.current);
+    setIsDirty(false);
+  }, []);
+
+  const dispatch = useCallback<Dispatch<CalculatorAction>>(
+    (action) => {
+      if (action.type === 'HYDRATE') {
+        // Loads (restore, import, share, undo/redo): a new branch of
+        // history starts — past undo steps no longer apply.
+        clearHistory(historyRef.current);
+        syncHistoryFlags();
+        baselineRef.current = canonicalStringify(action.state);
+        stateRef.current = action.state;
+        baseDispatch(action);
+        setIsDirty(false);
+        return;
+      }
+      const current = stateRef.current;
+      const next = calculatorReducer(current, action);
+      if (next === current) return;
+      if (UNDOABLE_ACTION_TYPES.has(action.type)) {
+        recordHistory(historyRef.current, current);
+        syncHistoryFlags();
+      }
+      stateRef.current = next;
+      baseDispatch(action);
+    },
+    [syncHistoryFlags]
+  );
+
+  // Recompute the dirty flag after every state change. The canonical
+  // snapshot ignores object key order, so hydrated documents compare
+  // correctly against the baseline.
   useEffect(() => {
+    setIsDirty(canonicalStringify(state) !== baselineRef.current);
+  }, [state]);
+
+  // Keyboard shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl+Y redo.
+  // Never hijacks native text-field undo.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (isEditableTarget(event.target)) return;
+      if (!event.ctrlKey && !event.metaKey) return;
+      const key = event.key.toLowerCase();
+      if (key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+      } else if (key === 'y' || (key === 'z' && event.shiftKey)) {
+        event.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
+
+  // Warn on navigation away, but only when there are actual unsaved changes.
+  useEffect(() => {
+    if (!isDirty || typeof window === 'undefined') return;
+    const handleBeforeUnload = (event: BeforeUnloadEvent): void => {
+      event.preventDefault();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Persist every state change to localStorage (best-effort), unless the
+  // caller disabled persistence (shared-link route).
+  useEffect(() => {
+    if (!persist) return;
     try {
       window.localStorage.setItem(siteConfig.stateStorageKey, JSON.stringify(state));
     } catch {
       // Storage unavailable (private mode, quota, SSR) — state still works in memory.
     }
-  }, [state]);
+  }, [state, persist]);
 
   // Sync the theme to the DOM so dispatches update the page chrome.
   // NOTE: ThemeToggle in the site header lives OUTSIDE this provider and keeps
@@ -458,7 +660,11 @@ export function CalculatorProvider({
   }, [state.theme]);
 
   return (
-    <CalculatorContext.Provider value={{ state, dispatch }}>{children}</CalculatorContext.Provider>
+    <CalculatorContext.Provider
+      value={{ state, dispatch, undo, redo, canUndo, canRedo, isDirty, markSaved }}
+    >
+      {children}
+    </CalculatorContext.Provider>
   );
 }
 

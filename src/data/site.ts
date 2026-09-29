@@ -71,10 +71,11 @@ export const siteConfig = {
   /**
    * Feature flags gate functionality planned for later phases.
    * aiAssistant shipped in Phase 6 (DeepSeek + mock providers).
+   * graphSharing shipped in Phase 7 (named saves, share links, import/export).
    */
   featureFlags: {
     aiAssistant: true,
-    graphSharing: false,
+    graphSharing: true,
     sliders: false,
     expressionTables: false,
   },

@@ -14,6 +14,7 @@ import { GraphToolbar } from './GraphToolbar.js';
 import { CoordinateDisplay } from './CoordinateDisplay.js';
 import type { CoordinateDisplayHandle } from './CoordinateDisplay.js';
 import { GraphInteractionController } from '../../lib/graph/interaction.js';
+import { registerGraphCanvas } from '../../lib/persistence/transfer.js';
 import { createTransform } from '../../lib/graph/coordinate-system.js';
 import { buildFunctionDrawables } from '../../lib/graph/drawables.js';
 import { buildAnalysisDrawables } from '../../lib/graph/analysisDrawables.js';
@@ -373,6 +374,12 @@ export function GraphViewport() {
   const handleInteractionEnd = useCallback(() => {
     flushStoreSync();
   }, [flushStoreSync]);
+
+  // Register the live canvas so the persistence toolbar can export it
+  // as PNG. Unregisters on unmount.
+  useEffect(() => {
+    return registerGraphCanvas(() => canvasRef.current?.getCanvas() ?? null);
+  }, []);
 
   // Attach the pointer/wheel interaction controller once the canvas exists.
   // (GraphCanvas's mount effect creates the renderer before this runs.)

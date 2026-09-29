@@ -1,0 +1,20 @@
+---
+/**
+ * Shared graph route: opens a graph from a `#s=…` share-link hash.
+ * Always noindex/nofollow — shared links are user content, not site pages.
+ * The island below decodes the hash client-side; nothing here is SSR'd.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SharedGraphLoader } from '../../components/persistence/SharedGraphLoader.js';
+---
+
+<BaseLayout
+  title="Shared graph"
+  description="View a shared graphing calculator graph."
+  canonicalPath="/graphing-calculator/"
+  noindex
+  mainClass="flex flex-col"
+>
+  <h1 class="sr-only">Shared graph</h1>
+  <SharedGraphLoader client:load />
+</BaseLayout>

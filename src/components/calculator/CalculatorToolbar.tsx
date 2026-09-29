@@ -6,6 +6,7 @@
 import { Button } from '../ui/index.js';
 import { PlusIcon } from '../ui/icons.js';
 import { useCalculator } from './CalculatorStore.js';
+import { PersistenceControls } from '../persistence/PersistenceControls.js';
 import { zoomViewport } from '../../lib/graph/viewport.js';
 
 export function CalculatorToolbar() {
@@ -15,7 +16,7 @@ export function CalculatorToolbar() {
     <div
       role="toolbar"
       aria-label="Calculator actions"
-      className="flex items-center gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-800"
+      className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-800"
     >
       <span className="hidden text-sm font-semibold text-slate-900 dark:text-slate-100 sm:inline">
         Graphing calculator
@@ -52,6 +53,9 @@ export function CalculatorToolbar() {
         <Button variant="ghost" size="sm" onClick={() => dispatch({ type: 'RESET_VIEWPORT' })}>
           Reset view
         </Button>
+      </div>
+      <div className="ml-auto">
+        <PersistenceControls />
       </div>
     </div>
   );
