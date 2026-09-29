@@ -116,15 +116,55 @@ export function panViewport(
 /**
  * Fit the viewport to a set of drawables.
  *
- * Phase 2 note: drawables carry no computed bounds yet (sampling lands in
- * Phase 3), so there is nothing honest to fit to. This returns a copy of
- * `fallback` (or the default viewport when omitted). Phase 3 will give this
- * real logic by scanning drawable segment extents and padding the result.
+ * Scans every visible function drawable's finite segment points for the
+ * data bounds, pads each axis by 10% (minimum ±1 world unit on a
+ * degenerate span), and clamps the result to the sane viewport limits.
+ * Points with |y| > 1e6 are ignored: those are asymptote-clamped sampler
+ * artifacts, and including them would zoom the view out to meaninglessness
+ * (a known limitation for functions with vertical asymptotes — Reset view
+ * restores the default). With no plottable points, returns a copy of
+ * `fallback` (or the default viewport when omitted).
  */
 export function fitViewportToDrawables(
   drawables: GraphDrawable[],
   fallback?: GraphViewport
 ): GraphViewport {
-  void drawables;
-  return { ...(fallback ?? DEFAULT_VIEWPORT) };
+  const safeFallback = { ...(fallback ?? DEFAULT_VIEWPORT) };
+  let xMin = Infinity;
+  let xMax = -Infinity;
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  let count = 0;
+
+  for (const drawable of drawables ?? []) {
+    if (!drawable || drawable.visible !== true || drawable.kind !== 'function') continue;
+    const segments = Array.isArray(drawable.segments) ? drawable.segments : [];
+    for (const segment of segments) {
+      if (!Array.isArray(segment)) continue;
+      for (const point of segment) {
+        if (!point) continue;
+        const { x, y } = point;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        if (Math.abs(y) > 1e6) continue;
+        if (x < xMin) xMin = x;
+        if (x > xMax) xMax = x;
+        if (y < yMin) yMin = y;
+        if (y > yMax) yMax = y;
+        count += 1;
+      }
+    }
+  }
+
+  if (count === 0) return safeFallback;
+
+  const padX = Math.max((xMax - xMin) * 0.1, 1);
+  const padY = Math.max((yMax - yMin) * 0.1, 1);
+  return (
+    validateViewport({
+      xMin: xMin - padX,
+      xMax: xMax + padX,
+      yMin: yMin - padY,
+      yMax: yMax + padY,
+    }) ?? safeFallback
+  );
 }

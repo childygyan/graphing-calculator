@@ -81,8 +81,8 @@ export function computeAxes(
   const xVisible = viewport.yMin <= 0 && 0 <= viewport.yMax;
   const yVisible = viewport.xMin <= 0 && 0 <= viewport.xMax;
 
-  const majorX = niceTickInterval(xSpan, size.width / xSpan, 80);
-  const majorY = niceTickInterval(ySpan, size.height / ySpan, 80);
+  const majorX = niceTickInterval(size.width / xSpan, 80);
+  const majorY = niceTickInterval(size.height / ySpan, 80);
 
   const xTickLabels: TickLabel[] = computeTicks(viewport.xMin, viewport.xMax, majorX).map(
     (tick) => ({

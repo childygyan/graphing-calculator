@@ -21,41 +21,32 @@ function expectNiceInterval(interval: number): void {
 }
 
 describe('niceTickInterval', () => {
-  it('returns 2 for a 20-unit span at 40 px/unit', () => {
-    expect(niceTickInterval(20, 40)).toBe(2);
+  it('returns 2 for 40 px/unit', () => {
+    expect(niceTickInterval(40)).toBe(2);
   });
 
-  it('returns 0.1 for a tiny 0.03 span at 1000 px/unit', () => {
-    expect(niceTickInterval(0.03, 1000)).toBeCloseTo(0.1, 12);
+  it('returns 0.1 for 1000 px/unit', () => {
+    expect(niceTickInterval(1000)).toBeCloseTo(0.1, 12);
   });
 
-  it('returns 200 for a large 2000 span at 0.5 px/unit', () => {
-    expect(niceTickInterval(2000, 0.5)).toBe(200);
+  it('returns 200 for 0.5 px/unit', () => {
+    expect(niceTickInterval(0.5)).toBe(200);
   });
 
   it('always returns intervals of the form {1,2,5,10} × 10^n', () => {
-    const cases: Array<[number, number]> = [
-      [20, 40],
-      [0.03, 1000],
-      [2000, 0.5],
-      [1, 100],
-      [137, 3.7],
-      [0.00042, 5000],
-      [7.5e8, 0.01],
-      [Math.PI, Math.E],
-    ];
-    for (const [span, pxPerUnit] of cases) {
-      expectNiceInterval(niceTickInterval(span, pxPerUnit));
+    const cases: number[] = [40, 1000, 0.5, 100, 3.7, 5000, 0.01, Math.E];
+    for (const pxPerUnit of cases) {
+      expectNiceInterval(niceTickInterval(pxPerUnit));
     }
   });
 
   it('falls back to 1 for degenerate pixelsPerUnit', () => {
     // The raw interval is targetPixelSpacing / pixelsPerUnit; only a
     // non-finite or non-positive raw value triggers the fallback.
-    expect(niceTickInterval(20, 0)).toBe(1);
-    expect(niceTickInterval(20, -5)).toBe(1);
-    expect(niceTickInterval(20, NaN)).toBe(1);
-    expect(niceTickInterval(20, Infinity)).toBe(1);
+    expect(niceTickInterval(0)).toBe(1);
+    expect(niceTickInterval(-5)).toBe(1);
+    expect(niceTickInterval(NaN)).toBe(1);
+    expect(niceTickInterval(Infinity)).toBe(1);
   });
 });
 

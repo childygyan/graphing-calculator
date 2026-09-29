@@ -15,6 +15,7 @@ import { CoordinateDisplay } from './CoordinateDisplay.js';
 import type { CoordinateDisplayHandle } from './CoordinateDisplay.js';
 import { GraphInteractionController } from '../../lib/graph/interaction.js';
 import { createTransform } from '../../lib/graph/coordinate-system.js';
+import { buildFunctionDrawables } from '../../lib/graph/drawables.js';
 import {
   createDefaultViewport,
   panViewport,
@@ -22,7 +23,9 @@ import {
   zoomViewport,
 } from '../../lib/graph/viewport.js';
 import type { GraphViewport as Viewport } from '../../types/calculator.js';
+import type { Expression } from '../../types/calculator.js';
 import type {
+  GraphDrawable,
   GraphRenderInput,
   GraphThemeMode,
   ScreenPoint,
@@ -88,13 +91,53 @@ export function GraphViewport() {
   // Latest store values for the stable gesture callbacks below, which must
   // not close over stale render-time state.
   const storeViewportRef = useRef(state.viewport);
+  const expressionsRef = useRef<Expression[]>(state.expressions);
   const settingsRef = useRef(state.settings);
   const themeRef = useRef<GraphThemeMode>(graphTheme);
   useEffect(() => {
     storeViewportRef.current = state.viewport;
+    expressionsRef.current = state.expressions;
     settingsRef.current = state.settings;
     themeRef.current = graphTheme;
   });
+
+  // Memoized drawable builder: pure function of (expressions, viewport,
+  // size), so per-frame gesture renders reuse the last result when nothing
+  // changed instead of re-sampling every curve.
+  const drawablesCacheRef = useRef<{ key: string; drawables: GraphDrawable[] }>({
+    key: '',
+    drawables: [],
+  });
+
+  const getDrawables = useCallback((): GraphDrawable[] => {
+    const renderer = canvasRef.current?.getRenderer();
+    if (!renderer) return [];
+    const size = renderer.getSize();
+    if (size.width <= 0 || size.height <= 0) return [];
+    const viewport = renderer.getViewport();
+    const expressions = expressionsRef.current;
+    const key = JSON.stringify([
+      expressions.map((e) => [
+        e.id,
+        e.kind,
+        e.visible,
+        e.color,
+        e.lineWidth ?? null,
+        e.kind === 'cartesian'
+          ? e.definition.rhs
+          : e.kind === 'point'
+            ? [e.definition.x, e.definition.y]
+            : e.kind,
+      ]),
+      viewport,
+      size,
+    ]);
+    const cached = drawablesCacheRef.current;
+    if (cached.key === key) return cached.drawables;
+    const drawables = buildFunctionDrawables(expressions, viewport, size);
+    drawablesCacheRef.current = { key, drawables };
+    return drawables;
+  }, []);
 
   const buildInput = useCallback((): GraphRenderInput | null => {
     const renderer = canvasRef.current?.getRenderer();
@@ -106,9 +149,9 @@ export function GraphViewport() {
       settings: settingsRef.current,
       size,
       theme: themeRef.current,
-      drawables: [],
+      drawables: getDrawables(),
     };
-  }, []);
+  }, [getDrawables]);
 
   // One-time mount initialization once the renderer has a real size. Runs
   // whether the first ResizeObserver callback or a settings change wins the
@@ -277,6 +320,16 @@ export function GraphViewport() {
     if (input) renderer.render(input);
   }, [state.settings, graphTheme, buildInput]);
 
+  // Expression changes (add/edit/rename/color/visibility/delete) re-render
+  // the current view with freshly sampled drawables.
+  useEffect(() => {
+    if (!initializedRef.current) return;
+    const renderer = canvasRef.current?.getRenderer();
+    if (!renderer) return;
+    const input = buildInput();
+    if (input) renderer.render(input);
+  }, [state.expressions, buildInput]);
+
   // On unmount, flush any pending debounced store sync so the persisted
   // state converges instead of dropping the last gesture.
   useEffect(() => {
@@ -303,7 +356,7 @@ export function GraphViewport() {
         className="absolute inset-0 block h-full w-full touch-none select-none"
       />
       <div className="absolute right-2 top-2">
-        <GraphToolbar />
+        <GraphToolbar getDrawables={getDrawables} />
       </div>
       <CoordinateDisplay ref={coordRef} />
     </div>

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { GraphViewport } from '../../../types/calculator.js';
 import { createTransform } from '../coordinate-system.js';
+import type { FunctionDrawable } from '../types.js';
 import {
   MAX_VIEWPORT_SPAN,
   MIN_VIEWPORT_SPAN,
@@ -173,7 +174,18 @@ describe('resetViewport', () => {
 });
 
 describe('fitViewportToDrawables', () => {
-  it('returns the fallback viewport (Phase 2 placeholder behavior)', () => {
+  function drawable(points: Array<[number, number]>, visible = true): FunctionDrawable {
+    return {
+      kind: 'function',
+      id: 'd1',
+      color: '#000000',
+      lineWidth: 2,
+      visible,
+      segments: [points.map(([x, y]) => ({ x, y }))],
+    };
+  }
+
+  it('returns the fallback viewport when there are no drawables', () => {
     const fallback: GraphViewport = { xMin: -1, xMax: 1, yMin: -2, yMax: 2 };
     const result = fitViewportToDrawables([], fallback);
     expect(result).toEqual(fallback);
@@ -182,5 +194,54 @@ describe('fitViewportToDrawables', () => {
 
   it('defaults to the default viewport when no fallback is given', () => {
     expect(fitViewportToDrawables([])).toEqual(DEFAULT);
+  });
+
+  it('fits to drawable bounds with 10% padding', () => {
+    const result = fitViewportToDrawables([
+      drawable([
+        [0, 0],
+        [10, 100],
+      ]),
+    ]);
+    expect(result.xMin).toBeCloseTo(-1, 9);
+    expect(result.xMax).toBeCloseTo(11, 9);
+    expect(result.yMin).toBeCloseTo(-10, 9);
+    expect(result.yMax).toBeCloseTo(110, 9);
+  });
+
+  it('ignores hidden drawables and asymptote-clamped |y| > 1e6', () => {
+    const result = fitViewportToDrawables([
+      drawable(
+        [
+          [0, 0],
+          [10, 100],
+        ],
+        false
+      ),
+      drawable([
+        [0, 2e6],
+        [1, -3e6],
+      ]),
+    ]);
+    expect(result).toEqual(DEFAULT);
+  });
+
+  it('ignores non-finite points', () => {
+    const result = fitViewportToDrawables([
+      drawable([
+        [NaN, 1],
+        [2, Infinity],
+        [0, 0],
+        [4, 4],
+      ]),
+    ]);
+    expect(result.xMin).toBeLessThan(0);
+    expect(result.xMax).toBeGreaterThan(4);
+  });
+
+  it('pads degenerate zero-span bounds by ±1', () => {
+    const result = fitViewportToDrawables([drawable([[3, 3]])]);
+    expect(result.xMin).toBeCloseTo(2, 9);
+    expect(result.xMax).toBeCloseTo(4, 9);
   });
 });

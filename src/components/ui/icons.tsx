@@ -258,3 +258,20 @@ export function ArrowRightIcon({ className }: IconProps) {
     </Svg>
   );
 }
+
+export function DuplicateIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </Svg>
+  );
+}
+
+export function PencilIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z" />
+    </Svg>
+  );
+}

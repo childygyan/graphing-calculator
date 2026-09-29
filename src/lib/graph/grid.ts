@@ -31,13 +31,14 @@ export interface GridSpec {
 
 /**
  * A "nice" tick interval (1/2/5 × 10^n) targeting ~`targetPixelSpacing`
- * pixels between major ticks. Falls back to 1 for degenerate input.
+ * pixels between major ticks. The interval follows directly from the
+ * pixel density: targetPixelSpacing / pixelsPerUnit, snapped to 1/2/5×10ⁿ.
+ * Falls back to 1 for degenerate input.
+ *
+ * (Phase 3 note: the old `worldSpan` parameter was unused — the interval
+ * derives solely from `pixelsPerUnit` — so it was removed.)
  */
-export function niceTickInterval(
-  worldSpan: number,
-  pixelsPerUnit: number,
-  targetPixelSpacing = 80
-): number {
+export function niceTickInterval(pixelsPerUnit: number, targetPixelSpacing = 80): number {
   const raw = targetPixelSpacing / pixelsPerUnit;
   if (!Number.isFinite(raw) || raw <= 0) return 1;
   const exponent = Math.floor(Math.log10(raw));
@@ -161,8 +162,8 @@ export function computeGrid(viewport: GraphViewport, size: CanvasSize): GridSpec
   const transform = createTransform(viewport, size);
   const pxPerUnitX = size.width / xSpan;
   const pxPerUnitY = size.height / ySpan;
-  const majorX = niceTickInterval(xSpan, pxPerUnitX, 80);
-  const majorY = niceTickInterval(ySpan, pxPerUnitY, 80);
+  const majorX = niceTickInterval(pxPerUnitX, 80);
+  const majorY = niceTickInterval(pxPerUnitY, 80);
   const minorX = majorX / 5;
   const minorY = majorY / 5;
 

@@ -1,13 +1,15 @@
 /**
  * Math engine abstraction boundary.
  *
- * Phase 1 is foundation only: this file defines the interfaces a real math
- * engine must satisfy (parse, validate, evaluate, roots, derivatives,
- * integrals, intersections) plus an honest stub that throws on every call.
- * No real math parsing or evaluation is implemented here.
+ * Phase 3 implements the real single-variable expression engine behind
+ * this interface (see engine.ts): parse, validate, and evaluate compile
+ * user input through a hand-rolled tokenizer → parser → AST → compiler
+ * pipeline (never eval/new Function). Roots, derivatives, integrals, and
+ * intersections remain honest stubs until Phase 4.
  */
 
 import type { Point } from '../../types/calculator.js';
+import { ExpressionMathEngine } from './engine.js';
 
 export type EngineNumber = number;
 
@@ -89,6 +91,11 @@ export class NotImplementedMathEngine implements MathEngine {
   }
 }
 
+/**
+ * Phase 3: returns the real expression engine (normalize → tokenize →
+ * parse → compile). Analysis methods (roots, derivatives, integrals,
+ * intersections) still throw MathEngineError until Phase 4.
+ */
 export function createMathEngine(): MathEngine {
-  return new NotImplementedMathEngine();
+  return new ExpressionMathEngine();
 }

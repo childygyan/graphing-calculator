@@ -8,6 +8,7 @@
 import type { ReactNode } from 'react';
 import { useCalculator } from '../calculator/CalculatorStore.js';
 import { fitViewportToDrawables, zoomViewport } from '../../lib/graph/viewport.js';
+import type { GraphDrawable } from '../../lib/graph/types.js';
 import {
   AxesIcon,
   FitViewIcon,
@@ -48,7 +49,12 @@ function ToolbarButton({ label, pressed, onClick, children }: ToolbarButtonProps
   );
 }
 
-export function GraphToolbar() {
+export function GraphToolbar({
+  getDrawables,
+}: {
+  /** Builds the current drawables (used by Fit view). Defaults to none. */
+  getDrawables?: () => GraphDrawable[];
+}) {
   const { state, dispatch } = useCalculator();
 
   return (
@@ -81,7 +87,7 @@ export function GraphToolbar() {
         onClick={() =>
           dispatch({
             type: 'SET_VIEWPORT',
-            viewport: fitViewportToDrawables([], state.viewport),
+            viewport: fitViewportToDrawables(getDrawables?.() ?? [], state.viewport),
           })
         }
       >
