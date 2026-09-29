@@ -2,7 +2,7 @@
  * Centralized site configuration.
  *
  * Production URL: the Cloudflare Pages deployment
- * (https://graphing-calc.pages.dev). Canonical URLs, sitemap
+ * (https://graphingcalculator.online). Canonical URLs, sitemap
  * entries, and Open Graph tags are all derived from `siteUrl`.
  * If a custom domain is attached later, update this single value and rebuild.
  *
@@ -30,7 +30,7 @@ export const siteConfig = {
     'A fast, accessible online graphing calculator. Plot mathematical functions, ' +
     'manage multiple expressions, and — in future releases — explore math with AI assistance.',
   /** Production origin (Cloudflare Pages). Update + rebuild if a custom domain is attached. */
-  siteUrl: 'https://graphing-calc.pages.dev',
+  siteUrl: 'https://graphingcalculator.online',
   /** PLACEHOLDER — replace with a real contact address before launch. */
   contactEmail: 'contact@example.com',
   defaultTheme: 'system' as ThemeMode,

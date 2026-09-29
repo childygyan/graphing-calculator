@@ -11,9 +11,9 @@ import cloudflare from '@astrojs/cloudflare';
 // demand from the Pages Functions worker — the modern equivalent of
 // the old `hybrid` mode.
 export default defineConfig({
-  // Production origin: Cloudflare Pages (https://graphing-calc.pages.dev).
-  // Update + rebuild if a custom domain is attached later.
-  site: 'https://graphing-calc.pages.dev',
+  // Production origin: custom domain https://graphingcalculator.online
+  // (Cloudflare Pages project graphing-calc serves it).
+  site: 'https://graphingcalculator.online',
   output: 'static',
   adapter: cloudflare({
     // Static assets are served from the CDN edge; only /api/* hits the worker.
