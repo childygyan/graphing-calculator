@@ -28,6 +28,34 @@ const wordCount = article.sections
   .join(' ')
   .split(/\s+/).length;
 const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+
+/**
+ * Formats an ISO YYYY-MM-DD date as "September 29, 2026". Returns null for
+ * anything that does not look like a valid ISO date, so the page never
+ * shows a wrong or malformed date — the date line is simply omitted.
+ */
+function formatReviewDate(iso: string | undefined): string | null {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [year, month, day] = iso.split('-').map(Number);
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return `${months[month - 1]} ${day}, ${year}`;
+}
+
+const reviewDate = formatReviewDate(article.reviewedOn);
 ---
 
 <BaseLayout title={title} description={article.description} canonicalPath={canonicalPath}>
@@ -56,6 +84,14 @@ const readingMinutes = Math.max(1, Math.round(wordCount / 200));
     <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
       {article.title}
     </h1>
+
+    <aside
+      class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+      aria-label="Review information"
+    >
+      <p>Reviewed for mathematical accuracy by the Graphing Calculator team</p>
+      {reviewDate && <p class="mt-1">Last reviewed: {reviewDate}</p>}
+    </aside>
 
     <ArticleSections sections={article.sections} />
 

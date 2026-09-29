@@ -1,0 +1,199 @@
+---
+/**
+ * Desmos alternative comparison page: /desmos-alternative/.
+ *
+ * Follows the learn/[slug] content-article pattern (BaseLayout +
+ * Breadcrumbs + JSON-LD + prose sections + FaqBlock + RelatedLinks).
+ * This page is intentionally INDEXED.
+ *
+ * Legal notes (do not weaken):
+ * - Graphing Calculator is an independent product, NOT affiliated with,
+ *   endorsed by, or connected to Desmos or Amplify.
+ * - "Desmos" appears only in nominative, comparative use ("alternative
+ *   to Desmos"). No Desmos logo, branding, screenshots, or interface text.
+ * - About Desmos, state ONLY publicly well-known facts. No reviews,
+ *   ratings, statistics, or user counts anywhere on this page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import FaqBlock from '../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { articleSchema, faqSchema } from '../../lib/seo/metadata.js';
+
+const title = 'Best Desmos Alternative — Free Online Graphing Calculator | Graphing Calculator';
+const description =
+  'Looking for a Desmos alternative? Graphing Calculator is a free, independent online graphing calculator with 2D/3D graphing, AI help, and analysis tools.';
+const canonicalPath = '/desmos-alternative/';
+const heading = 'Best Desmos Alternative — Free Online Graphing Calculator';
+
+const faqs = [
+  {
+    q: 'Is this affiliated with Desmos?',
+    a: 'No. Graphing Calculator is an independent product. It is not affiliated with, endorsed by, or connected to Desmos or Amplify. The name "Desmos" appears on this page only to describe what this site is an alternative to.',
+  },
+  {
+    q: 'Is Graphing Calculator free?',
+    a: 'Yes. Graphing Calculator is free to use, and there is no sign-up — the site has no accounts at all.',
+  },
+  {
+    q: 'Do I need an account to save or share graphs?',
+    a: 'No. There are no accounts to create. You can turn any graph into a shareable link that reopens the exact same view, and anyone who opens the link needs no account either.',
+  },
+  {
+    q: 'Can I plot 3D graphs?',
+    a: 'Yes. Graphing Calculator includes an interactive 3D surface plotter for functions of the form z = f(x, y), with orbit controls, zoom, resolution control, and preset surfaces.',
+  },
+  {
+    q: 'Does it have an AI assistant?',
+    a: 'Yes. The built-in AI math assistant can explain concepts and help you set up graphs. Until the site owner configures an API key it runs in a clearly labeled mock mode, and the calculator itself — not the AI — is always the source of truth for results.',
+  },
+  {
+    q: 'What analysis tools are included?',
+    a: 'Roots, intersections, derivatives, integrals, limits, extrema, and tangent/normal lines — all computed by the site\u2019s own math engine and drawn directly on the graph.',
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: heading,
+        description,
+      }),
+      faqSchema(faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Desmos Alternative' }]} />
+
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{heading}</h1>
+
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      Many people search the web for a Desmos calculator when they need to plot a function quickly.
+      If you are one of them,{' '}
+      <a href="/graphing-calculator/" class="text-brand-700 hover:underline dark:text-brand-300">
+        Graphing Calculator
+      </a>{' '}
+      is a free, independent alternative you can use right now — no sign-up, no download, no
+      account.
+    </p>
+
+    <aside
+      class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+      aria-label="Independence notice"
+    >
+      <p>
+        <strong class="font-semibold text-slate-900 dark:text-white">Independent product.</strong>{' '}
+        Graphing Calculator is not affiliated with, endorsed by, or connected to Desmos or Amplify.
+        “Desmos” is used on this page only to describe what this site is an alternative to.
+      </p>
+    </aside>
+
+    <section class="mt-10" aria-labelledby="comparison">
+      <h2 id="comparison" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        Desmos vs. Graphing Calculator
+      </h2>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        A side-by-side look at the basics. About Desmos, this table states only publicly well-known
+        facts — nothing guessed or unverified.
+      </p>
+      <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+        <table class="w-full min-w-[560px] border-collapse text-left text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-800/60">
+              <th scope="col" class="px-4 py-3 font-semibold text-slate-900 dark:text-white">
+                Feature
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold text-slate-900 dark:text-white">
+                Desmos
+              </th>
+              <th scope="col" class="px-4 py-3 font-semibold text-slate-900 dark:text-white">
+                Graphing Calculator
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+            <tr>
+              <th scope="row" class="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                Price
+              </th>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">Free to use</td>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">Free to use</td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                Sign-up required?
+              </th>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                No — basic graphing works without an account
+              </td>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                No — the site has no accounts at all
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                2D graphing
+              </th>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">Yes</td>
+              <td class="px-4 py-3 text-slate-600 dark:text-slate-300">
+                Yes — with sliders, parametric and polar modes, and inequalities
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-10" aria-labelledby="beyond">
+      <h2 id="beyond" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        What you get with Graphing Calculator
+      </h2>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        The{' '}
+        <a href="/graphing-calculator/" class="text-brand-700 hover:underline dark:text-brand-300">
+          2D graphing calculator
+        </a>{' '}
+        plots functions instantly as you type, with zoom-toward-cursor, panning, and touch support.
+        Add sliders to explore parameters live, switch to parametric or polar mode, or shade
+        inequalities — all in the same view.
+      </p>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        For three dimensions, the{' '}
+        <a href="/3d/" class="text-brand-700 hover:underline dark:text-brand-300">
+          3D surface plotter
+        </a>{' '}
+        renders z = f(x, y) with orbit controls, zoom, resolution control, and preset surfaces,
+        compiled by the site’s own math engine.
+      </p>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        Built-in analysis finds roots, intersections, derivatives, integrals, limits, and extrema,
+        and draws tangent and normal lines directly on the graph. The standalone{' '}
+        <a href="/calculators/" class="text-brand-700 hover:underline dark:text-brand-300">
+          math calculators
+        </a>{' '}
+        cover the same operations step by step, and the{' '}
+        <a href="/learn/" class="text-brand-700 hover:underline dark:text-brand-300">
+          learn guides
+        </a>{' '}
+        explain the ideas behind them.
+      </p>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        An AI math assistant is built in to explain concepts and help set up graphs. Until the site
+        owner configures an API key it runs in a clearly labeled mock mode — the calculator itself,
+        never the AI, is the source of truth for results.
+      </p>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+        Every graph can be shared as a link that reopens the exact same view, with no account needed
+        on either end. And there is nothing to agree to beyond the basics: no accounts, no cookies,
+        no third-party trackers.
+      </p>
+    </section>
+
+    <FaqBlock faqs={faqs} />
+    <RelatedLinks paths={['/graphing-calculator/', '/calculators/', '/learn/']} />
+  </div>
+</BaseLayout>

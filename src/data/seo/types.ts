@@ -54,6 +54,12 @@ export interface LearnArticle {
   faqs: ContentFaq[];
   /** Full root-relative paths. */
   related: string[];
+  /**
+   * ISO date (YYYY-MM-DD) the article was last reviewed for mathematical
+   * accuracy. Optional; when absent, pages omit the "Last reviewed" line
+   * rather than showing a date.
+   */
+  reviewedOn?: string;
 }
 
 /** A curated example graph, e.g. /examples/projectile-motion/. */

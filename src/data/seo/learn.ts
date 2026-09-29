@@ -10,6 +10,7 @@ import type { LearnArticle } from './types.js';
 export const LEARN_ARTICLES: LearnArticle[] = [
   {
     slug: 'what-is-a-function',
+    reviewedOn: '2026-09-29',
     title: 'What Is a Function? Domain, Range, and Notation',
     description:
       'Learn what a function really is: inputs, outputs, domain, range, and f(x) notation — with concrete examples you can graph yourself.',
@@ -84,6 +85,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
   },
   {
     slug: 'understanding-derivatives',
+    reviewedOn: '2026-09-29',
     title: 'Derivatives: Understanding Rate of Change and Slope',
     description:
       'What a derivative measures, how it gives the slope of a curve, and how to read increasing, decreasing, and extreme points from it.',
@@ -158,6 +160,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
   },
   {
     slug: 'understanding-integrals',
+    reviewedOn: '2026-09-29',
     title: 'Integrals and the Area Under a Curve',
     description:
       'Learn what definite integrals mean as signed area under a curve, how the Fundamental Theorem links integrals to derivatives, and when to use them.',
@@ -232,6 +235,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
   },
   {
     slug: 'asymptotes-explained',
+    reviewedOn: '2026-09-29',
     title: 'Asymptotes: Vertical, Horizontal, and Oblique',
     description:
       'Understand asymptotes — lines a graph approaches but never touches. Covers vertical, horizontal, and oblique asymptotes with clear examples.',
@@ -305,6 +309,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
   },
   {
     slug: 'graphing-inequalities',
+    reviewedOn: '2026-09-29',
     title: 'Graphing Inequalities in Two Variables',
     description:
       'How to graph inequalities like y > x^2: boundary curves, dashed vs. solid lines, shading, and testing points — explained step by step.',
@@ -378,6 +383,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
   },
   {
     slug: 'parametric-vs-cartesian',
+    reviewedOn: '2026-09-29',
     title: 'Parametric vs Cartesian Equations',
     description:
       'Cartesian equations y = f(x) vs parametric equations x(t), y(t): what each can express, when to use which, and how to convert between them.',

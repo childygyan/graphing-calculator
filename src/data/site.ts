@@ -42,6 +42,8 @@ export const siteConfig = {
     { label: 'Examples', href: '/examples/' },
     { label: 'Learn', href: '/learn/' },
     { label: 'Calculators', href: '/calculators/' },
+    { label: '3D Graph', href: '/3d/' },
+    { label: 'Scientific Calculator', href: '/scientific-calculator/' },
     { label: 'About', href: '/about/' },
   ] as NavLink[],
   footerColumns: [
@@ -59,6 +61,8 @@ export const siteConfig = {
         { label: 'Function Library', href: '/math-functions/' },
         { label: 'Graph Examples', href: '/examples/' },
         { label: 'Learn Graphing', href: '/learn/' },
+        { label: '3D Graphing', href: '/3d/' },
+        { label: 'Desmos Alternative', href: '/desmos-alternative/' },
       ] as NavLink[],
     },
     {
@@ -67,6 +71,7 @@ export const siteConfig = {
         { label: 'Derivative Calculator', href: '/calculators/derivative/' },
         { label: 'Integral Calculator', href: '/calculators/integral/' },
         { label: 'Root Finder', href: '/calculators/root-finder/' },
+        { label: 'Scientific Calculator', href: '/scientific-calculator/' },
       ] as NavLink[],
     },
     {

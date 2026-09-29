@@ -1,0 +1,81 @@
+---
+/**
+ * Scientific calculator tool page (Workstream B): a full keypad calculator
+ * for arithmetic, trig, logarithms, powers, roots and constants, with
+ * DEG/RAD angle modes and honest error messages.
+ */
+import ToolPageShell from '../../components/content/ToolPageShell.astro';
+import { ScientificCalculator } from '../../components/tools/ScientificCalculator.js';
+
+const title = 'Scientific Calculator Online — Free with DEG/RAD Modes | Graphing Calculator';
+const description =
+  'Free online scientific calculator: trig, inverse trig, log, ln, powers, roots, π and e with DEG/RAD modes, keyboard support, and clear error messages.';
+---
+
+<ToolPageShell
+  title={title}
+  description={description}
+  canonicalPath="/scientific-calculator/"
+  breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Scientific Calculator' }]}
+  heading="Scientific Calculator"
+  intro={[
+    'A free online scientific calculator for everyday math: arithmetic with correct order of operations, trigonometric and inverse trigonometric functions, base-10 and natural logarithms, powers, roots, and the constants π and e. Type on your keyboard or tap the keypad — every calculation runs in your browser through the same expression engine as our graphing calculator.',
+  ]}
+  sections={[
+    {
+      heading: 'What this calculator does',
+      body: [
+        'Enter any expression — for example sin(30) + √(16), log(1000), or 2^10 — and press = to evaluate it. The calculator follows standard precedence (parentheses, then powers, then multiplication and division, then addition and subtraction), so 2 + 3 × 4 gives 14, not 20.',
+        'Beyond arithmetic you get the full scientific set: sin, cos, tan and their inverses asin, acos, atan; log (base 10) and ln (natural logarithm); xʸ powers including fractional exponents; square roots; and the constants π and e. Expressions can be nested freely, e.g. sin(π/6)^2 + cos(π/6)^2.',
+      ],
+    },
+    {
+      heading: 'Degrees vs radians (DEG and RAD modes)',
+      body: [
+        'Angles can be measured in degrees or radians, and trigonometric functions give different answers depending on which you mean: sin(30°) = 0.5, but sin(30 radians) ≈ −0.988. The DEG/RAD toggle at the top-left of the keypad switches between the two, and the badge above the display always shows the active mode.',
+        'In DEG mode, sin, cos and tan read their input as degrees, while asin, acos and atan report their results in degrees — matching the behavior of a physical scientific calculator. In RAD mode everything works in radians, which is what most formulas in calculus and physics expect. If a trig result looks wrong, the angle mode is the first thing to check.',
+      ],
+    },
+    {
+      heading: 'Keyboard shortcuts',
+      body: [
+        'You never have to touch the keypad: click the expression field and type. Digits, +, −, (, ), ^ and . work as typed; typing * inserts × and / inserts ÷; Enter or = evaluates; Escape clears everything; Backspace deletes as usual. After a result, typing a digit starts a fresh expression, while typing an operator continues from the previous answer.',
+      ],
+    },
+    {
+      heading: 'Honest errors, not NaN',
+      body: [
+        'When an expression has no meaningful answer, this calculator says so in plain language instead of showing NaN or Infinity. Dividing by zero, taking the square root of a negative number, or the logarithm of a non-positive number each produce a specific explanation. Incomplete expressions get guidance too: a trailing operator or mismatched parentheses tells you exactly what to fix.',
+      ],
+    },
+  ]}
+  faqs={[
+    {
+      q: 'Should I use DEG or RAD mode?',
+      a: 'Use DEG for everyday angle problems (a 30° incline, a triangle with degree angles) and RAD for calculus, physics formulas, and anything involving π as an angle. The mode only affects sin, cos, tan, asin, acos and atan — everything else is identical.',
+    },
+    {
+      q: 'What is the difference between log and ln?',
+      a: 'The log key computes the base-10 logarithm (log 1000 = 3) and ln computes the natural logarithm, base e (ln(e) = 1). Both are undefined for zero and negative numbers, and the calculator will tell you so.',
+    },
+    {
+      q: 'Why does 1 ÷ 0 show an error instead of infinity?',
+      a: 'Division by zero is undefined in mathematics — it has no single meaningful value. Showing "infinity" would be misleading (1 ÷ 0 and −1 ÷ 0 cannot both be infinity), so the calculator reports it honestly as undefined.',
+    },
+    {
+      q: 'Can I type expressions with my keyboard?',
+      a: 'Yes. Focus the expression field and type normally; Enter evaluates and Escape clears. The * key inserts ×, / inserts ÷, and ^ is the power operator, so 2^10 gives 1024.',
+    },
+    {
+      q: 'How precise are the results?',
+      a: 'Results are shown with 10 significant digits, computed in double-precision floating point — the same arithmetic a physical scientific calculator uses. Very large results that overflow are reported as overflow rather than infinity.',
+    },
+    {
+      q: 'Can I graph an expression instead of just evaluating it?',
+      a: 'Yes — the graphing calculator on this site plots functions of x with zoom, trace, roots, and tangent-line analysis. It uses the same expression engine, so anything you evaluate here behaves identically there.',
+    },
+  ]}
+  related={['/graphing-calculator/', '/calculators/', '/calculators/derivative/', '/learn/']}
+>
+  <ScientificCalculator client:load slot="tool" />
+</ToolPageShell>

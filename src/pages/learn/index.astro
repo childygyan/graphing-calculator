@@ -10,6 +10,28 @@ import { LEARN_ARTICLES } from '../../data/seo/learn.js';
 const title = 'Learn Graphing — Functions, Derivatives, Integrals & More | Graphing Calculator';
 const description =
   'Learn graphing concepts step by step: functions, derivatives, integrals, asymptotes, inequalities, and parametric equations — with examples to try.';
+
+/** Compact "Sep 29, 2026" form; null when the article carries no valid date. */
+function shortReviewDate(iso: string | undefined): string | null {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [year, month, day] = iso.split('-').map(Number);
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return `${months[month - 1]} ${day}, ${year}`;
+}
 ---
 
 <BaseLayout title={title} description={description} canonicalPath="/learn/">
@@ -33,6 +55,11 @@ const description =
             {article.title}
           </h2>
           <p class="mt-2 text-slate-600 dark:text-slate-300">{article.description}</p>
+          {shortReviewDate(article.reviewedOn) && (
+            <p class="mt-3 text-xs text-slate-500 dark:text-slate-400">
+              Reviewed for accuracy · {shortReviewDate(article.reviewedOn)}
+            </p>
+          )}
         </a>
       ))}
     </div>
