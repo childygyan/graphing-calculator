@@ -37,6 +37,7 @@ import { suggestVariableName } from '../../lib/math/variables.js';
 
 export type CalculatorAction =
   | { type: 'ADD_EXPRESSION'; kind: ExpressionKind }
+  | { type: 'INSERT_EXPRESSION'; expression: Expression }
   | { type: 'UPDATE_EXPRESSION'; expression: Expression }
   | { type: 'REMOVE_EXPRESSION'; id: string }
   | { type: 'DUPLICATE_EXPRESSION'; id: string }
@@ -167,6 +168,19 @@ function calculatorReducer(state: CalculatorState, action: CalculatorAction): Ca
   switch (action.type) {
     case 'ADD_EXPRESSION': {
       const expression = createExpression(action.kind);
+      return {
+        ...state,
+        expressions: [...state.expressions, expression],
+        selectedExpressionId: expression.id,
+      };
+    }
+    case 'INSERT_EXPRESSION': {
+      // Insert a fully-built expression (used by the AI command processor).
+      // A colliding id is regenerated so state can never hold duplicates.
+      const exists = state.expressions.some((e) => e.id === action.expression.id);
+      const expression: Expression = exists
+        ? { ...action.expression, id: createExpressionId() }
+        : action.expression;
       return {
         ...state,
         expressions: [...state.expressions, expression],

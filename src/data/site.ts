@@ -70,10 +70,10 @@ export const siteConfig = {
   ] as SocialLink[],
   /**
    * Feature flags gate functionality planned for later phases.
-   * Everything is off in Phase 1 (foundation only).
+   * aiAssistant shipped in Phase 6 (DeepSeek + mock providers).
    */
   featureFlags: {
-    aiAssistant: false,
+    aiAssistant: true,
     graphSharing: false,
     sliders: false,
     expressionTables: false,
