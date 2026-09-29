@@ -23,7 +23,7 @@ export function getStaticPaths() {
 const { page } = Astro.props;
 const facts = computeFunctionFacts(page.expression);
 const canonicalPath = `/math-functions/${page.slug}/`;
-const title = `${page.displayName} — Graph & Properties | AI Graphing Calculator`;
+const title = `${page.displayName} — Graph & Properties | Graphing Calculator`;
 
 const sampleRows = facts.samples.map((sample) => ({
   x: sample.x,

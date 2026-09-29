@@ -1,4 +1,4 @@
-# Redirects for the AI Graphing Calculator site.
+# Redirects for the Graphing Calculator site.
 # Cloudflare Pages / Netlify `_redirects` format: <from> <to> <status>.
 # These cover legacy / typo entry points; the canonical routes are the
 # <to> targets. No mass redirects — one rule per genuine alias.

@@ -24,7 +24,7 @@ export interface SocialLink {
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 export const siteConfig = {
-  name: 'AI Graphing Calculator',
+  name: 'Graphing Calculator',
   tagline: 'Graph functions, explore mathematics, and learn with AI assistance.',
   description:
     'A fast, accessible online graphing calculator. Plot mathematical functions, ' +

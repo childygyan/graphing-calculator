@@ -1,4 +1,4 @@
-# AI Graphing Calculator
+# Graphing Calculator
 
 A fast, accessible, open-source graphing calculator for the web. Plot mathematical
 functions, analyze them (roots, derivatives, integrals, limits, extrema), save and

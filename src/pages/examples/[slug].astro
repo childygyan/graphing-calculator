@@ -20,7 +20,7 @@ export function getStaticPaths() {
 const { example } = Astro.props;
 const shareUrl = await buildExampleShareUrl(example);
 const canonicalPath = `/examples/${example.slug}/`;
-const title = `${example.title} | AI Graphing Calculator`;
+const title = `${example.title} | Graphing Calculator`;
 
 const expressionLabels = example.expressions.map((spec) => {
   switch (spec.kind) {

@@ -21,7 +21,7 @@ export function getStaticPaths() {
 
 const { article } = Astro.props;
 const canonicalPath = `/learn/${article.slug}/`;
-const title = `${article.title} | AI Graphing Calculator`;
+const title = `${article.title} | Graphing Calculator`;
 
 const wordCount = article.sections
   .flatMap((section) => [section.heading, ...section.body])
