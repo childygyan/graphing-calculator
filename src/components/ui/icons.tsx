@@ -379,3 +379,34 @@ export function ImageIcon({ className }: IconProps) {
     </Svg>
   );
 }
+
+export function TableIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+      <line x1="9" y1="10" x2="9" y2="20" />
+      <line x1="15" y1="4" x2="15" y2="10" />
+    </Svg>
+  );
+}
+
+export function NoteIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="9" y1="13" x2="15" y2="13" />
+      <line x1="9" y1="17" x2="13" y2="17" />
+    </Svg>
+  );
+}
+
+export function BoltIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </Svg>
+  );
+}

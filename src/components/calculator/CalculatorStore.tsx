@@ -39,6 +39,10 @@ import {
   createInitialCalculatorState,
   DEFAULT_VIEWPORT,
 } from '../../lib/expressions/expressions.js';
+import {
+  moveExpressionToFolder,
+  removeExpressionFromFolders,
+} from '../../lib/expressions/folders.js';
 import { sanitizeAnalysisState } from '../../lib/analysis/state.js';
 import { normalizeVariableName, validateVariableName } from '../../lib/math/variables.js';
 import { suggestVariableName } from '../../lib/math/variables.js';
@@ -84,7 +88,13 @@ export type CalculatorAction =
   | { type: 'ADD_VARIABLE'; name?: string }
   | { type: 'UPDATE_VARIABLE'; name: string; patch: Partial<VariableDefinition> }
   | { type: 'REMOVE_VARIABLE'; name: string }
-  | { type: 'SET_VARIABLE_VALUE'; name: string; value: number };
+  | { type: 'SET_VARIABLE_VALUE'; name: string; value: number }
+  | { type: 'TOGGLE_FOLDER_COLLAPSED'; id: string }
+  | { type: 'MOVE_EXPRESSION_TO_FOLDER'; expressionId: string; folderId: string | null }
+  | {
+      type: 'APPLY_ACTION_RESULT';
+      updates: Array<{ name: string; expression: string }>;
+    };
 
 function isFiniteViewport(value: unknown): value is GraphViewport {
   if (typeof value !== 'object' || value === null) return false;
@@ -211,6 +221,9 @@ const UNDOABLE_ACTION_TYPES: ReadonlySet<CalculatorAction['type']> = new Set([
   'REMOVE_EXPRESSION',
   'DUPLICATE_EXPRESSION',
   'TOGGLE_EXPRESSION_VISIBILITY',
+  'TOGGLE_FOLDER_COLLAPSED',
+  'MOVE_EXPRESSION_TO_FOLDER',
+  'APPLY_ACTION_RESULT',
   'ADD_VARIABLE',
   'UPDATE_VARIABLE',
   'REMOVE_VARIABLE',
@@ -271,7 +284,7 @@ export function calculatorReducer(
       if (expressions.length === state.expressions.length) return state;
       return {
         ...state,
-        expressions,
+        expressions: removeExpressionFromFolders(expressions, action.id),
         selectedExpressionId:
           state.selectedExpressionId === action.id ? null : state.selectedExpressionId,
       };
@@ -300,6 +313,27 @@ export function calculatorReducer(
     }
     case 'SELECT_EXPRESSION':
       return { ...state, selectedExpressionId: action.id };
+    case 'TOGGLE_FOLDER_COLLAPSED': {
+      const target = state.expressions.find((e) => e.id === action.id);
+      if (!target || target.kind !== 'folder') return state;
+      return {
+        ...state,
+        expressions: state.expressions.map((e) =>
+          e.id === action.id && e.kind === 'folder'
+            ? {
+                ...e,
+                definition: { ...e.definition, collapsed: !e.definition.collapsed },
+                updatedAt: Date.now(),
+              }
+            : e
+        ),
+      };
+    }
+    case 'MOVE_EXPRESSION_TO_FOLDER': {
+      const next = moveExpressionToFolder(state.expressions, action.expressionId, action.folderId);
+      if (next === state.expressions) return state;
+      return { ...state, expressions: next };
+    }
     case 'SET_VIEWPORT':
       return { ...state, viewport: { ...action.viewport } };
     case 'RESET_VIEWPORT':
@@ -472,6 +506,41 @@ export function calculatorReducer(
         // Slider drags write a numeric literal into the definition.
         return { ...v, expression: String(clampVariableValue(v, action.value)) };
       });
+      if (!changed) return state;
+      return { ...state, variables };
+    }
+    case 'APPLY_ACTION_RESULT': {
+      // Atomic application of an action button's computed assignments: one
+      // undo step no matter how many variables changed. The caller evaluates
+      // each assignment against the engine; the reducer only writes.
+      if (action.updates.length === 0) return state;
+      let variables = state.variables;
+      let changed = false;
+      for (const update of action.updates) {
+        const name = normalizeVariableName(update.name);
+        if (validateVariableName(name) !== null) continue;
+        const numeric = Number(update.expression);
+        const finiteValue = Number.isFinite(numeric) ? numeric : 0;
+        const index = variables.findIndex((v) => v.name === name);
+        if (index >= 0) {
+          if (variables[index].expression === update.expression) continue;
+          variables = variables.map((v, i) =>
+            i === index ? { ...v, expression: update.expression } : v
+          );
+        } else {
+          variables = [
+            ...variables,
+            {
+              name,
+              expression: update.expression,
+              min: finiteValue - 10,
+              max: finiteValue + 10,
+              step: 0.1,
+            },
+          ];
+        }
+        changed = true;
+      }
       if (!changed) return state;
       return { ...state, variables };
     }

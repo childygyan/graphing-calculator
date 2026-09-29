@@ -35,7 +35,8 @@ export type GraphDrawableKind =
   | 'shape'
   | 'inequality-region'
   | 'area'
-  | 'annotation';
+  | 'annotation'
+  | 'image';
 
 export interface GraphDrawableBase {
   kind: GraphDrawableKind;
@@ -66,6 +67,24 @@ export interface PointMarkerDrawable extends GraphDrawableBase {
   points: WorldPoint[];
   /** Circle radius in CSS pixels. Default 5. */
   radius?: number;
+}
+
+/**
+ * A user-placed image in world coordinates. The bitmap loads
+ * asynchronously; the renderer paints it once the image cache reports it
+ * ready and skips it otherwise.
+ */
+export interface ImageDrawable extends GraphDrawableBase {
+  kind: 'image';
+  /** https:// or data:image/ URL (validated at edit time). */
+  src: string;
+  centerX: number;
+  centerY: number;
+  /** Size in world units. */
+  width: number;
+  height: number;
+  /** 0 (transparent) … 1 (opaque). */
+  opacity: number;
 }
 
 /** A straight line segment between two world points (tangent/normal lines). */
@@ -140,7 +159,8 @@ export type GraphDrawable =
   | SegmentDrawable
   | AreaDrawable
   | InequalityDrawable
-  | AnnotationDrawable;
+  | AnnotationDrawable
+  | ImageDrawable;
 
 export type GraphThemeMode = 'light' | 'dark';
 

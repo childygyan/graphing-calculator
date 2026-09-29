@@ -18,6 +18,8 @@ import { registerGraphCanvas } from '../../lib/persistence/transfer.js';
 import { createTransform } from '../../lib/graph/coordinate-system.js';
 import { buildFunctionDrawables } from '../../lib/graph/drawables.js';
 import { buildAnalysisDrawables } from '../../lib/graph/analysisDrawables.js';
+import { ensureImageLoaded } from '../../lib/graph/images.js';
+import { applyFolderVisibility } from '../../lib/expressions/folders.js';
 import { compileExpressionScoped } from '../../lib/math/engine.js';
 import { CARTESIAN_PARAMETER, VariableEnvironment } from '../../lib/math/variables.js';
 import {
@@ -42,6 +44,15 @@ const STORE_SYNC_DELAY_MS = 150;
 
 /** Tap within this many CSS px of a curve snaps to it for inspection. */
 const TAP_SNAP_DISTANCE_PX = 28;
+
+/** Cheap djb2 hash so long image data-URLs stay out of the drawable cache key. */
+function hashString(value: string): number {
+  let hash = 5381;
+  for (let i = 0; i < value.length; i++) {
+    hash = ((hash << 5) + hash + value.charCodeAt(i)) | 0;
+  }
+  return hash;
+}
 
 /** Relative epsilon for comparing the renderer viewport against the store. */
 const VIEWPORT_EPSILON = 1e-12;
@@ -154,7 +165,20 @@ export function GraphViewport({ strings }: { strings: CalculatorShellStrings }) 
                 ? e.definition.rOfTheta
                 : e.kind === 'inequality'
                   ? [e.definition.lhs, e.definition.operator, e.definition.rhs]
-                  : e.kind,
+                  : e.kind === 'table'
+                    ? e.definition.rows
+                    : e.kind === 'image'
+                      ? [
+                          hashString(e.definition.src),
+                          e.definition.centerX,
+                          e.definition.centerY,
+                          e.definition.width,
+                          e.definition.height,
+                          e.definition.opacity,
+                        ]
+                      : e.kind === 'folder'
+                        ? [e.definition.collapsed, e.definition.children]
+                        : e.kind,
       ]),
       // Variable definitions (names, values, ranges) change the curves.
       variables,
@@ -166,10 +190,26 @@ export function GraphViewport({ strings }: { strings: CalculatorShellStrings }) 
     ]);
     const cached = drawablesCacheRef.current;
     if (cached.key === key) return cached.drawables;
+    // Folder collapse hides children; folder membership never draws itself.
+    const effectiveExpressions = applyFolderVisibility(expressions);
     const drawables: GraphDrawable[] = [
-      ...buildFunctionDrawables(expressions, viewport, size, env),
-      ...buildAnalysisDrawables(expressions, analysisRef.current, viewport, size, env),
+      ...buildFunctionDrawables(effectiveExpressions, viewport, size, env),
+      ...buildAnalysisDrawables(effectiveExpressions, analysisRef.current, viewport, size, env),
     ];
+    // Kick off async loads for image drawables; repaint when each arrives.
+    // The drawables themselves do not change when a bitmap arrives (the
+    // renderer resolves the bitmap by src each frame), so a repaint with
+    // the cached input is enough — never invalidate the drawable cache
+    // here, or the rebuild would resubscribe and loop forever.
+    for (const drawable of drawables) {
+      if (drawable.kind === 'image') {
+        ensureImageLoaded(drawable.src, () => {
+          const input = buildInput();
+          const rendererInstance = canvasRef.current?.getRenderer();
+          if (input && rendererInstance) rendererInstance.scheduleRender(input);
+        });
+      }
+    }
     drawablesCacheRef.current = { key, drawables };
     return drawables;
   }, []);

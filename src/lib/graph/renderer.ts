@@ -28,6 +28,7 @@ import type {
   GraphDrawableBase,
   GraphRenderInput,
   GraphThemeMode,
+  ImageDrawable,
   InequalityDrawable,
   ParametricDrawable,
   PointMarkerDrawable,
@@ -36,6 +37,7 @@ import type {
   WorldPoint,
 } from './types.js';
 import { createDefaultViewport, validateViewport } from './viewport.js';
+import { getLoadedImage } from './images.js';
 
 export interface GraphRenderer {
   initialize(canvas: HTMLCanvasElement): void;
@@ -386,6 +388,9 @@ export class CanvasGraphRenderer implements GraphRenderer {
         case 'annotation':
           this.drawAnnotation(ctx, transform, theme, drawable);
           break;
+        case 'image':
+          this.drawImageDrawable(ctx, transform, drawable);
+          break;
         default:
           // Later phases add kinds to the union; unknown kinds are ignored.
           break;
@@ -492,6 +497,44 @@ export class CanvasGraphRenderer implements GraphRenderer {
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
+  }
+
+  /**
+   * A user-placed image in world coordinates. Paints the cached bitmap when
+   * it has finished loading; silently skips otherwise (the viewport
+   * repaints when the load completes).
+   */
+  private drawImageDrawable(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: ImageDrawable
+  ): void {
+    const element = getLoadedImage(drawable.src);
+    if (!element) return;
+    const halfW = drawable.width / 2;
+    const halfH = drawable.height / 2;
+    const topLeft = transform.worldToScreen({
+      x: drawable.centerX - halfW,
+      y: drawable.centerY + halfH,
+    });
+    const bottomRight = transform.worldToScreen({
+      x: drawable.centerX + halfW,
+      y: drawable.centerY - halfH,
+    });
+    if (![topLeft.x, topLeft.y, bottomRight.x, bottomRight.y].every(Number.isFinite)) {
+      return;
+    }
+    const widthPx = bottomRight.x - topLeft.x;
+    const heightPx = bottomRight.y - topLeft.y;
+    if (!(widthPx > 0) || !(heightPx > 0)) return;
+    ctx.save();
+    ctx.globalAlpha = drawable.opacity;
+    try {
+      ctx.drawImage(element, topLeft.x, topLeft.y, widthPx, heightPx);
+    } catch {
+      // A corrupt bitmap must never take down the frame.
+    }
+    ctx.restore();
   }
 
   /** A single straight segment (tangent/normal lines), dashed when flagged. */

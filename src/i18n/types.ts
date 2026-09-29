@@ -202,6 +202,9 @@ export interface CalculatorShellStrings {
       point: string;
       table: string;
       textNote: string;
+      folder: string;
+      image: string;
+      action: string;
     };
     kindOptions: Array<{ kind: string; label: string }>;
     addKindOptions: Array<{ kind: string; label: string }>;
@@ -239,6 +242,71 @@ export interface CalculatorShellStrings {
       table: string;
       note: string;
       noteEmpty: string;
+      folder: string;
+      image: string;
+      imageEmpty: string;
+      action: string;
+    };
+    /** The "+ Add" menu (Expression / Table / Folder / Note / Image / Action). */
+    addMenu: {
+      buttonAriaLabel: string;
+      expression: string;
+      expressionKindsAriaLabel: string;
+      table: string;
+      folder: string;
+      note: string;
+      image: string;
+      action: string;
+    };
+    tableEditor: {
+      columnX: string;
+      columnY: string;
+      addRow: string;
+      removeRowAriaTemplate: string;
+      cellAriaTemplate: string;
+      emptyHint: string;
+    };
+    noteEditor: {
+      placeholder: string;
+      ariaLabel: string;
+    };
+    folderRow: {
+      collapseAriaTemplate: string;
+      expandAriaTemplate: string;
+      itemCountTemplate: string;
+      emptyFolder: string;
+      moveToFolder: string;
+      moveToTopLevel: string;
+      noFolders: string;
+    };
+    imageEditor: {
+      srcLabel: string;
+      srcPlaceholder: string;
+      invalidSrc: string;
+      centerX: string;
+      centerY: string;
+      width: string;
+      height: string;
+      opacity: string;
+      uploadLabel: string;
+      uploadAria: string;
+      uploadedLabel: string;
+      clearImageAria: string;
+      uploadTooLarge: string;
+      loadFailed: string;
+    };
+    actionEditor: {
+      defaultButtonLabel: string;
+      buttonLabelLabel: string;
+      variableHeader: string;
+      valueHeader: string;
+      addAssignment: string;
+      removeAssignmentAriaTemplate: string;
+      runAriaTemplate: string;
+      lastRunTemplate: string;
+      invalidVariableTemplate: string;
+      evaluationErrorTemplate: string;
+      nonFiniteTemplate: string;
     };
   };
   graph: {

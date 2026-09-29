@@ -50,6 +50,10 @@ describe('defaultCspDirectives', () => {
     expect(directives['img-src']).toContain('blob:');
   });
 
+  it('allows https: images (user-supplied image expressions)', () => {
+    expect(directives['img-src']).toContain('https:');
+  });
+
   it('embeds every supplied script hash exactly once', () => {
     const values = directives['script-src'] as readonly string[];
     expect(values).toContain("'sha256-h1'");

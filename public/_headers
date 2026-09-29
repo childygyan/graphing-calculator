@@ -17,7 +17,7 @@
 # inline gtag config snippet's sha256 is in the hash list above.
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.googletagmanager.com 'sha256-u7n5BVkutmhxHuPinDrzbm1jIMnNOlcEWDu/qSJSiFw=' 'sha256-gNs96FXVRssm5joLF7KPAxTDrwPfoOWYrLPo7iLWP/E=' 'sha256-C/lXU9H0b6FRTyU+eorZni/GlhGl/oy7SKmrQGUzuEI=' 'sha256-QzWFZi+FLIx23tnm9SBU4aEgx4x8DsuASP07mfqol/c=' 'sha256-U7a72oKuFFz8D7GUHLA1NZ0ciymHmDOc9T9aVDg2rWU=' 'sha256-eLMRob6VUtK+6TWtBdIJFUN9Tr/fKA2pTMJBTPIviDM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://www.google-analytics.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.googletagmanager.com 'sha256-u7n5BVkutmhxHuPinDrzbm1jIMnNOlcEWDu/qSJSiFw=' 'sha256-gNs96FXVRssm5joLF7KPAxTDrwPfoOWYrLPo7iLWP/E=' 'sha256-C/lXU9H0b6FRTyU+eorZni/GlhGl/oy7SKmrQGUzuEI=' 'sha256-QzWFZi+FLIx23tnm9SBU4aEgx4x8DsuASP07mfqol/c=' 'sha256-U7a72oKuFFz8D7GUHLA1NZ0ciymHmDOc9T9aVDg2rWU=' 'sha256-eLMRob6VUtK+6TWtBdIJFUN9Tr/fKA2pTMJBTPIviDM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://www.google-analytics.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()

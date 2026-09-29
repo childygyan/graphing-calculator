@@ -30,6 +30,8 @@ import {
   MAX_DEFINITION_CHARS,
   MAX_DOCUMENT_NAME_CHARS,
   MAX_EXPRESSIONS,
+  MAX_ACTION_ASSIGNMENTS,
+  MAX_IMAGE_SRC_CHARS,
   MAX_LABEL_CHARS,
   MAX_TABLE_CELLS,
   MAX_TEXT_CONTENT_CHARS,
@@ -50,6 +52,9 @@ const EXPRESSION_KINDS: readonly ExpressionKind[] = [
   'inequality',
   'table',
   'text',
+  'folder',
+  'image',
+  'action',
 ];
 
 const INEQUALITY_OPERATORS: readonly InequalityOperator[] = ['<', '<=', '>', '>='];
@@ -220,6 +225,83 @@ function validateExpressionDefinition(
         if (
           !validator.finiteNumber(value.anchor.x, `${path}.anchor.x`) ||
           !validator.finiteNumber(value.anchor.y, `${path}.anchor.y`)
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+    case 'folder': {
+      if (typeof value.collapsed !== 'boolean') {
+        validator.error(`${path}.collapsed`, 'must be a boolean.');
+        return false;
+      }
+      if (
+        !Array.isArray(value.children) ||
+        !value.children.every((child) => typeof child === 'string')
+      ) {
+        validator.error(`${path}.children`, 'must be an array of strings.');
+        return false;
+      }
+      return true;
+    }
+    case 'image': {
+      if (typeof value.src !== 'string') {
+        validator.error(`${path}.src`, 'must be a string.');
+        return false;
+      }
+      if (value.src.length > MAX_IMAGE_SRC_CHARS) {
+        validator.error(`${path}.src`, `must be at most ${MAX_IMAGE_SRC_CHARS} characters.`);
+        return false;
+      }
+      const numericFields = ['centerX', 'centerY', 'width', 'height'] as const;
+      for (const field of numericFields) {
+        if (!validator.finiteNumber(value[field], `${path}.${field}`)) return false;
+      }
+      if (
+        typeof value.width !== 'number' ||
+        typeof value.height !== 'number' ||
+        !(value.width > 0) ||
+        !(value.height > 0)
+      ) {
+        validator.error(`${path}`, 'width and height must be positive numbers.');
+        return false;
+      }
+      if (typeof value.opacity !== 'number' || !(value.opacity >= 0) || !(value.opacity <= 1)) {
+        validator.error(`${path}.opacity`, 'must be a number between 0 and 1.');
+        return false;
+      }
+      return true;
+    }
+    case 'action': {
+      if (typeof value.buttonLabel !== 'string') {
+        validator.error(`${path}.buttonLabel`, 'must be a string.');
+        return false;
+      }
+      if (value.buttonLabel.length > MAX_LABEL_CHARS) {
+        validator.error(`${path}.buttonLabel`, `must be at most ${MAX_LABEL_CHARS} characters.`);
+        return false;
+      }
+      if (!Array.isArray(value.assignments)) {
+        validator.error(`${path}.assignments`, 'must be an array.');
+        return false;
+      }
+      if (value.assignments.length > MAX_ACTION_ASSIGNMENTS) {
+        validator.error(
+          `${path}.assignments`,
+          `must have at most ${MAX_ACTION_ASSIGNMENTS} assignments.`
+        );
+        return false;
+      }
+      for (let i = 0; i < value.assignments.length; i++) {
+        const assignment = value.assignments[i];
+        const assignmentPath = `${path}.assignments[${i}]`;
+        if (typeof assignment?.variable !== 'string' || assignment.variable.trim() === '') {
+          validator.error(`${assignmentPath}.variable`, 'must be a non-empty string.');
+          return false;
+        }
+        if (
+          validateDefinitionString(assignment.value, `${assignmentPath}.value`, validator) === null
         ) {
           return false;
         }

@@ -33,7 +33,8 @@ export const MAX_SUPPORTED_DOCUMENT_VERSION = 1;
 export const GRAPH_DOCUMENT_APP = 'graphing-calculator' as const;
 
 /** Strict import limits (import security): oversized documents are rejected. */
-export const MAX_IMPORT_BYTES = 256 * 1024;
+/** Raised from 256 KB: documents may embed uploaded images as data URLs. */
+export const MAX_IMPORT_BYTES = 1024 * 1024;
 export const MAX_EXPRESSIONS = 100;
 export const MAX_VARIABLES = 50;
 export const MAX_DEFINITION_CHARS = 4000;
@@ -41,6 +42,10 @@ export const MAX_LABEL_CHARS = 200;
 export const MAX_DOCUMENT_NAME_CHARS = 80;
 export const MAX_TEXT_CONTENT_CHARS = 20000;
 export const MAX_TABLE_CELLS = 5000;
+/** Image sources may be data: URLs; cap well below the import byte limit. */
+export const MAX_IMAGE_SRC_CHARS = 700 * 1024;
+/** Assignments per action button (import security). */
+export const MAX_ACTION_ASSIGNMENTS = 20;
 /** Guard against stack-overflow via deeply nested JSON. */
 export const MAX_JSON_NESTING_DEPTH = 64;
 

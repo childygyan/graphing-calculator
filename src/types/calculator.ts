@@ -3,14 +3,24 @@
  *
  * Expressions are a discriminated union on `kind` so new expression families
  * can be added without rewriting consumers. Nothing here is hard-coded to
- * y = f(x): cartesian, parametric, polar, points, inequalities, tables and
- * text notes are all first-class expression kinds.
+ * y = f(x): cartesian, parametric, polar, points, inequalities, tables,
+ * text notes, folders, images, and actions are all first-class expression
+ * kinds.
  */
 
 import type { ThemeMode } from '../data/site.js';
 
 export type ExpressionKind =
-  'cartesian' | 'parametric' | 'polar' | 'point' | 'inequality' | 'table' | 'text';
+  | 'cartesian'
+  | 'parametric'
+  | 'polar'
+  | 'point'
+  | 'inequality'
+  | 'table'
+  | 'text'
+  | 'folder'
+  | 'image'
+  | 'action';
 
 interface BaseExpression {
   id: string;
@@ -65,6 +75,50 @@ export interface TextExpression extends BaseExpression {
   definition: { content: string; anchor?: { x: number; y: number } };
 }
 
+/**
+ * A folder groups other expressions in the list. Children are referenced by
+ * id in `definition.children`; the flat expressions array stays the source
+ * of truth for ordering. Folders draw nothing on the graph.
+ */
+export interface FolderExpression extends BaseExpression {
+  kind: 'folder';
+  definition: { collapsed: boolean; children: string[] };
+}
+
+/**
+ * An image placed on the graph in world coordinates. `src` is an
+ * https:// or data:image/ URL; anything else is rejected at edit time.
+ * Images draw nothing until the underlying bitmap finishes loading.
+ */
+export interface ImageExpression extends BaseExpression {
+  kind: 'image';
+  definition: {
+    src: string;
+    centerX: number;
+    centerY: number;
+    width: number;
+    height: number;
+    opacity: number;
+  };
+}
+
+/** One variable assignment applied when an action button is pressed. */
+export interface ActionAssignment {
+  variable: string;
+  /** Math expression evaluated in the current variable scope at press time. */
+  value: string;
+}
+
+/**
+ * A pressable button in the expression list. On press, each assignment is
+ * evaluated and written to the named slider variable (created when missing).
+ * Actions draw nothing on the graph.
+ */
+export interface ActionExpression extends BaseExpression {
+  kind: 'action';
+  definition: { buttonLabel: string; assignments: ActionAssignment[] };
+}
+
 export type Expression =
   | CartesianExpression
   | ParametricExpression
@@ -72,7 +126,10 @@ export type Expression =
   | PointExpression
   | InequalityExpression
   | TableExpression
-  | TextExpression;
+  | TextExpression
+  | FolderExpression
+  | ImageExpression
+  | ActionExpression;
 
 export interface GraphViewport {
   xMin: number;

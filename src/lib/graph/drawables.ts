@@ -12,7 +12,12 @@
  * - polar: r(theta) over theta in [0, 2π] (parameter theta).
  * - inequality: y </<=/>/>= f(x) or x </<=/>/>= g(y) → a filled region
  *   polygon plus a boundary curve (dashed for strict inequalities).
- * - other kinds (table, text): skipped — later phases.
+ * - table: rows plotted as point markers. Each cell is a math expression
+ *   evaluated in the shared variable scope; unparsable or non-finite cells
+ *   are skipped, never fatal.
+ * - image: an ImageDrawable carrying world-space geometry; the renderer
+ *   paints the bitmap once it finishes loading (async image cache).
+ * - text, folder, action: never draw — list-only items.
  * - hidden expressions: skipped. Invalid expressions: skipped here; the
  *   expression editor surfaces the parse error inline.
  *
@@ -36,8 +41,10 @@ import type {
   CanvasSize,
   FunctionDrawable,
   GraphDrawable,
+  ImageDrawable,
   InequalityDrawable,
   ParametricDrawable,
+  PointMarkerDrawable,
   PolarDrawable,
   WorldPoint,
 } from './types.js';
@@ -68,6 +75,63 @@ function scoped(
   env: VariableEnvironment
 ): (v: number) => number {
   return compileExpressionScoped(source, { parameter, env }).fn;
+}
+
+/**
+ * Table rows → point markers. Cells are math expressions in the shared
+ * variable scope, so `a` in a cell follows the slider. Blank, unparsable,
+ * or non-finite cells are skipped; a table with no plottable rows draws
+ * nothing.
+ */
+function tableDrawable(
+  expression: Extract<Expression, { kind: 'table' }>,
+  env: VariableEnvironment
+): PointMarkerDrawable | null {
+  const points: WorldPoint[] = [];
+  for (const row of expression.definition.rows) {
+    const xSource = row[0] ?? '';
+    const ySource = row[1] ?? '';
+    if (xSource.trim() === '' || ySource.trim() === '') continue;
+    try {
+      const x = scoped(xSource, CARTESIAN_PARAMETER, env)(0);
+      const y = scoped(ySource, CARTESIAN_PARAMETER, env)(0);
+      if (Number.isFinite(x) && Number.isFinite(y)) points.push({ x, y });
+    } catch {
+      // Bad cell — the table editor shows no error for graph-only cells;
+      // the point is simply omitted.
+    }
+  }
+  if (points.length === 0) return null;
+  return {
+    ...baseDrawable(expression),
+    kind: 'point',
+    points,
+    radius: 5,
+  };
+}
+
+/**
+ * Image → world-space image drawable. The bitmap itself loads
+ * asynchronously (see lib/graph/images.ts); the renderer paints it when
+ * ready. Empty sources and non-positive geometry draw nothing.
+ */
+function imageDrawable(expression: Extract<Expression, { kind: 'image' }>): ImageDrawable | null {
+  const { src, centerX, centerY, width, height, opacity } = expression.definition;
+  if (typeof src !== 'string' || src.trim() === '') return null;
+  if (![centerX, centerY, width, height].every(Number.isFinite)) return null;
+  if (!(width > 0) || !(height > 0)) return null;
+  const clampedOpacity =
+    typeof opacity === 'number' && Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 1;
+  return {
+    ...baseDrawable(expression),
+    kind: 'image',
+    src: src.trim(),
+    centerX,
+    centerY,
+    width,
+    height,
+    opacity: clampedOpacity,
+  };
 }
 
 function cartesianDrawable(
@@ -189,8 +253,14 @@ export function buildFunctionDrawables(
       } else if (expression.kind === 'inequality') {
         const drawable = inequalityDrawable(expression, viewport, size, env);
         if (drawable) drawables.push(drawable);
+      } else if (expression.kind === 'table') {
+        const drawable = tableDrawable(expression, env);
+        if (drawable) drawables.push(drawable);
+      } else if (expression.kind === 'image') {
+        const drawable = imageDrawable(expression);
+        if (drawable) drawables.push(drawable);
       }
-      // table / text: later phases.
+      // text / folder / action: list-only, never drawn.
     } catch {
       // Invalid expression text — the editor shows the error; the graph
       // simply omits the curve.

@@ -45,6 +45,9 @@ export interface DefaultCspOptions {
  * googletagmanager.com and sends hits to google-analytics.com) — enabled
  * 2026-09-29 per site owner. The DeepSeek call happens server-side, so the
  * browser otherwise only ever calls our own `/api/ai/math`.
+ * `img-src` allows any https: source because the calculator's image
+ * expressions can reference user-supplied image URLs (loaded with
+ * `referrerPolicy="no-referrer"` and never with page credentials).
  */
 export function defaultCspDirectives(options: DefaultCspOptions): CspDirectiveMap {
   return {
@@ -55,7 +58,7 @@ export function defaultCspDirectives(options: DefaultCspOptions): CspDirectiveMa
       ...options.scriptHashes.map((hash) => `'sha256-${hash}'`),
     ],
     'style-src': ["'self'", "'unsafe-inline'"],
-    'img-src': ["'self'", 'data:', 'blob:'],
+    'img-src': ["'self'", 'data:', 'blob:', 'https:'],
     'connect-src': ["'self'", 'https://www.google-analytics.com'],
     'font-src': ["'self'"],
     'object-src': ["'none'"],

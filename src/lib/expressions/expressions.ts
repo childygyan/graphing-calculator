@@ -35,6 +35,9 @@ export const EXPRESSION_KIND_LABELS: Record<ExpressionKind, string> = {
   inequality: 'Inequality',
   table: 'Table',
   text: 'Text note',
+  folder: 'Folder',
+  image: 'Image',
+  action: 'Action',
 };
 
 export const DEFAULT_VIEWPORT: GraphViewport = {
@@ -60,6 +63,9 @@ const EXPRESSION_KINDS: readonly ExpressionKind[] = [
   'inequality',
   'table',
   'text',
+  'folder',
+  'image',
+  'action',
 ];
 
 /** Round-robin palette cursor; module-level so colors cycle across calls. */
@@ -74,6 +80,9 @@ const kindCounters: Record<ExpressionKind, number> = {
   inequality: 0,
   table: 0,
   text: 0,
+  folder: 0,
+  image: 0,
+  action: 0,
 };
 
 export function createExpressionId(): string {
@@ -174,6 +183,33 @@ export function createExpression(
         { ...baseExpression(kind, seedIndex), kind, definition: { content: '' } },
         overrides
       );
+    case 'folder':
+      return applyOverrides(
+        {
+          ...baseExpression(kind, seedIndex),
+          kind,
+          definition: { collapsed: false, children: [] },
+        },
+        overrides
+      );
+    case 'image':
+      return applyOverrides(
+        {
+          ...baseExpression(kind, seedIndex),
+          kind,
+          definition: { src: '', centerX: 0, centerY: 0, width: 4, height: 4, opacity: 1 },
+        },
+        overrides
+      );
+    case 'action':
+      return applyOverrides(
+        {
+          ...baseExpression(kind, seedIndex),
+          kind,
+          definition: { buttonLabel: '', assignments: [{ variable: 'a', value: 'a + 1' }] },
+        },
+        overrides
+      );
   }
 }
 
@@ -209,6 +245,17 @@ export function getExpressionSummary(expression: Expression): string {
       const content = expression.definition.content.trim();
       const preview = content.length > 40 ? content.slice(0, 40) + '...' : content;
       return preview ? `Note: ${preview}` : 'Note: (empty)';
+    }
+    case 'folder': {
+      const count = expression.definition.children.length;
+      return `Folder (${count} item${count === 1 ? '' : 's'})`;
+    }
+    case 'image': {
+      return expression.definition.src ? 'Image' : 'Image: (no source)';
+    }
+    case 'action': {
+      const count = expression.definition.assignments.length;
+      return `Action (${count} assignment${count === 1 ? '' : 's'})`;
     }
   }
 }
