@@ -86,9 +86,10 @@ export const methodology: MethodologyStrings = {
         'Sem interfaces copiadas. A calculadora é uma implementação independente. Ela não ' +
           'reproduz a marca, a interface nem o material protegido por direitos autorais de ' +
           'nenhum outro produto.',
-        'Sem coleta oculta de dados. Os gráficos ficam armazenados no seu navegador; os links ' +
-          'de compartilhamento codificam o estado no URL. Não há contas nem análises de ' +
-          'rastreamento ativadas por padrão. Consulte a política de privacidade para detalhes.',
+        'Sem coleta oculta de dados. Os gr\u00e1ficos s\u00e3o armazenados no seu navegador; os ' +
+          'links de compartilhamento codificam o estado na URL. N\u00e3o h\u00e1 contas. O site usa o ' +
+          'Google Analytics para estat\u00edsticas de uso agregadas. Consulte a pol\u00edtica de ' +
+          'privacidade para detalhes.',
       ],
       links: [{ label: 'política de privacidade', href: '/privacy-policy/' }],
     },

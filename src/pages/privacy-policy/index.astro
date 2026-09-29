@@ -1,7 +1,8 @@
 ---
 /**
  * Privacy Policy — static page. Concise, real policy matching what the
- * app actually does: no accounts, no analytics, no servers.
+ * app actually does: no accounts; Google Analytics for aggregate usage
+ * stats; graphs and settings stay in the browser.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../data/site.js';
@@ -9,7 +10,7 @@ import { siteConfig } from '../../data/site.js';
 
 <BaseLayout
   title="Privacy Policy"
-  description="Privacy policy for the Graphing Calculator: no accounts, no analytics, no cookies. Your AI assistant messages go to the app's own server endpoint."
+  description="Privacy policy for the Graphing Calculator: no accounts, Google Analytics for aggregate usage stats, and your graphs stay in your browser."
   canonicalPath="/privacy-policy/"
   mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
 >
@@ -23,9 +24,11 @@ import { siteConfig } from '../../data/site.js';
     </p>
     <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">What we collect</h2>
     <p>
-      Nothing by default. There are no accounts, no sign-ups, and no analytics. Browsing the site,
-      plotting functions, and saving graphs send no usage data, identifiers, or personal information
-      to any server.
+      There are no accounts or sign-ups. To understand aggregate usage, the site uses Google
+      Analytics, which collects usage data such as pages visited, device and browser type, and
+      approximate location. Browsing the site, plotting functions, and saving graphs send no
+      personal information — like your name or email — to any server, because the site never asks
+      for it.
     </p>
     <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">AI assistant</h2>
     <p>
@@ -44,8 +47,10 @@ import { siteConfig } from '../../data/site.js';
     </p>
     <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">Cookies</h2>
     <p>
-      The site sets no cookies and uses no third-party trackers. Because there are no analytics and
-      no advertising, there is no cookie banner and no consent to manage.
+      Google Analytics sets cookies (such as <code>_ga</code>) to recognize returning visitors and
+      measure aggregate usage. These are the only third-party cookies on the site; there is no
+      advertising. You can block or delete cookies in your browser settings, or use Google&rsquo;s
+      Analytics opt-out browser add-on, without breaking the calculator.
     </p>
     <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
       What stays in your browser

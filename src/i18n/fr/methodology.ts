@@ -90,10 +90,10 @@ export const methodology: MethodologyStrings = {
           'comparaisons avec d’autres produits n’énoncent que des faits publiquement connus.',
         'Pas d’interfaces copiées. La calculatrice est une implémentation indépendante. Elle ' +
           'ne reproduit la marque, l’interface ou le matériel protégé d’aucun autre produit.',
-        'Pas de collecte de données cachée. Les graphes sont stockés dans votre navigateur ; ' +
-          'les liens de partage encodent l’état dans l’URL. Il n’y a pas de comptes et pas ' +
-          'd’analyse de suivi activée par défaut. Voir la politique de confidentialité pour ' +
-          'les détails.',
+        'Pas de collecte de donn\u00e9es cach\u00e9e. Les graphiques sont stock\u00e9s dans votre ' +
+          'navigateur ; les liens de partage encodent l\u2019\u00e9tat dans l\u2019URL. Il n\u2019y a ' +
+          'aucun compte. Le site utilise Google Analytics pour des statistiques d\u2019utilisation ' +
+          'agr\u00e9g\u00e9es. Voir la politique de confidentialit\u00e9 pour plus de d\u00e9tails.',
       ],
       links: [{ label: 'politique de confidentialité', href: '/privacy-policy/' }],
     },

@@ -85,9 +85,10 @@ export const methodology: MethodologyStrings = {
         'Keine kopierten Oberflächen. Der Rechner ist eine unabhängige Implementierung. Er ' +
           'reproduziert weder Branding, Oberfläche noch urheberrechtlich geschütztes Material ' +
           'eines anderen Produkts.',
-        'Keine versteckte Datenerfassung. Graphen werden in Ihrem Browser gespeichert; ' +
-          'Freigabelinks kodieren den Zustand in der URL. Es gibt keine Konten und keine ' +
-          'standardmäßig aktivierten Tracking-Analysen. Details finden Sie in der Datenschutzerklärung.',
+        'Keine versteckte Datenerfassung. Graphen werden in deinem Browser gespeichert; ' +
+          'Freigabe-Links kodieren den Zustand in der URL. Es gibt keine Konten. Die Website ' +
+          'verwendet Google Analytics f\u00fcr aggregierte Nutzungsstatistiken. Details findest du ' +
+          'in der Datenschutzerkl\u00e4rung.',
       ],
       links: [{ label: 'Datenschutzerklärung', href: '/privacy-policy/' }],
     },

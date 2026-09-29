@@ -41,16 +41,22 @@ export interface DefaultCspOptions {
 /**
  * The default policy for the static site. Same-origin everything, no
  * plugins, no framing by third parties, forms post to self only.
- * `connect-src 'self'` is sufficient because the browser only ever calls
- * our own `/api/ai/math` endpoint — the DeepSeek call happens server-side.
+ * `connect-src` also allows Google Analytics (gtag.js loads from
+ * googletagmanager.com and sends hits to google-analytics.com) — enabled
+ * 2026-09-29 per site owner. The DeepSeek call happens server-side, so the
+ * browser otherwise only ever calls our own `/api/ai/math`.
  */
 export function defaultCspDirectives(options: DefaultCspOptions): CspDirectiveMap {
   return {
     'default-src': ["'self'"],
-    'script-src': ["'self'", ...options.scriptHashes.map((hash) => `'sha256-${hash}'`)],
+    'script-src': [
+      "'self'",
+      'https://www.googletagmanager.com',
+      ...options.scriptHashes.map((hash) => `'sha256-${hash}'`),
+    ],
     'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:', 'blob:'],
-    'connect-src': ["'self'"],
+    'connect-src': ["'self'", 'https://www.google-analytics.com'],
     'font-src': ["'self'"],
     'object-src': ["'none'"],
     'base-uri': ["'self'"],

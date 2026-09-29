@@ -43,12 +43,12 @@ export const about = {
     {
       heading: 'Cómo se manejan tus datos',
       body: [
-        'Todo se ejecuta en tu dispositivo. Las gráficas que guardas se almacenan en el ' +
-          'almacenamiento local de tu navegador; los enlaces para compartir codifican el ' +
-          'estado de la gráfica en la propia URL. No hay cuentas, no hay analíticas de ' +
-          'seguimiento activadas por defecto y la calculadora no envía datos personales a ' +
-          'ningún servidor. Las solicitudes al asistente de IA solo llegan al proveedor de IA ' +
-          'configurado cuando usas el asistente.',
+        'Todo se ejecuta en tu dispositivo. Los gr\u00e1ficos que guardas se almacenan en el ' +
+          'almacenamiento local de tu navegador; los enlaces para compartir codifican el estado del ' +
+          'gr\u00e1fico en la propia URL. No hay cuentas y la calculadora no env\u00eda datos ' +
+          'personales a ning\u00fan servidor. El sitio utiliza Google Analytics para medir el uso ' +
+          'agregado (consulta la pol\u00edtica de privacidad). Las solicitudes al asistente de IA solo ' +
+          'llegan al proveedor de IA configurado cuando utilizas el asistente.',
       ],
     },
     {

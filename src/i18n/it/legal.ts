@@ -29,8 +29,8 @@ export const legal: LegalStrings = {
     seo: {
       title: 'Informativa sulla privacy',
       description:
-        'Informativa sulla privacy di Graphing Calculator: niente account, niente analisi, niente cookie. ' +
-        'I tuoi messaggi all\u2019assistente AI vanno all\u2019endpoint server dell\u2019app.',
+        'Informativa sulla privacy di Graphing Calculator: nessun account, Google Analytics per ' +
+        'statistiche di utilizzo aggregate e i tuoi grafici restano nel tuo browser.',
     },
     updatedTemplate: 'Ultimo aggiornamento: {date}',
     heading: 'Privacy Policy',

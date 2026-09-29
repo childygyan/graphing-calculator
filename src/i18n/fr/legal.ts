@@ -28,8 +28,8 @@ export const legal: LegalStrings = {
     seo: {
       title: 'Politique de confidentialité',
       description:
-        'Politique de confidentialité de Graphing Calculator : pas de comptes, pas ' +
-        'd’analyse, pas de cookies. Vos messages à l’assistant IA vont au propre point ' +
+        'Politique de confidentialité de Graphing Calculator : aucun compte, Google Analytics ' +
+        'pour des statistiques d\u2019utilisation agrégées, et vos graphiques restent dans ' +
         'de terminaison serveur de l’application.',
     },
     updatedTemplate: 'Dernière mise à jour : {date}',

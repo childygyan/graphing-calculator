@@ -84,10 +84,10 @@ export const methodology = {
         'Sin interfaces copiadas. La calculadora es una implementación independiente. No ' +
           'reproduce la marca, la interfaz ni el material con derechos de autor de ningún ' +
           'otro producto.',
-        'Sin recopilación oculta de datos. Las gráficas se guardan en tu navegador; los ' +
-          'enlaces para compartir codifican el estado en la URL. No hay cuentas ni analíticas ' +
-          'de seguimiento activadas por defecto. Consulta la política de privacidad para más ' +
-          'detalles.',
+        'Sin recopilaci\u00f3n oculta de datos. Los gr\u00e1ficos se almacenan en tu navegador; ' +
+          'los enlaces para compartir codifican el estado en la URL. No hay cuentas. El sitio s\u00ed ' +
+          'utiliza Google Analytics para estad\u00edsticas de uso agregadas. Consulta la pol\u00edtica ' +
+          'de privacidad para m\u00e1s detalles.',
       ],
       links: [{ label: 'política de privacidad', href: '/privacy-policy/' }],
     },

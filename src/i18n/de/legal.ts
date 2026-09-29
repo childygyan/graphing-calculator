@@ -29,8 +29,8 @@ export const legal: LegalStrings = {
     seo: {
       title: 'Datenschutzerklärung',
       description:
-        'Datenschutzerklärung des Graphing Calculator: keine Konten, keine Analysen, keine Cookies. ' +
-        'Ihre KI-Assistenten-Nachrichten gehen an den eigenen Server-Endpunkt der App.',
+        'Datenschutzerklärung des Graphing Calculator: keine Konten, Google Analytics für ' +
+        'aggregierte Nutzungsstatistiken, deine Graphen bleiben in deinem Browser.',
     },
     updatedTemplate: 'Zuletzt aktualisiert: {date}',
     heading: 'Datenschutzerklärung',

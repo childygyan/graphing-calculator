@@ -44,12 +44,12 @@ export const about: AboutStrings = {
     {
       heading: 'Como seus dados são tratados',
       body: [
-        'Tudo é executado no seu dispositivo. Os gráficos que você salva ficam armazenados no ' +
-          'armazenamento local do seu navegador; os links de compartilhamento codificam o estado ' +
-          'do gráfico no próprio URL. Não há contas, nenhuma análise de rastreamento ativada por ' +
-          'padrão e nenhum dado pessoal enviado a um servidor pela calculadora. Solicitações ao ' +
-          'assistente de IA vão apenas para o provedor de IA configurado, e somente quando você ' +
-          'usa o assistente.',
+        'Tudo \u00e9 executado no seu dispositivo. Os gr\u00e1ficos salvos ficam no armazenamento ' +
+          'local do seu navegador; os links de compartilhamento codificam o estado do gr\u00e1fico ' +
+          'diretamente na URL. N\u00e3o h\u00e1 contas e a calculadora n\u00e3o envia dados pessoais ' +
+          'a nenhum servidor. O site usa o Google Analytics para medir o uso agregado (consulte a ' +
+          'pol\u00edtica de privacidade). As solicita\u00e7\u00f5es ao assistente de IA s\u00f3 chegam ' +
+          'ao provedor de IA configurado quando voc\u00ea usa o assistente.',
       ],
     },
     {

@@ -80,8 +80,8 @@ export const methodology: MethodologyStrings = {
         'No copied interfaces. The calculator is an independent implementation. It does not ' +
           'reproduce any other product\u2019s branding, interface, or copyrighted material.',
         'No hidden data collection. Graphs are stored in your browser; share links encode ' +
-          'state in the URL. There are no accounts and no tracking analytics enabled by default. ' +
-          'See the privacy policy for details.',
+          'state in the URL. There are no accounts. The site does use Google Analytics for ' +
+          'aggregate usage statistics. See the privacy policy for details.',
       ],
       links: [{ label: 'privacy policy', href: '/privacy-policy/' }],
     },

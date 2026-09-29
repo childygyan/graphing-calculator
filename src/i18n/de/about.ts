@@ -44,11 +44,12 @@ export const about: AboutStrings = {
     {
       heading: 'Wie Ihre Daten behandelt werden',
       body: [
-        'Alles läuft auf Ihrem Gerät. Gespeicherte Graphen liegen im lokalen Speicher Ihres Browsers; ' +
-          'Freigabelinks kodieren den Graphenzustand in der URL selbst. Es gibt keine Konten, keine ' +
-          'standardmäßig aktivierten Tracking-Analysen und keine persönlichen Daten, die der Rechner an ' +
-          'einen Server sendet. KI-Assistenten-Anfragen gehen nur dann an den konfigurierten KI-Anbieter, ' +
-          'wenn Sie den Assistenten nutzen.',
+        'Alles l\u00e4uft auf deinem Ger\u00e4t. Gespeicherte Graphen liegen im lokalen Speicher ' +
+          'deines Browsers; Freigabe-Links kodieren den Graphenzustand direkt in der URL. Es gibt ' +
+          'keine Konten, und der Rechner sendet keine pers\u00f6nlichen Daten an einen Server. Die ' +
+          'Website verwendet Google Analytics zur Messung der Gesamtnutzung (siehe ' +
+          'Datenschutzerkl\u00e4rung). KI-Assistenten-Anfragen gehen nur bei Nutzung des Assistenten ' +
+          'an den konfigurierten KI-Anbieter.',
       ],
     },
     {

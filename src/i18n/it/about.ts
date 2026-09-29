@@ -44,11 +44,12 @@ export const about: AboutStrings = {
     {
       heading: 'Come vengono gestiti i tuoi dati',
       body: [
-        'Tutto gira sul tuo dispositivo. I grafici che salvi sono conservati nello storage locale del tuo ' +
-          'browser; i link di condivisione codificano lo stato del grafico nell\u2019URL stesso. Non ci sono ' +
-          'account, nessuna analisi di tracciamento attiva di default e nessun dato personale inviato a un ' +
-          'server dalla calcolatrice. Le richieste all\u2019assistente AI vanno al provider AI configurato ' +
-          'solo quando usi l\u2019assistente.',
+        'Tutto viene eseguito sul tuo dispositivo. I grafici salvati sono archiviati nella memoria ' +
+          'locale del tuo browser; i link di condivisione codificano lo stato del grafico direttamente ' +
+          'nell\u2019URL. Non ci sono account e la calcolatrice non invia dati personali ad alcun ' +
+          'server. Il sito utilizza Google Analytics per misurare l\u2019utilizzo complessivo (vedi ' +
+          'l\u2019informativa sulla privacy). Le richieste all\u2019assistente IA raggiungono il ' +
+          'provider IA configurato solo quando utilizzi l\u2019assistente.',
       ],
     },
     {

@@ -33,6 +33,17 @@ export const siteConfig = {
   siteUrl: 'https://graphingcalculator.online',
   /** PLACEHOLDER — replace with a real contact address before launch. */
   contactEmail: 'contact@example.com',
+  /**
+   * Google Analytics 4 measurement ID (Firoz, 2026-09-29). Rendered by
+   * BaseLayout on every page. Public value — it appears in page source.
+   */
+  googleAnalyticsId: 'G-CT7LPWPCV4',
+  /**
+   * Google Search Console verification code (Firoz, 2026-09-29). Rendered
+   * as a meta tag by SeoHead. Overridable at build time via
+   * PUBLIC_GOOGLE_SITE_VERIFICATION.
+   */
+  googleSiteVerification: '9qSByFO2_LS68JSI9dZc6Ixc_SxPALwlXKyX6tNSIAY',
   defaultTheme: 'system' as ThemeMode,
   themeStorageKey: 'graphing-calculator-theme',
   stateStorageKey: 'graphing-calculator-state-v1',

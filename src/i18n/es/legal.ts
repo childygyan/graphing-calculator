@@ -29,8 +29,8 @@ export const legal = {
     seo: {
       title: 'Política de privacidad',
       description:
-        'Política de privacidad de Graphing Calculator: sin cuentas, sin analíticas, sin ' +
-        'cookies. Tus mensajes al asistente de IA llegan al propio servidor de la aplicación.',
+        'Política de privacidad de Graphing Calculator: sin cuentas, Google Analytics para ' +
+        'estadísticas de uso agregadas y tus gráficos se quedan en tu navegador.',
     },
     updatedTemplate: 'Última actualización: {date}',
     heading: 'Privacy Policy',

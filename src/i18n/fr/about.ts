@@ -47,12 +47,13 @@ export const about: AboutStrings = {
     {
       heading: 'Comment vos données sont traitées',
       body: [
-        'Tout s’exécute sur votre appareil. Les graphes que vous enregistrez sont stockés ' +
-          'dans le stockage local de votre navigateur ; les liens de partage encodent l’état ' +
-          'du graphe dans l’URL elle-même. Il n’y a pas de comptes, pas d’analyse de suivi ' +
-          'activée par défaut, et aucune donnée personnelle envoyée à un serveur par la ' +
-          'calculatrice. Les requêtes de l’assistant IA ne vont vers le fournisseur d’IA ' +
-          'configuré que lorsque vous utilisez l’assistant.',
+        'Tout s\u2019ex\u00e9cute sur votre appareil. Les graphiques enregistr\u00e9s sont stock\u00e9s ' +
+          'dans le stockage local de votre navigateur ; les liens de partage encodent l\u2019\u00e9tat ' +
+          'du graphique directement dans l\u2019URL. Il n\u2019y a aucun compte et la calculatrice ' +
+          'n\u2019envoie aucune donn\u00e9e personnelle \u00e0 un serveur. Le site utilise Google ' +
+          'Analytics pour mesurer l\u2019utilisation globale (voir la politique de ' +
+          'confidentialit\u00e9). Les requ\u00eates \u00e0 l\u2019assistant IA ne sont transmises au ' +
+          'fournisseur d\u2019IA configur\u00e9 que lorsque vous utilisez l\u2019assistant.',
       ],
     },
     {

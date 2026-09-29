@@ -37,8 +37,12 @@ describe('defaultCspDirectives', () => {
     expect(directives['base-uri']).toEqual(["'self'"]);
   });
 
-  it('keeps connect-src same-origin (the browser never calls DeepSeek directly)', () => {
-    expect(directives['connect-src']).toEqual(["'self'"]);
+  it('keeps connect-src same-origin except Google Analytics (browser never calls DeepSeek directly)', () => {
+    expect(directives['connect-src']).toEqual(["'self'", 'https://www.google-analytics.com']);
+  });
+
+  it('allows the Google Analytics tag host in script-src', () => {
+    expect(directives['script-src']).toContain('https://www.googletagmanager.com');
   });
 
   it('allows data: and blob: images (PNG export uses canvas data URLs)', () => {

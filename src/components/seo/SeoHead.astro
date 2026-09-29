@@ -48,11 +48,12 @@ const canonical = buildCanonical(localizedPath);
 const robotsContent = noindex ? 'noindex, nofollow' : (robots ?? 'index, follow');
 const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
 /**
- * Search Console verification slot. Env-driven and empty by default —
- * no verification code is fabricated; set PUBLIC_GOOGLE_SITE_VERIFICATION
- * at build time once a real Search Console property exists.
+ * Search Console verification slot. Build-time env var wins; falls back to
+ * the real code in site config (set 2026-09-29). Empty only if both are unset.
  */
-const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION as string | undefined;
+const googleVerification =
+  (import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION as string | undefined) ||
+  siteConfig.googleSiteVerification;
 ---
 
 <title>{title}</title>
