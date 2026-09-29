@@ -3,6 +3,11 @@
 # These cover legacy / typo entry points; the canonical routes are the
 # <to> targets. No mass redirects — one rule per genuine alias.
 
+# Canonical domain migration (Firoz, 2026-09-29): the *.pages.dev origin
+# now permanently redirects to the production domain. Host-specific source,
+# so it never fires on graphingcalculator.online itself (no loop).
+https://graphing-calc.pages.dev/* https://graphingcalculator.online/:splat 301
+
 /calculator/ /graphing-calculator/ 301
 /graphing-calculator.html /graphing-calculator/ 301
 /calculators.html /calculators/ 301

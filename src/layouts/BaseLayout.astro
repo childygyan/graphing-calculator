@@ -96,6 +96,19 @@ const dict = getDictionary(locale);
         }
       })();
     </script>
+    <!--
+      Canonical-domain redirect (Firoz, 2026-09-29): when a page is served
+      from the legacy *.pages.dev origin, bounce to graphingcalculator.online.
+      Belt-and-suspenders alongside the host-specific _redirects rule; the
+      exact bytes of this script are allow-listed by sha256 in public/_headers.
+    -->
+    <script is:inline>
+      if (location.hostname === 'graphing-calc.pages.dev') {
+        location.replace(
+          'https://graphingcalculator.online' + location.pathname + location.search + location.hash
+        );
+      }
+    </script>
   </head>
   <body>
     <a
