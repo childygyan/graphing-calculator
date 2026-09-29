@@ -8,9 +8,20 @@ export interface ModalProps {
   title: string;
   children: React.ReactNode;
   titleId?: string;
+  /** Accessible labels; English literals are the defaults. */
+  closeLabel?: string;
+  backdropLabel?: string;
 }
 
-export function Modal({ open, onClose, title, children, titleId }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  titleId,
+  closeLabel,
+  backdropLabel,
+}: ModalProps) {
   const [mounted, setMounted] = useState(false);
   const generatedId = useId();
   const headingId = titleId ?? `modal-title-${generatedId}`;
@@ -73,7 +84,7 @@ export function Modal({ open, onClose, title, children, titleId }: ModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        aria-label="Close dialog"
+        aria-label={backdropLabel ?? 'Close dialog'}
         onClick={onClose}
         className="absolute inset-0 bg-slate-950/50 transition-colors dark:bg-slate-950/70"
       />
@@ -93,7 +104,7 @@ export function Modal({ open, onClose, title, children, titleId }: ModalProps) {
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={closeLabel ?? 'Close'}
             className="inline-flex shrink-0 rounded-md p-1 text-slate-500 transition-colors
               hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400
               dark:hover:bg-slate-800 dark:hover:text-slate-200"

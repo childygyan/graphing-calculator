@@ -8,6 +8,7 @@ import SeoHead from '../components/seo/SeoHead.astro';
 import AnalyticsStub from '../components/seo/AnalyticsStub.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
+import { getDictionary, htmlLangFor, type Locale } from '../i18n/index.js';
 
 interface Props {
   title: string;
@@ -16,16 +17,27 @@ interface Props {
   noindex?: boolean;
   robots?: string;
   ogImage?: string;
+  /** Locale of this page; defaults to English. Drives <html lang>, the skip link, and the header/footer/seo dictionaries. */
+  locale?: Locale;
   /** Extra classes for the <main> wrapper (e.g. padding for marketing pages). */
   mainClass?: string;
 }
 
-const { title, description, canonicalPath, noindex, robots, ogImage, mainClass }: Props =
-  Astro.props;
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex,
+  robots,
+  ogImage,
+  locale = 'en',
+  mainClass,
+}: Props = Astro.props;
+const dict = getDictionary(locale);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={htmlLangFor(locale)}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,6 +48,7 @@ const { title, description, canonicalPath, noindex, robots, ogImage, mainClass }
       noindex={noindex}
       robots={robots}
       ogImage={ogImage}
+      locale={locale}
     />
     <!--
       Apply the stored theme before first paint to avoid a flash of the
@@ -63,13 +76,13 @@ const { title, description, canonicalPath, noindex, robots, ogImage, mainClass }
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-white"
     >
-      Skip to main content
+      {dict.chrome.skipLink}
     </a>
-    <Header />
+    <Header locale={locale} />
     <main id="main-content" class={mainClass}>
       <slot />
     </main>
-    <Footer />
+    <Footer locale={locale} />
     <AnalyticsStub />
   </body>
 </html>

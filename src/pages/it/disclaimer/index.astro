@@ -1,0 +1,83 @@
+---
+/**
+ * Disclaimer (it): the legal body stays in English verbatim (translating
+ * legal text changes legal meaning). Only the chrome is localized: title and
+ * description from the locale dictionary, and the "last updated" line uses
+ * the dictionary's updatedTemplate.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getDictionary, format, type Locale } from '../../../i18n/index.js';
+
+const locale: Locale = 'it';
+const dict = getDictionary(locale);
+const ns = dict.legal.disclaimer;
+
+// The date itself is never translated; only the surrounding template is.
+const updatedLine = format(ns.updatedTemplate, { date: 'September 29, 2026' });
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/it/disclaimer/"
+  locale={locale}
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Disclaimer</h1>
+  <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">{updatedLine}</p>
+
+  <div class="mt-6 space-y-4 text-slate-600 dark:text-slate-300">
+    <aside
+      class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+      aria-label={dict.legal.notice.title}
+    >
+      <p>
+        <strong class="font-semibold text-slate-900 dark:text-white">
+          {dict.legal.notice.title}
+        </strong>{' '}
+        {dict.legal.notice.body}
+      </p>
+    </aside>
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
+      AI assistant output is informational
+    </h2>
+    <p>
+      The built-in AI math assistant explains concepts and interprets requests in plain language,
+      but it can make mistakes — including confidently stated ones. Treat AI answers as a starting
+      point, not as authoritative mathematics.
+    </p>
+
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
+      Numerical results are computed, not proven
+    </h2>
+    <p>
+      Roots, derivatives, integrals, limits, and other analysis results are computed numerically
+      with floating-point arithmetic. They are accurate to the displayed precision under normal
+      conditions, but rounding and sampling can introduce small errors — especially near
+      discontinuities, sharp corners, or asymptotes. For homework, exams, engineering, or any
+      decision that matters, verify important calculations independently.
+    </p>
+
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
+      No professional advice
+    </h2>
+    <p>
+      Nothing on this site constitutes professional advice of any kind — mathematical, educational,
+      financial, or otherwise. The content is provided for general educational purposes.
+    </p>
+
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
+      Your graphs stay yours
+    </h2>
+    <p>
+      Graphs you save are stored only in your own browser. Shared links encode the graph in the link
+      itself, so anyone with the link can open it. Do not share links containing anything you would
+      not want others to see.
+    </p>
+
+    <p class="text-sm">
+      By using this site you accept that its authors are not liable for decisions made on the basis
+      of its output. See the Terms of Service for details.
+    </p>
+  </div>
+</BaseLayout>

@@ -2,20 +2,30 @@
 /**
  * Breadcrumbs — visible breadcrumb trail plus BreadcrumbList JSON-LD.
  * Every content page (functions, examples, learn, tools) renders one.
+ *
+ * The landmark's accessible name comes from the chrome dictionary;
+ * breadcrumb hrefs are localized (English output unchanged).
  */
 import JsonLd from './JsonLd.astro';
 import { breadcrumbSchema, type BreadcrumbItem } from '../../lib/seo/metadata';
+import { getDictionary, localizePath, type Locale } from '../../i18n/index.js';
 
 interface Props {
   items: BreadcrumbItem[];
+  locale?: Locale;
 }
 
-const { items }: Props = Astro.props;
+const { items, locale = 'en' }: Props = Astro.props;
+const dict = getDictionary(locale);
+const localized = items.map((item) => ({
+  ...item,
+  href: item.href ? localizePath(item.href, locale) : item.href,
+}));
 ---
 
-<nav aria-label="Breadcrumb" class="mb-6 text-sm">
+<nav aria-label={dict.chrome.breadcrumbs.ariaLabel} class="mb-6 text-sm">
   <ol class="flex flex-wrap items-center gap-1 text-slate-500 dark:text-slate-400">
-    {items.map((item, index) => (
+    {localized.map((item, index) => (
       <li class="flex items-center gap-1">
         {index > 0 && (
           <span aria-hidden="true" class="text-slate-300 dark:text-slate-600">
@@ -38,4 +48,4 @@ const { items }: Props = Astro.props;
     ))}
   </ol>
 </nav>
-<JsonLd schemas={[breadcrumbSchema(items)]} />
+<JsonLd schemas={[breadcrumbSchema(localized)]} />

@@ -8,22 +8,24 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { formatCoordinate } from '../../lib/graph/grid.js';
 import type { WorldPoint } from '../../lib/graph/types.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 export interface CoordinateDisplayHandle {
   setCoordinates(world: WorldPoint | null): void;
 }
 
-/** CoordinateDisplay takes no props; the imperative handle is its whole API. */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- intentionally empty props
+/** CoordinateDisplay takes the shell strings for the hover readout template. */
 export interface CoordinateDisplayProps {
-  // Intentionally empty.
+  strings: CalculatorShellStrings;
 }
 
 const CoordinateDisplay = forwardRef<CoordinateDisplayHandle, CoordinateDisplayProps>(
-  function CoordinateDisplay(_props, ref) {
+  function CoordinateDisplay({ strings }, ref) {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const textRef = useRef<HTMLSpanElement | null>(null);
 
+    const template = strings.graph.coordinateTemplate;
     useImperativeHandle(
       ref,
       () => ({
@@ -36,10 +38,13 @@ const CoordinateDisplay = forwardRef<CoordinateDisplayHandle, CoordinateDisplayP
             return;
           }
           container.style.visibility = 'visible';
-          text.textContent = `x: ${formatCoordinate(world.x)}, y: ${formatCoordinate(world.y)}`;
+          text.textContent = format(template, {
+            x: formatCoordinate(world.x),
+            y: formatCoordinate(world.y),
+          });
         },
       }),
-      []
+      [template]
     );
 
     return (

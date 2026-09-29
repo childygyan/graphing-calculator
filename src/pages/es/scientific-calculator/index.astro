@@ -1,0 +1,30 @@
+---
+/**
+ * Scientific calculator tool page (es): mirrors the English page. Strings from the locale dictionary.
+ */
+import ToolPageShell from '../../../components/content/ToolPageShell.astro';
+import { ScientificCalculator } from '../../../components/tools/ScientificCalculator.js';
+import { getDictionary, type Locale } from '../../../i18n/index.js';
+
+const locale: Locale = 'es';
+const dict = getDictionary(locale);
+const ns = dict.scientific;
+
+// FaqBlock consumes ContentFaq ({q, a}); the dictionary uses {question, answer}.
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+---
+
+<ToolPageShell
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/es/scientific-calculator/"
+  breadcrumbs={ns.crumbs}
+  heading={ns.heading}
+  intro={ns.intro}
+  sections={ns.sections}
+  faqs={faqs}
+  related={ns.related}
+  locale={locale}
+>
+  <ScientificCalculator client:load slot="tool" strings={ns.island} />
+</ToolPageShell>

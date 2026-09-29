@@ -1,0 +1,138 @@
+---
+/**
+ * Learn articles (de): mirrors the English template. Strings from the
+ * locale dictionary and locale content data (same slugs; `tryExpressions`
+ * are math and stay verbatim, linking to the localized calculator).
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import ArticleSections from '../../../components/content/ArticleSections.astro';
+import FaqBlock from '../../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import { getDictionary, localizePath, format, type Locale } from '../../../i18n/index.js';
+import { LEARN_ARTICLES } from '../../../data/seo/de/learn.js';
+import { articleSchema, faqSchema } from '../../../lib/seo/metadata.js';
+
+const locale: Locale = 'de';
+const dict = getDictionary(locale);
+const ns = dict.learn;
+
+export function getStaticPaths() {
+  return LEARN_ARTICLES.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const canonicalPath = `/de/learn/${article.slug}/`;
+// NOTE: no dictionary title template exists for learn articles; the English
+// page title pattern is kept verbatim (only the title localizes).
+const title = `${article.title} | Graphing Calculator`;
+
+const wordCount = article.sections
+  .flatMap((section) => [section.heading, ...section.body])
+  .join(' ')
+  .split(/\s+/).length;
+const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+
+/**
+ * Formats an ISO YYYY-MM-DD date with the dictionary's full month names.
+ * Returns null for anything that does not look like a valid ISO date, so the
+ * page never shows a wrong or malformed date — the date line is omitted.
+ */
+function formatReviewDate(iso: string | undefined): string | null {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
+  const [year, month, day] = iso.split('-').map(Number);
+  const months = ns.months;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return `${months[month - 1]} ${day}, ${year}`;
+}
+
+const reviewDate = formatReviewDate(article.reviewedOn);
+const tryIntroParts = ns.template.tryIntroTemplate.split('{link}');
+---
+
+<BaseLayout
+  title={title}
+  description={article.description}
+  canonicalPath={canonicalPath}
+  locale={locale}
+>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: article.title,
+        description: article.description,
+      }),
+      faqSchema(article.faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[{ ...ns.crumbs[0] }, { ...ns.crumbs[1] }, { label: article.title }]}
+      locale={locale}
+    />
+
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      {format(ns.template.minReadTemplate, { minutes: readingMinutes })}
+    </p>
+    <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {article.title}
+    </h1>
+
+    <aside
+      class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+      aria-label={ns.template.reviewAriaLabel}
+    >
+      <p>{ns.template.reviewLine}</p>
+      {reviewDate && (
+        <p class="mt-1">{format(ns.template.lastReviewedTemplate, { date: reviewDate })}</p>
+      )}
+    </aside>
+
+    <ArticleSections sections={article.sections} />
+
+    {article.tryExpressions.length > 0 && (
+      <section
+        class="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50"
+        aria-labelledby="try-it"
+      >
+        <h2 id="try-it" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          {ns.template.tryHeading}
+        </h2>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">
+          {tryIntroParts[0]}
+          <a
+            href={localizePath('/graphing-calculator/', locale)}
+            class="text-brand-700 hover:underline dark:text-brand-300"
+          >
+            {ns.template.calculatorLinkText}
+          </a>
+          {tryIntroParts[1]}
+        </p>
+        <ul class="mt-4 space-y-2 font-mono text-slate-900 dark:text-white">
+          {article.tryExpressions.map((expression) => (
+            <li class="rounded bg-white px-3 py-2 dark:bg-slate-900">{expression}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        {ns.template.takeawaysHeading}
+      </h2>
+      <ul class="mt-4 list-disc space-y-2 pl-6 text-slate-600 dark:text-slate-300">
+        {article.keyTakeaways.map((takeaway) => (
+          <li class="leading-7">{takeaway}</li>
+        ))}
+      </ul>
+    </section>
+
+    <FaqBlock faqs={article.faqs} locale={locale} />
+    <RelatedLinks paths={article.related} locale={locale} />
+  </div>
+</BaseLayout>

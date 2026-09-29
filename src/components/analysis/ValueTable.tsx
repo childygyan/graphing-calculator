@@ -12,6 +12,8 @@ import type { KeyboardEvent } from 'react';
 import { formatNumber } from '../../lib/math/format.js';
 import type { TableRow } from '../../lib/math/table.js';
 import type { PrecisionSettings } from '../../types/calculator.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 interface ValueTableProps {
   rows: TableRow[];
@@ -20,6 +22,7 @@ interface ValueTableProps {
   step: number;
   precision: PrecisionSettings;
   title: string;
+  strings: CalculatorShellStrings['analysis']['table'];
 }
 
 export function ValueTable({
@@ -29,7 +32,9 @@ export function ValueTable({
   step,
   precision,
   title,
+  strings,
 }: ValueTableProps) {
+  const t = strings;
   const [active, setActive] = useState(0);
   const rowRefs = useRef(new Map<number, HTMLTableRowElement>());
 
@@ -77,7 +82,7 @@ export function ValueTable({
   };
 
   if (rows.length === 0) {
-    return <p className="text-sm text-slate-500 dark:text-slate-400">No rows to show.</p>;
+    return <p className="text-sm text-slate-500 dark:text-slate-400">{t.noRows}</p>;
   }
 
   return (
@@ -126,7 +131,7 @@ export function ValueTable({
                 </td>
                 <td className="px-3 py-1 font-mono text-slate-900 dark:text-slate-100">
                   {row.y === null ? (
-                    <span title="Not defined at this x">—</span>
+                    <span title={t.notDefinedTitle}>—</span>
                   ) : (
                     formatNumber(row.y, precision)
                   )}
@@ -137,9 +142,12 @@ export function ValueTable({
         </table>
       </div>
       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        Step {formatNumber(step, precision)} · showing {rows.length} of {totalRows} rows
-        {truncated ? ' — narrow the range or increase the step to see the rest' : ''}. Focus the
-        table and use ↑/↓ to move between rows.
+        {format(t.stepCaptionTemplate, {
+          step: formatNumber(step, precision),
+          shown: rows.length,
+          total: totalRows,
+        })}
+        {truncated ? t.captionTruncatedSuffix : ''}. {t.keyboardHint}
       </p>
     </div>
   );

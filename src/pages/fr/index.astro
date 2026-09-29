@@ -1,0 +1,93 @@
+---
+/**
+ * Homepage (fr): mirrors the English homepage. Strings from the locale
+ * dictionary; internal links are localized.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '../../components/ui/index.js';
+import { ArrowRightIcon } from '../../components/ui/icons.js';
+import { getDictionary, localizePath, type Locale } from '../../i18n/index.js';
+
+const locale: Locale = 'fr';
+const dict = getDictionary(locale);
+const ns = dict.home;
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/fr/"
+  locale={locale}
+  mainClass="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16"
+>
+  <section class="text-center">
+    <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+      {ns.hero.title}
+    </h1>
+    <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+      {ns.hero.subtitle}
+    </p>
+    <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <a
+        href={localizePath('/graphing-calculator/', locale)}
+        class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400"
+      >
+        {ns.hero.primaryCta}
+      </a>
+      <a
+        href={localizePath('/learn/', locale)}
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+      >
+        {ns.hero.secondaryCta}
+      </a>
+    </div>
+  </section>
+
+  <section aria-label={ns.features.ariaLabel} class="mt-14">
+    <div class="grid gap-4 sm:grid-cols-2">
+      {ns.features.cards.map((card) => (
+        <Card className="flex flex-col">
+          <CardHeader>
+            <CardTitle>{card.title}</CardTitle>
+            <CardDescription>{card.description}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1">
+            <p class="text-sm text-slate-600 dark:text-slate-300">{card.body}</p>
+          </CardContent>
+          <CardFooter>
+            <a
+              href={localizePath(card.href, locale)}
+              class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+            >
+              {card.cta} <ArrowRightIcon className="h-4 w-4" />
+            </a>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  </section>
+
+  <section aria-label={ns.explore.ariaLabel} class="mt-14">
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {ns.explore.heading}
+    </h2>
+    <div class="mt-6 grid gap-4 sm:grid-cols-3">
+      {ns.explore.cards.map((card) => (
+        <a
+          href={localizePath(card.href, locale)}
+          class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+        >
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">{card.title}</h3>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{card.body}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

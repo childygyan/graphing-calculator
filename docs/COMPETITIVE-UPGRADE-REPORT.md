@@ -8,9 +8,10 @@ Phase 10 was final; this is a separately authorized workstream.
 ## Why
 
 Competitor analysis (2026-09-29):
+
 - **graphingcalculator.us** (13 pages): educator-voiced content, named reviewer
-  + "last reviewed" dates on guides, worked examples, polar + scientific
-  calculators.
+  - "last reviewed" dates on guides, worked examples, polar + scientific
+    calculators.
 - **graphingcalculator.io** (18+ pages): 3D graphing (`/3d`), blog, grade/GPA
   calculators, scientific calculator.
 
@@ -22,6 +23,7 @@ for the high-volume "desmos calculator" keyword.
 ## What was built
 
 ### A. 3D surface graphing — `/3d/` (indexed)
+
 - `src/lib/graph3d/`: `vec3.ts` (immutable Vec3 ops), `camera.ts` (orbit
   camera: azimuth/elevation/distance, perspective projection, clamped
   elevation/zoom), `surface.ts` (z = f(x, y) sampler over a grid with
@@ -44,6 +46,7 @@ for the high-volume "desmos calculator" keyword.
   NaN gaps, two-variable compilation, z-fit, render sort).
 
 ### B. Scientific calculator — `/scientific-calculator/` (indexed)
+
 - `src/lib/math/scientific.ts`: pure evaluation layer reusing
   `compileExpression` → AST → `compileAst`. DEG/RAD via AST rewrite
   (`sin(d)` → `sin(d·π/180)`); the shared `functions.ts` table was **not**
@@ -63,6 +66,7 @@ for the high-volume "desmos calculator" keyword.
   constants, every error path).
 
 ### C. Trust signals on learn guides
+
 - `LearnArticle.reviewedOn?: string` (ISO date, additive) in
   `src/data/seo/types.ts`; set to `2026-09-29` on all 6 articles in
   `src/data/seo/learn.ts`.
@@ -78,6 +82,7 @@ for the high-volume "desmos calculator" keyword.
   date validity, byline presence in built HTML, no fabricated reviewer names.
 
 ### D. `/desmos-alternative/` comparison page (indexed)
+
 - Title: "Best Desmos Alternative — Free Online Graphing Calculator"
   (never just "Desmos Calculator"). 153-char meta description.
 - Comparison table limited to publicly well-known Desmos facts only
@@ -93,6 +98,7 @@ for the high-volume "desmos calculator" keyword.
   independence notice, required links, no unverifiable Desmos claims).
 
 ### Integration (coordinator)
+
 - `src/lib/seo/page-registry.ts`: registered `/3d/`, `/scientific-calculator/`,
   `/desmos-alternative/` (sitemap + llms.txt + SEO audit pick them up).
 - `src/data/site.ts`: primary nav + footer links for the new pages.
@@ -104,21 +110,23 @@ for the high-volume "desmos calculator" keyword.
 
 ## Validation
 
-| Gate | Result |
-|---|---|
-| `tsc --noEmit` | 0 errors |
-| `eslint .` | clean |
-| `prettier --check .` | clean |
-| `npm test` | **557/557 pass** (45 files; 478 pre-existing + 79 new) |
-| `npm run build` | clean; `/3d/`, `/scientific-calculator/`, `/desmos-alternative/` in output, all indexed, correct titles |
+| Gate                     | Result                                                                                                      |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `tsc --noEmit`           | 0 errors                                                                                                    |
+| `eslint .`               | clean                                                                                                       |
+| `prettier --check .`     | clean                                                                                                       |
+| `npm test`               | **557/557 pass** (45 files; 478 pre-existing + 79 new)                                                      |
+| `npm run build`          | clean; `/3d/`, `/scientific-calculator/`, `/desmos-alternative/` in output, all indexed, correct titles     |
 | Live smoke (post-deploy) | `/3d/` 200, `/scientific-calculator/` 200, `/desmos-alternative/` 200, `/` 200, `/graphing-calculator/` 200 |
 
 ## Deployment
+
 - Cloudflare Pages project `graphing-calc`, production branch `main`.
 - Method: `wrangler pages deploy` with absolute staging path, pre-bundled
   minimal API worker (`_worker.js`, ~39 KB), `--skip-caching`.
 
 ## Known gaps / honest notes
+
 - 3D is wireframe-only (no solid shading); fine for math visualization, not a
   CAD renderer.
 - No blog yet (.io has one) — `/learn/` covers educational content instead.

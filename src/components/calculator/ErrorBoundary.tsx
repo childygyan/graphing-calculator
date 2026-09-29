@@ -12,6 +12,14 @@ import { AlertTriangleIcon } from '../ui/icons.js';
 export interface ErrorBoundaryProps {
   children: ReactNode;
   fallbackTitle?: string;
+  fallbackMessage?: string;
+  retryLabel?: string;
+}
+
+/** Translated generic fallback strings; passed by pages that own a dictionary. */
+export interface ErrorFallbackStrings {
+  message: string;
+  retry: string;
 }
 
 interface ErrorBoundaryState {
@@ -46,10 +54,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {this.props.fallbackTitle ?? 'Something went wrong'}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            An unexpected error interrupted this part of the page. Your other data is unaffected.
+            {this.props.fallbackMessage ??
+              'An unexpected error interrupted this part of the page. Your other data is unaffected.'}
           </p>
           <Button size="sm" variant="secondary" onClick={this.handleRetry}>
-            Try again
+            {this.props.retryLabel ?? 'Try again'}
           </Button>
         </div>
       );

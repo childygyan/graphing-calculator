@@ -15,15 +15,17 @@ import RelatedLinks from '../../components/content/RelatedLinks.astro';
 import { FUNCTION_PAGES } from '../../data/seo/functions.js';
 import { computeFunctionFacts } from '../../lib/seo/content-engine.js';
 import { faqSchema } from '../../lib/seo/metadata.js';
+import { getDictionary, format } from '../../i18n/index.js';
 
 export function getStaticPaths() {
   return FUNCTION_PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
 }
 
+const ns = getDictionary('en').functions;
 const { page } = Astro.props;
 const facts = computeFunctionFacts(page.expression);
 const canonicalPath = `/math-functions/${page.slug}/`;
-const title = `${page.displayName} — Graph & Properties | Graphing Calculator`;
+const title = `${format(ns.template.slugTitleTemplate, { displayName: page.displayName })} | Graphing Calculator`;
 
 const sampleRows = facts.samples.map((sample) => ({
   x: sample.x,

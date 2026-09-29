@@ -5,25 +5,35 @@
  * readers can keep exploring. Labels resolve through the central page
  * registry (`src/lib/seo/page-registry.ts`); unknown paths fall back to
  * the raw path and are flagged by the SEO test suite.
+ *
+ * The default heading comes from the chrome dictionary and links are
+ * localized (English output unchanged).
  */
 import { resolvePageLabel } from '../../lib/seo/page-registry';
+import { getDictionary, localizePath, type Locale } from '../../i18n/index.js';
 
 interface Props {
   paths: string[];
   heading?: string;
+  locale?: Locale;
 }
 
-const { paths, heading = 'Related pages' }: Props = Astro.props;
-const links = paths.map((path) => ({ path, label: resolvePageLabel(path) }));
+const { paths, heading, locale = 'en' }: Props = Astro.props;
+const dict = getDictionary(locale);
+const title = heading ?? dict.chrome.relatedDefaultHeading;
+const links = paths.map((path) => ({ path, label: resolvePageLabel(path, locale) }));
 ---
 
 {links.length > 0 && (
   <section class="mt-12 rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-    <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{heading}</h2>
+    <h2 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h2>
     <ul class="mt-4 grid gap-2 sm:grid-cols-2">
       {links.map((link) => (
         <li>
-          <a href={link.path} class="text-brand-700 hover:underline dark:text-brand-300">
+          <a
+            href={localizePath(link.path, locale)}
+            class="text-brand-700 hover:underline dark:text-brand-300"
+          >
             {link.label}
           </a>
         </li>

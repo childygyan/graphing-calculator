@@ -53,6 +53,8 @@ import type {
 } from '../../types/calculator.js';
 import { createExpressionId } from '../../lib/expressions/expressions.js';
 import { ValueTable } from './ValueTable.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 // ---------------------------------------------------------------------------
 // Shared bits
@@ -62,6 +64,7 @@ interface SectionProps {
   expression: CartesianExpression;
   fn: CompiledFunction;
   precision: PrecisionSettings;
+  strings: CalculatorShellStrings;
 }
 
 function SectionTitle({ children }: { children: ReactNode }): ReactNode {
@@ -117,7 +120,11 @@ function useClearMarkers(expression: CartesianExpression) {
 }
 
 /** Fill an x-input from the currently inspected graph point. */
-function useInspectedX(expressionId: string, setX: (v: string) => void) {
+function useInspectedX(
+  expressionId: string,
+  setX: (v: string) => void,
+  strings: CalculatorShellStrings
+) {
   const { state } = useCalculator();
   const inspected = state.inspectedPoint;
   if (!inspected || inspected.expressionId !== expressionId) return null;
@@ -126,9 +133,9 @@ function useInspectedX(expressionId: string, setX: (v: string) => void) {
       size="sm"
       variant="ghost"
       onClick={() => setX(String(inspected.x))}
-      title="Use the point selected by tapping the graph"
+      title={strings.analysis.table.useTappedPointTitle}
     >
-      Use tapped point
+      {strings.analysis.table.useTappedPoint}
     </Button>
   );
 }
@@ -162,10 +169,13 @@ function NumericInput({
 function PrecisionControls({
   precision,
   dispatch,
+  strings,
 }: {
   precision: PrecisionSettings;
   dispatch: Dispatch<CalculatorAction>;
+  strings: CalculatorShellStrings;
 }) {
+  const t = strings.analysis;
   const set = (patch: Partial<PrecisionSettings>): void => {
     const mode = patch.mode ?? precision.mode;
     const maxDigits = mode === 'significant' ? 15 : 12;
@@ -183,13 +193,13 @@ function PrecisionControls({
           id="precision-mode-label"
           className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200"
         >
-          Format
+          {t.precision.formatLabel}
         </span>
         <div role="group" aria-labelledby="precision-mode-label" className="flex gap-1">
           {(
             [
-              ['decimals', 'Decimals'],
-              ['significant', 'Significant'],
+              ['decimals', t.precision.decimals],
+              ['significant', t.precision.significant],
             ] as const
           ).map(([mode, label]) => (
             <button
@@ -210,7 +220,11 @@ function PrecisionControls({
       </div>
       <div className="w-28">
         <TextInput
-          label={precision.mode === 'significant' ? 'Digits (1–15)' : 'Places (0–12)'}
+          label={
+            precision.mode === 'significant'
+              ? t.precision.digitsTemplate
+              : t.precision.placesTemplate
+          }
           value={String(precision.digits)}
           onChange={(v) => {
             const n = parseNumericInput(v);
@@ -227,7 +241,8 @@ function PrecisionControls({
 // Value table
 // ---------------------------------------------------------------------------
 
-function TableSection({ expression, fn, precision }: SectionProps) {
+function TableSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const [start, setStart] = useState('-10');
   const [end, setEnd] = useState('10');
   const [step, setStep] = useState('auto');
@@ -238,7 +253,7 @@ function TableSection({ expression, fn, precision }: SectionProps) {
     const s = parseNumericInput(start);
     const e = parseNumericInput(end);
     if (s === null || e === null) {
-      setError('Enter valid numbers for start and end.');
+      setError(t.table.startError);
       setTable(null);
       return;
     }
@@ -247,7 +262,7 @@ function TableSection({ expression, fn, precision }: SectionProps) {
     if (trimmed !== '' && trimmed !== 'auto') {
       const n = parseNumericInput(trimmed);
       if (n === null || n <= 0) {
-        setError('Step must be a positive number or "auto".');
+        setError(t.table.stepError);
         setTable(null);
         return;
       }
@@ -259,15 +274,15 @@ function TableSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Table of values</SectionTitle>
+      <SectionTitle>{t.table.title}</SectionTitle>
       <div className="grid grid-cols-3 gap-2">
-        <NumericInput label="Start" value={start} onChange={setStart} placeholder="-10" />
-        <NumericInput label="End" value={end} onChange={setEnd} placeholder="10" />
-        <NumericInput label='Step ("auto")' value={step} onChange={setStep} placeholder="auto" />
+        <NumericInput label={t.table.start} value={start} onChange={setStart} placeholder="-10" />
+        <NumericInput label={t.table.end} value={end} onChange={setEnd} placeholder="10" />
+        <NumericInput label={t.table.step} value={step} onChange={setStep} placeholder="auto" />
       </div>
       <div className="mt-2">
         <Button size="sm" variant="secondary" onClick={build}>
-          Build table
+          {t.table.build}
         </Button>
       </div>
       {error ? <EmptyNote>{error}</EmptyNote> : null}
@@ -279,7 +294,8 @@ function TableSection({ expression, fn, precision }: SectionProps) {
             truncated={table.truncated}
             step={table.step}
             precision={precision}
-            title={`Table of values for ${expression.label}`}
+            title={format(t.table.captionTemplate, { label: expression.label })}
+            strings={strings.analysis.table}
           />
         </div>
       ) : null}
@@ -291,7 +307,8 @@ function TableSection({ expression, fn, precision }: SectionProps) {
 // Roots
 // ---------------------------------------------------------------------------
 
-function RootsSection({ expression, fn, precision }: SectionProps) {
+function RootsSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const { state } = useCalculator();
   const pinMarkers = usePinMarkers(expression);
   const clearMarkers = useClearMarkers(expression);
@@ -341,14 +358,14 @@ function RootsSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Roots</SectionTitle>
+      <SectionTitle>{t.roots.title}</SectionTitle>
       <div className="grid grid-cols-2 gap-2">
-        <NumericInput label="From" value={a} onChange={setA} />
-        <NumericInput label="To" value={b} onChange={setB} />
+        <NumericInput label={t.roots.from} value={a} onChange={setA} />
+        <NumericInput label={t.roots.to} value={b} onChange={setB} />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <Button size="sm" variant="secondary" onClick={find}>
-          Find roots
+          {t.roots.find}
         </Button>
         <Button
           size="sm"
@@ -358,20 +375,20 @@ function RootsSection({ expression, fn, precision }: SectionProps) {
             setB(String(state.viewport.xMax));
           }}
         >
-          Use viewport
+          {t.roots.useViewport}
         </Button>
         <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
           <input type="checkbox" checked={pinned} onChange={togglePinned} />
-          Show on graph
+          {t.roots.showOnGraph}
         </label>
       </div>
       {roots === null ? null : roots.length === 0 ? (
-        <EmptyNote>No roots found in this range.</EmptyNote>
+        <EmptyNote>{t.roots.none}</EmptyNote>
       ) : (
         <ul className="mt-2 space-y-1">
           {roots.map((x, i) => (
             <li key={i} className="font-mono text-sm text-slate-900 dark:text-slate-100">
-              x = {formatNumber(x, precision)}
+              {format(t.roots.resultTemplate, { x: formatNumber(x, precision) })}
             </li>
           ))}
         </ul>
@@ -389,7 +406,9 @@ function IntersectionsSection({
   fn,
   precision,
   all,
+  strings,
 }: SectionProps & { all: Expression[] }) {
+  const t = strings.analysis;
   const { state } = useCalculator();
   const pinMarkers = usePinMarkers(expression);
   const clearMarkers = useClearMarkers(expression);
@@ -436,18 +455,20 @@ function IntersectionsSection({
   if (others.length === 0) {
     return (
       <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-        <SectionTitle>Intersections</SectionTitle>
-        <EmptyNote>Add a second Cartesian expression to find intersections.</EmptyNote>
+        <SectionTitle>{t.intersections.title}</SectionTitle>
+        <EmptyNote>{t.intersections.noneDefined}</EmptyNote>
       </div>
     );
   }
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Intersections</SectionTitle>
+      <SectionTitle>{t.intersections.title}</SectionTitle>
       <div className="flex flex-wrap items-end gap-2">
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-slate-700 dark:text-slate-200">With</span>
+          <span className="mb-1 block font-medium text-slate-700 dark:text-slate-200">
+            {t.intersections.with}
+          </span>
           <select
             value={otherId}
             onChange={(e) => {
@@ -466,18 +487,18 @@ function IntersectionsSection({
           </select>
         </label>
         <Button size="sm" variant="secondary" onClick={find}>
-          Find intersections
+          {t.intersections.find}
         </Button>
         <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
           <input type="checkbox" checked={pinned} onChange={togglePinned} />
-          Show on graph
+          {t.intersections.showOnGraph}
         </label>
       </div>
       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        Searched within the current viewport x-range.
+        {t.intersections.viewportNote}
       </p>
       {points === null ? null : points.length === 0 ? (
-        <EmptyNote>No intersections found in the viewport.</EmptyNote>
+        <EmptyNote>{t.intersections.none}</EmptyNote>
       ) : (
         <ul className="mt-2 space-y-1">
           {points.map((p, i) => (
@@ -495,11 +516,12 @@ function IntersectionsSection({
 // Derivative
 // ---------------------------------------------------------------------------
 
-function DerivativeSection({ expression, fn, precision }: SectionProps) {
+function DerivativeSection({ expression, fn, precision, strings }: SectionProps) {
   const { state, dispatch } = useCalculator();
   const [x, setX] = useState('0');
   const [value, setValue] = useState<number | null>(null);
-  const useTapped = useInspectedX(expression.id, setX);
+  const t = strings.analysis;
+  const useTapped = useInspectedX(expression.id, setX, strings);
   const plotted = state.analysis.derivativePlots.some((p) => p.expressionId === expression.id);
 
   const compute = (): void => {
@@ -509,10 +531,10 @@ function DerivativeSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Derivative</SectionTitle>
+      <SectionTitle>{t.derivative.title}</SectionTitle>
       <div className="flex flex-wrap items-end gap-2">
         <div className="w-32">
-          <NumericInput label="At x =" value={x} onChange={setX} />
+          <NumericInput label={t.derivative.atX} value={x} onChange={setX} />
         </div>
         <Button size="sm" variant="secondary" onClick={compute}>
           f′(x)
@@ -524,18 +546,18 @@ function DerivativeSection({ expression, fn, precision }: SectionProps) {
           onClick={() => dispatch({ type: 'TOGGLE_DERIVATIVE_PLOT', expressionId: expression.id })}
           aria-pressed={plotted}
         >
-          {plotted ? 'Hide f′(x)' : 'Plot f′(x)'}
+          {plotted ? t.derivative.hide : t.derivative.plot}
         </Button>
       </div>
       {value !== null ? (
         <ResultLine>
-          f′({formatNumber(parseNumericInput(x) ?? NaN, precision)}) ={' '}
-          {formatNumber(value, precision)}
+          {format(t.derivative.resultTemplate, {
+            x: formatNumber(parseNumericInput(x) ?? NaN, precision),
+            value: formatNumber(value, precision),
+          })}
         </ResultLine>
       ) : null}
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        Numerical (central difference) — not a symbolic derivative.
-      </p>
+      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t.derivative.note}</p>
     </div>
   );
 }
@@ -544,7 +566,8 @@ function DerivativeSection({ expression, fn, precision }: SectionProps) {
 // Integral
 // ---------------------------------------------------------------------------
 
-function IntegralSection({ expression, fn, precision }: SectionProps) {
+function IntegralSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const { state, dispatch } = useCalculator();
   const [a, setA] = useState('0');
   const [b, setB] = useState('1');
@@ -595,14 +618,14 @@ function IntegralSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Definite integral</SectionTitle>
+      <SectionTitle>{t.integral.title}</SectionTitle>
       <div className="grid grid-cols-2 gap-2">
-        <NumericInput label="From a" value={a} onChange={setA} />
-        <NumericInput label="To b" value={b} onChange={setB} />
+        <NumericInput label={t.integral.fromA} value={a} onChange={setA} />
+        <NumericInput label={t.integral.toB} value={b} onChange={setB} />
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
         <Button size="sm" variant="secondary" onClick={compute}>
-          Compute
+          {t.integral.compute}
         </Button>
         <Button
           size="sm"
@@ -610,17 +633,16 @@ function IntegralSection({ expression, fn, precision }: SectionProps) {
           onClick={toggleShade}
           aria-pressed={!!existing}
         >
-          {existing ? 'Hide shading' : 'Shade area'}
+          {existing ? t.integral.hideShading : t.integral.shadeArea}
         </Button>
       </div>
       {result ? (
         result.converged ? (
-          <ResultLine>∫ = {formatNumber(result.value, precision)}</ResultLine>
+          <ResultLine>
+            {format(t.integral.resultTemplate, { value: formatNumber(result.value, precision) })}
+          </ResultLine>
         ) : (
-          <EmptyNote>
-            The quadrature did not converge on this interval (possible singularity or domain gap) —
-            no value reported.
-          </EmptyNote>
+          <EmptyNote>{t.integral.noConvergence}</EmptyNote>
         )
       ) : null}
     </div>
@@ -631,11 +653,12 @@ function IntegralSection({ expression, fn, precision }: SectionProps) {
 // Limits
 // ---------------------------------------------------------------------------
 
-function LimitSection({ expression, fn, precision }: SectionProps) {
+function LimitSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const [x, setX] = useState('0');
   const [side, setSide] = useState<LimitSide>('two-sided');
   const [result, setResult] = useState<LimitResult | null>(null);
-  const useTapped = useInspectedX(expression.id, setX);
+  const useTapped = useInspectedX(expression.id, setX, strings);
 
   const compute = (): void => {
     const c = parseNumericInput(x);
@@ -645,37 +668,43 @@ function LimitSection({ expression, fn, precision }: SectionProps) {
   const describe = (r: LimitResult): string => {
     switch (r.status) {
       case 'converges':
-        return `Limit = ${formatNumber(r.value ?? NaN, precision)}`;
+        return format(t.limit.convergesTemplate, {
+          value: formatNumber(r.value ?? NaN, precision),
+        });
       case 'unbounded':
-        return `Unbounded — approaches ${r.direction === -1 ? '−∞' : '+∞'}`;
+        return format(t.limit.unboundedTemplate, {
+          direction: r.direction === -1 ? '−∞' : '+∞',
+        });
       case 'does-not-exist':
-        return 'Does not exist (one-sided limits disagree or the function oscillates)';
+        return t.limit.doesNotExist;
       case 'indeterminate':
-        return 'Cannot determine — the function is not defined near this point';
+        return t.limit.indeterminate;
     }
   };
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Limit</SectionTitle>
+      <SectionTitle>{t.limit.title}</SectionTitle>
       <div className="flex flex-wrap items-end gap-2">
         <div className="w-32">
-          <NumericInput label="At x =" value={x} onChange={setX} />
+          <NumericInput label={t.limit.atX} value={x} onChange={setX} />
         </div>
         <label className="block text-sm">
-          <span className="mb-1 block font-medium text-slate-700 dark:text-slate-200">Side</span>
+          <span className="mb-1 block font-medium text-slate-700 dark:text-slate-200">
+            {t.limit.side}
+          </span>
           <select
             value={side}
             onChange={(e) => setSide(e.target.value as LimitSide)}
             className="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
-            <option value="two-sided">Two-sided</option>
-            <option value="left">Left</option>
-            <option value="right">Right</option>
+            <option value="two-sided">{t.limit.sides.twoSided}</option>
+            <option value="left">{t.limit.sides.left}</option>
+            <option value="right">{t.limit.sides.right}</option>
           </select>
         </label>
         <Button size="sm" variant="secondary" onClick={compute}>
-          Compute
+          {t.limit.compute}
         </Button>
         {useTapped}
       </div>
@@ -688,7 +717,8 @@ function LimitSection({ expression, fn, precision }: SectionProps) {
 // Extrema
 // ---------------------------------------------------------------------------
 
-function ExtremaSection({ expression, fn, precision }: SectionProps) {
+function ExtremaSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const { state } = useCalculator();
   const pinMarkers = usePinMarkers(expression);
   const clearMarkers = useClearMarkers(expression);
@@ -720,24 +750,26 @@ function ExtremaSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Local extrema</SectionTitle>
+      <SectionTitle>{t.extrema.title}</SectionTitle>
       <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" variant="secondary" onClick={find}>
-          Find in viewport
+          {t.extrema.find}
         </Button>
         <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
           <input type="checkbox" checked={pinned} onChange={togglePinned} />
-          Show on graph
+          {t.extrema.showOnGraph}
         </label>
       </div>
       {extrema === null ? null : extrema.length === 0 ? (
-        <EmptyNote>No local minima or maxima found in the viewport.</EmptyNote>
+        <EmptyNote>{t.extrema.none}</EmptyNote>
       ) : (
         <ul className="mt-2 space-y-1">
           {extrema.map((e, i) => (
             <li key={i} className="font-mono text-sm text-slate-900 dark:text-slate-100">
-              {e.kind === 'min' ? 'Min' : 'Max'} at ({formatNumber(e.x, precision)},{' '}
-              {formatNumber(e.y, precision)})
+              {format(e.kind === 'min' ? t.extrema.minTemplate : t.extrema.maxTemplate, {
+                x: formatNumber(e.x, precision),
+                y: formatNumber(e.y, precision),
+              })}
             </li>
           ))}
         </ul>
@@ -750,12 +782,13 @@ function ExtremaSection({ expression, fn, precision }: SectionProps) {
 // Tangent / normal
 // ---------------------------------------------------------------------------
 
-function TangentSection({ expression, fn, precision }: SectionProps) {
+function TangentSection({ expression, fn, precision, strings }: SectionProps) {
+  const t = strings.analysis;
   const { state, dispatch } = useCalculator();
   const [x, setX] = useState('0');
   const [info, setInfo] = useState<TangentInfo | null>(null);
   const [failed, setFailed] = useState(false);
-  const useTapped = useInspectedX(expression.id, setX);
+  const useTapped = useInspectedX(expression.id, setX, strings);
   const existing = state.analysis.tangents.find((t) => t.expressionId === expression.id);
 
   const upsert = (showTangent: boolean, showNormal: boolean): void => {
@@ -800,13 +833,13 @@ function TangentSection({ expression, fn, precision }: SectionProps) {
 
   return (
     <div className="border-t border-slate-100 py-3 dark:border-slate-800">
-      <SectionTitle>Tangent &amp; normal</SectionTitle>
+      <SectionTitle>{t.tangent.title}</SectionTitle>
       <div className="flex flex-wrap items-end gap-2">
         <div className="w-32">
-          <NumericInput label="At x =" value={x} onChange={setX} />
+          <NumericInput label={t.tangent.atX} value={x} onChange={setX} />
         </div>
         <Button size="sm" variant="secondary" onClick={compute}>
-          Compute
+          {t.tangent.compute}
         </Button>
         {useTapped}
       </div>
@@ -817,7 +850,7 @@ function TangentSection({ expression, fn, precision }: SectionProps) {
             checked={existing?.showTangent ?? false}
             onChange={(e) => upsert(e.target.checked, existing?.showNormal ?? false)}
           />
-          Show tangent
+          {t.tangent.showTangent}
         </label>
         <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
           <input
@@ -825,20 +858,23 @@ function TangentSection({ expression, fn, precision }: SectionProps) {
             checked={existing?.showNormal ?? false}
             onChange={(e) => upsert(existing?.showTangent ?? false, e.target.checked)}
           />
-          Show normal
+          {t.tangent.showNormal}
         </label>
       </div>
-      {failed ? (
-        <EmptyNote>
-          No tangent here — the function is not defined or not differentiable at this x.
-        </EmptyNote>
-      ) : null}
+      {failed ? <EmptyNote>{t.tangent.failed}</EmptyNote> : null}
       {info ? (
         <div className="mt-2 space-y-1">
-          <ResultLine>Tangent: {lineEquation(info.tangent, precision)}</ResultLine>
-          <ResultLine>Normal: {lineEquation(info.normal, precision)}</ResultLine>
+          <ResultLine>
+            {format(t.tangent.tangentTemplate, { equation: lineEquation(info.tangent, precision) })}
+          </ResultLine>
+          <ResultLine>
+            {format(t.tangent.normalTemplate, { equation: lineEquation(info.normal, precision) })}
+          </ResultLine>
           <p className="font-mono text-xs text-slate-500 dark:text-slate-400">
-            slope f′({formatNumber(info.x, precision)}) = {formatNumber(info.slope, precision)}
+            {format(t.tangent.slopeTemplate, {
+              x: formatNumber(info.x, precision),
+              slope: formatNumber(info.slope, precision),
+            })}
           </p>
         </div>
       ) : null}
@@ -853,12 +889,15 @@ function TangentSection({ expression, fn, precision }: SectionProps) {
 function ExpressionAnalysis({
   expression,
   all,
+  strings,
 }: {
   expression: CartesianExpression;
   all: Expression[];
+  strings: CalculatorShellStrings;
 }) {
   const { state } = useCalculator();
   const env = useVariableEnvironment();
+  const t = strings.analysis;
   const compiled = useMemo(() => {
     try {
       return {
@@ -871,7 +910,7 @@ function ExpressionAnalysis({
     } catch (error) {
       return {
         fn: null,
-        error: error instanceof Error ? error.message : 'Could not parse this expression.',
+        error: error instanceof Error ? error.message : t.tangent.couldNotParse,
       };
     }
     // The compiled closure reads the environment's live values map at call
@@ -894,7 +933,9 @@ function ExpressionAnalysis({
       </summary>
       {compiled.fn === null || compiled.error !== null ? (
         <EmptyNote>
-          Cannot analyze this expression: {compiled.error ?? 'unknown parse error.'}
+          {format(t.tangent.cannotAnalyzeTemplate, {
+            error: compiled.error ?? t.tangent.unknownParseError,
+          })}
         </EmptyNote>
       ) : (
         <div className="pb-2">
@@ -902,42 +943,50 @@ function ExpressionAnalysis({
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <RootsSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <IntersectionsSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
             all={all}
+            strings={strings}
           />
           <DerivativeSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <IntegralSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <LimitSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <ExtremaSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
           <TangentSection
             expression={expression}
             fn={compiled.fn}
             precision={state.analysis.precision}
+            strings={strings}
           />
         </div>
       )}
@@ -949,14 +998,15 @@ function ExpressionAnalysis({
 // Annotations
 // ---------------------------------------------------------------------------
 
-function AnnotationsSection() {
+function AnnotationsSection({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
   const annotations = state.analysis.annotations;
   const inspected = state.inspectedPoint;
+  const t = strings.analysis;
 
   return (
     <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
-      <SectionTitle>Annotations</SectionTitle>
+      <SectionTitle>{t.annotations.title}</SectionTitle>
       {inspected ? (
         <div className="mb-2">
           <Button
@@ -980,15 +1030,12 @@ function AnnotationsSection() {
               });
             }}
           >
-            Annotate tapped point
+            {t.annotations.annotateTapped}
           </Button>
         </div>
       ) : null}
       {annotations.length === 0 ? (
-        <EmptyNote>
-          No annotations yet. Tap a curve on the graph, then annotate the point — or rename and
-          remove annotations here.
-        </EmptyNote>
+        <EmptyNote>{t.annotations.empty}</EmptyNote>
       ) : (
         <ul className="space-y-2">
           {annotations.map((a) => (
@@ -1014,21 +1061,21 @@ function AnnotationsSection() {
                         patch: { visible: e.target.checked },
                       })
                     }
-                    aria-label={`Show annotation ${a.label}`}
+                    aria-label={format(t.annotations.showAriaTemplate, { label: a.label })}
                   />
-                  Show
+                  {t.annotations.show}
                 </label>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => dispatch({ type: 'REMOVE_ANNOTATION', id: a.id })}
-                  aria-label={`Delete annotation ${a.label}`}
+                  aria-label={format(t.annotations.deleteAriaTemplate, { label: a.label })}
                 >
                   ×
                 </Button>
               </div>
               <TextInput
-                label="Label"
+                label={t.annotations.label}
                 value={a.label}
                 onChange={(v) =>
                   dispatch({
@@ -1050,29 +1097,36 @@ function AnnotationsSection() {
 // Panel
 // ---------------------------------------------------------------------------
 
-export function AnalysisPanel() {
+export function AnalysisPanel({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
   const cartesian = state.expressions.filter(
     (e): e is CartesianExpression => e.kind === 'cartesian'
   );
+  const t = strings.analysis;
 
   return (
-    <section aria-label="Mathematical analysis" className="mt-4">
-      <Panel title="Analysis">
-        <PrecisionControls precision={state.analysis.precision} dispatch={dispatch} />
+    <section aria-label={t.panelAriaLabel} className="mt-4">
+      <Panel title={t.panelTitle}>
+        <PrecisionControls
+          precision={state.analysis.precision}
+          dispatch={dispatch}
+          strings={strings}
+        />
         {cartesian.length === 0 ? (
-          <EmptyNote>
-            Add a Cartesian expression (y = …) to unlock tables, roots, derivatives, integrals,
-            limits, extrema, and tangents.
-          </EmptyNote>
+          <EmptyNote>{t.panelEmpty}</EmptyNote>
         ) : (
           <div>
             {cartesian.map((e) => (
-              <ExpressionAnalysis key={e.id} expression={e} all={state.expressions} />
+              <ExpressionAnalysis
+                key={e.id}
+                expression={e}
+                all={state.expressions}
+                strings={strings}
+              />
             ))}
           </div>
         )}
-        <AnnotationsSection />
+        <AnnotationsSection strings={strings} />
       </Panel>
     </section>
   );

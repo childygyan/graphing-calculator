@@ -21,6 +21,7 @@ import { requestAiCommand } from '../../lib/ai/client.js';
 import type { AiChatProvider } from '../../lib/ai/client.js';
 import { summarizeCalculatorState } from '../../lib/ai/context.js';
 import type { AiChatHistoryItem } from '../../lib/ai/request.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
 interface ChatMessage {
   id: string;
@@ -32,8 +33,6 @@ interface ChatMessage {
   mock?: boolean;
   error?: boolean;
 }
-
-const SUGGESTIONS = ['Plot y = x^2', 'Zoom out', 'Let a = 2', 'What can you do?'];
 
 const MAX_HISTORY_ITEMS = 8;
 
@@ -54,8 +53,9 @@ function outcomeToMessage(outcome: ProcessorOutcome, mock: boolean): ChatMessage
   };
 }
 
-export function AiChat() {
+export function AiChat({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
+  const t = strings.ai;
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -82,7 +82,7 @@ export function AiChat() {
 
   const applyOutcome = useCallback((outcome: ProcessorOutcome, mock: boolean) => {
     if (outcome.kind === 'clear_chat') {
-      setMessages([{ id: nextMessageId(), role: 'assistant', text: 'Chat cleared.', mock }]);
+      setMessages([{ id: nextMessageId(), role: 'assistant', text: t.chatCleared, mock }]);
       return;
     }
     const message = outcomeToMessage(outcome, mock);
@@ -160,7 +160,7 @@ export function AiChat() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={`${baseId}-panel`}
-        aria-label={open ? 'Close AI math assistant' : 'Open AI math assistant'}
+        aria-label={open ? t.toggleClose : t.toggleOpen}
         className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -184,27 +184,27 @@ export function AiChat() {
           id={`${baseId}-panel`}
           role="dialog"
           aria-modal="false"
-          aria-label="AI math assistant"
+          aria-label={t.panelLabel}
           onKeyDown={onPanelKeyDown}
           className="fixed bottom-[4.5rem] right-4 z-50 flex h-[min(34rem,calc(100dvh-7rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
         >
           <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
             <div>
               <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                AI math assistant
+                {t.heading}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {provider === 'mock'
-                  ? 'Mock mode — no AI key configured'
+                  ? t.statusMock
                   : provider === 'deepseek'
-                    ? 'Powered by DeepSeek'
-                    : 'Ask about the graph'}
+                    ? t.statusDeepseek
+                    : t.statusDefault}
               </p>
             </div>
             <button
               type="button"
               onClick={close}
-              aria-label="Close AI math assistant"
+              aria-label={t.toggleClose}
               className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -222,16 +222,14 @@ export function AiChat() {
             ref={listRef}
             role="log"
             aria-live="polite"
-            aria-label="AI chat messages"
+            aria-label={t.messagesLabel}
             className="flex-1 space-y-3 overflow-y-auto px-4 py-3"
           >
             {messages.length === 0 && !pending && (
               <div className="space-y-2">
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  I can plot functions, adjust the view, and manage sliders. Try one:
-                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{t.intro}</p>
                 <div className="flex flex-wrap gap-2">
-                  {SUGGESTIONS.map((s) => (
+                  {t.suggestions.map((s) => (
                     <button
                       key={s}
                       type="button"
@@ -261,12 +259,10 @@ export function AiChat() {
                   {/* Plain-text rendering: AI text is never injected as HTML. */}
                   <p className="whitespace-pre-wrap break-words">{m.text}</p>
                   {m.conceptual && (
-                    <p className="mt-1 text-[11px] italic opacity-70">
-                      Conceptual AI explanation — not computed by the math engine.
-                    </p>
+                    <p className="mt-1 text-[11px] italic opacity-70">{t.conceptualNote}</p>
                   )}
                   {m.mock && !m.conceptual && (
-                    <p className="mt-1 text-[11px] italic opacity-70">Mock response</p>
+                    <p className="mt-1 text-[11px] italic opacity-70">{t.mockNote}</p>
                   )}
                 </div>
               </div>
@@ -274,7 +270,7 @@ export function AiChat() {
             {pending && (
               <div className="flex justify-start">
                 <div className="rounded-2xl rounded-bl-sm bg-slate-100 px-3 py-2 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                  Thinking…
+                  {t.thinking}
                 </div>
               </div>
             )}
@@ -288,7 +284,7 @@ export function AiChat() {
             }}
           >
             <label htmlFor={`${baseId}-input`} className="sr-only">
-              Message the AI math assistant
+              {t.inputLabel}
             </label>
             <div className="flex gap-2">
               <input
@@ -297,7 +293,7 @@ export function AiChat() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder='Try "plot y = x^2"'
+                placeholder={t.inputPlaceholder}
                 autoComplete="off"
                 maxLength={2000}
                 disabled={pending}
@@ -308,12 +304,10 @@ export function AiChat() {
                 disabled={pending || input.trim().length === 0}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
               >
-                Send
+                {t.send}
               </button>
             </div>
-            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-              AI never computes results — the math engine does. History stays in this session.
-            </p>
+            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-slate-400">{t.footer}</p>
           </form>
         </section>
       )}

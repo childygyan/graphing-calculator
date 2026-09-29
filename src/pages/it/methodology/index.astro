@@ -1,0 +1,184 @@
+---
+/**
+ * Methodology page (it): mirrors the English page. All prose comes
+ * from the locale dictionary; inline anchors in `links` are re-localized at
+ * render time. FAQ pairs are mapped to the content-FAQ shape.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import FaqBlock from '../../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import { getDictionary, localizePath, type Locale } from '../../../i18n/index.js';
+import { articleSchema, faqSchema } from '../../../lib/seo/metadata.js';
+
+const locale: Locale = 'it';
+const dict = getDictionary(locale);
+const ns = dict.methodology;
+
+const canonicalPath = `/it/methodology/`;
+
+type InlineLink = { label: string; href: string };
+
+/**
+ * Splits text on the first occurrence of each link label so the label can
+ * be rendered as an anchor at the same position (see I18N-CONTRACTS.md).
+ */
+function inlineParts(
+  text: string,
+  links: InlineLink[] | undefined
+): Array<{ text: string } | { link: InlineLink }> {
+  let parts: Array<{ text: string } | { link: InlineLink }> = [{ text }];
+  for (const link of links ?? []) {
+    const next: Array<{ text: string } | { link: InlineLink }> = [];
+    for (const part of parts) {
+      if (!('text' in part)) {
+        next.push(part);
+        continue;
+      }
+      const idx = part.text.indexOf(link.label);
+      if (idx === -1) {
+        next.push(part);
+        continue;
+      }
+      if (idx > 0) next.push({ text: part.text.slice(0, idx) });
+      next.push({ link });
+      const rest = part.text.slice(idx + link.label.length);
+      if (rest) next.push({ text: rest });
+    }
+    parts = next;
+  }
+  return parts;
+}
+
+/** Splits a "No invented reviewers. …" item into its bold lead and the rest. */
+function splitLead(item: string): [string, string] {
+  const match = item.match(/^(.+?\.)\s+([\s\S]*)$/);
+  return match ? [match[1], match[2]] : [item, ''];
+}
+
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath={canonicalPath}
+  locale={locale}
+>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: ns.heading,
+        description: ns.seo.description,
+      }),
+      faqSchema(faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={ns.crumbs} locale={locale} />
+
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {ns.heading}
+    </h1>
+
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      {inlineParts(ns.sections[0].body[0], ns.sections[0].links).map((part) =>
+        'link' in part ? (
+          <a
+            href={localizePath(part.link.href, locale)}
+            class="text-brand-700 hover:underline dark:text-brand-300"
+          >
+            {part.link.label}
+          </a>
+        ) : (
+          part.text
+        )
+      )}
+    </p>
+
+    <div class="mt-10 space-y-10">
+      {ns.sections.map((section, index) => (
+        <section aria-labelledby={'methodology-' + index}>
+          <h2
+            id={'methodology-' + index}
+            class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+          >
+            {section.heading}
+          </h2>
+          {index === 0 ? (
+            <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+              {section.body.slice(1).map((paragraph) => (
+                <p>
+                  {inlineParts(paragraph, section.links).map((part) =>
+                    'link' in part ? (
+                      <a
+                        href={localizePath(part.link.href, locale)}
+                        class="text-brand-700 hover:underline dark:text-brand-300"
+                      >
+                        {part.link.label}
+                      </a>
+                    ) : (
+                      part.text
+                    )
+                  )}
+                </p>
+              ))}
+            </div>
+          ) : index === 3 ? (
+            <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+              <ul class="list-disc space-y-2 pl-6">
+                {section.body.map((item) => {
+                  const [lead, rest] = splitLead(item);
+                  const renderInline = (text: string) =>
+                    inlineParts(text, section.links).map((part) =>
+                      'link' in part ? (
+                        <a
+                          href={localizePath(part.link.href, locale)}
+                          class="text-brand-700 hover:underline dark:text-brand-300"
+                        >
+                          {part.link.label}
+                        </a>
+                      ) : (
+                        part.text
+                      )
+                    );
+                  return (
+                    <li>
+                      <strong class="text-slate-900 dark:text-white">{renderInline(lead)}</strong>{' '}
+                      {renderInline(rest)}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : (
+            <div class="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
+              {section.body.map((paragraph) => (
+                <p>
+                  {inlineParts(paragraph, section.links).map((part) =>
+                    'link' in part ? (
+                      <a
+                        href={localizePath(part.link.href, locale)}
+                        class="text-brand-700 hover:underline dark:text-brand-300"
+                      >
+                        {part.link.label}
+                      </a>
+                    ) : (
+                      part.text
+                    )
+                  )}
+                </p>
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+
+    <FaqBlock faqs={faqs} locale={locale} />
+
+    <RelatedLinks paths={ns.related} locale={locale} />
+  </div>
+</BaseLayout>

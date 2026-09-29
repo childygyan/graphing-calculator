@@ -20,6 +20,9 @@ import JsonLd from '../../components/seo/JsonLd.astro';
 import FaqBlock from '../../components/content/FaqBlock.astro';
 import RelatedLinks from '../../components/content/RelatedLinks.astro';
 import { articleSchema, faqSchema } from '../../lib/seo/metadata.js';
+import { getDictionary } from '../../i18n/index.js';
+
+const ns = getDictionary('en').desmosAlt;
 
 const title = 'Best Desmos Alternative — Free Online Graphing Calculator | Graphing Calculator';
 const description =
@@ -83,7 +86,7 @@ const faqs = [
 
     <aside
       class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
-      aria-label="Independence notice"
+      aria-label={ns.asideAriaLabel}
     >
       <p>
         <strong class="font-semibold text-slate-900 dark:text-white">Independent product.</strong>{' '}

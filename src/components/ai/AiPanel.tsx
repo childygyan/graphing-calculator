@@ -6,10 +6,11 @@
 
 import { AiChat } from './AiChat.js';
 import { siteConfig } from '../../data/site.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
-export function AiPanel() {
+export function AiPanel({ strings }: { strings: CalculatorShellStrings }) {
   if (!siteConfig.featureFlags.aiAssistant) return null;
-  return <AiChat />;
+  return <AiChat strings={strings} />;
 }
 
 export default AiPanel;

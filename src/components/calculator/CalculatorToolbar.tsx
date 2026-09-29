@@ -8,18 +8,20 @@ import { PlusIcon } from '../ui/icons.js';
 import { useCalculator } from './CalculatorStore.js';
 import { PersistenceControls } from '../persistence/PersistenceControls.js';
 import { zoomViewport } from '../../lib/graph/viewport.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
-export function CalculatorToolbar() {
+export function CalculatorToolbar({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
+  const t = strings.toolbar;
 
   return (
     <div
       role="toolbar"
-      aria-label="Calculator actions"
+      aria-label={t.regionLabel}
       className="flex flex-wrap items-center gap-2 border-b border-slate-200 px-3 py-2 dark:border-slate-800"
     >
       <span className="hidden text-sm font-semibold text-slate-900 dark:text-slate-100 sm:inline">
-        Graphing calculator
+        {t.title}
       </span>
       <div className="flex items-center gap-2">
         <Button
@@ -28,34 +30,34 @@ export function CalculatorToolbar() {
           icon={<PlusIcon className="h-4 w-4" />}
           onClick={() => dispatch({ type: 'ADD_EXPRESSION', kind: 'cartesian' })}
         >
-          Add expression
+          {t.addExpression}
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          aria-label="Zoom in"
+          aria-label={t.zoomIn}
           onClick={() =>
             dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 0.8) })
           }
         >
-          Zoom in
+          {t.zoomIn}
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          aria-label="Zoom out"
+          aria-label={t.zoomOut}
           onClick={() =>
             dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 1.25) })
           }
         >
-          Zoom out
+          {t.zoomOut}
         </Button>
         <Button variant="ghost" size="sm" onClick={() => dispatch({ type: 'RESET_VIEWPORT' })}>
-          Reset view
+          {t.resetView}
         </Button>
       </div>
       <div className="ml-auto">
-        <PersistenceControls />
+        <PersistenceControls strings={strings.persistence} />
       </div>
     </div>
   );

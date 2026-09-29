@@ -6,6 +6,9 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SharedGraphLoader } from '../../components/persistence/SharedGraphLoader.js';
+import { getDictionary } from '../../i18n/index.js';
+
+const dict = getDictionary('en');
 ---
 
 <BaseLayout
@@ -16,5 +19,5 @@ import { SharedGraphLoader } from '../../components/persistence/SharedGraphLoade
   mainClass="flex flex-col"
 >
   <h1 class="sr-only">Shared graph</h1>
-  <SharedGraphLoader client:load />
+  <SharedGraphLoader client:load strings={dict.calculator.shell} />
 </BaseLayout>

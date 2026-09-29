@@ -17,10 +17,13 @@ import { useCalculator } from '../calculator/CalculatorStore.js';
 import { createExpression, getExpressionSummary } from '../../lib/expressions/expressions.js';
 import { definedVariableNames, validateExpressionWithVariables } from '../../lib/math/variables.js';
 import type { Expression, ExpressionKind, InequalityOperator } from '../../types/calculator.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 export interface ExpressionRowProps {
   expression: Expression;
   isSelected: boolean;
+  strings: CalculatorShellStrings;
 }
 
 /** Bound parameter name for an expression's definition fields. */
@@ -80,14 +83,6 @@ function changeExpressionKind(
   });
 }
 
-const KIND_OPTIONS: Array<{ kind: ExpressionKind; label: string }> = [
-  { kind: 'cartesian', label: 'y = f(x)' },
-  { kind: 'parametric', label: 'Parametric' },
-  { kind: 'polar', label: 'Polar' },
-  { kind: 'inequality', label: 'Inequality' },
-  { kind: 'point', label: 'Point' },
-];
-
 const INEQUALITY_OPERATORS: Array<{ value: InequalityOperator; label: string }> = [
   { value: '<', label: '<' },
   { value: '<=', label: '≤' },
@@ -98,10 +93,12 @@ const INEQUALITY_OPERATORS: Array<{ value: InequalityOperator; label: string }> 
 const selectClassName =
   'rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200';
 
-export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
+export function ExpressionRow({ expression, isSelected, strings }: ExpressionRowProps) {
   const { dispatch } = useCalculator();
   const [renaming, setRenaming] = useState(false);
   const parameter = parameterFor(expression);
+  const t = strings.expressions;
+  const KIND_OPTIONS = t.kindOptions;
 
   const cartesianRhs = expression.kind === 'cartesian' ? expression.definition.rhs : '';
   const pointX = expression.kind === 'point' ? expression.definition.x : '';
@@ -139,8 +136,13 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
         isSelected && 'bg-brand-50 dark:bg-slate-800/60'
       )}
     >
-      <label className="mt-1.5 shrink-0 cursor-pointer" title={`Change ${expression.label} color`}>
-        <span className="sr-only">{`Change ${expression.label} color`}</span>
+      <label
+        className="mt-1.5 shrink-0 cursor-pointer"
+        title={format(t.changeColorTemplate, { label: expression.label })}
+      >
+        <span className="sr-only">
+          {format(t.changeColorTemplate, { label: expression.label })}
+        </span>
         <input
           type="color"
           value={expression.color}
@@ -152,7 +154,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
         {renaming ? (
           <div>
             <label htmlFor={`rename-${expression.id}`} className="sr-only">
-              {`Rename ${expression.label}`}
+              {format(t.renameAriaTemplate, { label: expression.label })}
             </label>
             <input
               id={`rename-${expression.id}`}
@@ -182,14 +184,14 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               size="sm"
               variant="ghost"
               icon={<PencilIcon className="h-3.5 w-3.5" />}
-              aria-label={`Rename ${expression.label}`}
+              aria-label={format(t.renameAriaTemplate, { label: expression.label })}
               onClick={() => setRenaming(true)}
             />
           </div>
         )}
         <div className="mt-1.5">
           <label htmlFor={`kind-${expression.id}`} className="sr-only">
-            {`Change ${expression.label} type`}
+            {format(t.changeTypeAriaTemplate, { label: expression.label })}
           </label>
           <select
             id={`kind-${expression.id}`}
@@ -198,7 +200,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               changeExpressionKind(expression, event.target.value as ExpressionKind, dispatch)
             }
             className={cn(selectClassName, 'text-xs')}
-            aria-label={`Change ${expression.label} type`}
+            aria-label={format(t.changeTypeAriaTemplate, { label: expression.label })}
           >
             {KIND_OPTIONS.map((option) => (
               <option key={option.kind} value={option.kind}>
@@ -213,7 +215,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               y =
             </span>
             <TextInput
-              label={`Edit ${expression.label} definition`}
+              label={format(t.editDefinitionAriaTemplate, { label: expression.label })}
               value={expression.definition.rhs}
               error={rhsError ?? undefined}
               onChange={(value) => setDefinition({ ...expression.definition, rhs: value })}
@@ -227,7 +229,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
                 x =
               </span>
               <TextInput
-                label="x(t) definition"
+                label={t.fields.xOfT}
                 value={expression.definition.xOfT}
                 error={paramXTError ?? undefined}
                 onChange={(value) => setDefinition({ ...expression.definition, xOfT: value })}
@@ -239,7 +241,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
                 y =
               </span>
               <TextInput
-                label="y(t) definition"
+                label={t.fields.yOfT}
                 value={expression.definition.yOfT}
                 error={paramYTError ?? undefined}
                 onChange={(value) => setDefinition({ ...expression.definition, yOfT: value })}
@@ -248,14 +250,14 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <TextInput
-                label="t min"
+                label={t.fields.tMin}
                 value={expression.definition.tMin}
                 error={paramTMinError ?? undefined}
                 onChange={(value) => setDefinition({ ...expression.definition, tMin: value })}
                 inputClassName="font-mono"
               />
               <TextInput
-                label="t max"
+                label={t.fields.tMax}
                 value={expression.definition.tMax}
                 error={paramTMaxError ?? undefined}
                 onChange={(value) => setDefinition({ ...expression.definition, tMax: value })}
@@ -269,10 +271,10 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               r =
             </span>
             <TextInput
-              label={`Edit ${expression.label} definition`}
+              label={format(t.editDefinitionAriaTemplate, { label: expression.label })}
               value={expression.definition.rOfTheta}
               error={polarRError ?? undefined}
-              hint="θ from 0 to 2π — type theta or θ"
+              hint={t.fields.polarHint}
               onChange={(value) => setDefinition({ ...expression.definition, rOfTheta: value })}
               inputClassName="font-mono"
             />
@@ -280,7 +282,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
         ) : expression.kind === 'inequality' ? (
           <div className="mt-1 flex items-center gap-2">
             <label className="sr-only" htmlFor={`ineq-lhs-${expression.id}`}>
-              Inequality side
+              {t.fields.inequalitySide}
             </label>
             <select
               id={`ineq-lhs-${expression.id}`}
@@ -294,7 +296,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               <option value="x">x</option>
             </select>
             <label className="sr-only" htmlFor={`ineq-op-${expression.id}`}>
-              Inequality operator
+              {t.fields.inequalityOperator}
             </label>
             <select
               id={`ineq-op-${expression.id}`}
@@ -314,7 +316,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
               ))}
             </select>
             <TextInput
-              label={`Edit ${expression.label} definition`}
+              label={format(t.editDefinitionAriaTemplate, { label: expression.label })}
               value={expression.definition.rhs}
               error={ineqRhsError ?? undefined}
               onChange={(value) => setDefinition({ ...expression.definition, rhs: value })}
@@ -324,14 +326,14 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
         ) : expression.kind === 'point' ? (
           <div className="mt-1 grid grid-cols-2 gap-2">
             <TextInput
-              label="x coordinate"
+              label={t.fields.xCoordinate}
               value={expression.definition.x}
               error={pointXError ?? undefined}
               onChange={(value) => setDefinition({ ...expression.definition, x: value })}
               inputClassName="font-mono"
             />
             <TextInput
-              label="y coordinate"
+              label={t.fields.yCoordinate}
               value={expression.definition.y}
               error={pointYError ?? undefined}
               onChange={(value) => setDefinition({ ...expression.definition, y: value })}
@@ -349,7 +351,7 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
           size="sm"
           variant="ghost"
           icon={<DuplicateIcon className="h-4 w-4" />}
-          aria-label={`Duplicate ${expression.label}`}
+          aria-label={format(t.duplicateAriaTemplate, { label: expression.label })}
           onClick={() => dispatch({ type: 'DUPLICATE_EXPRESSION', id: expression.id })}
         />
         <Button
@@ -363,14 +365,14 @@ export function ExpressionRow({ expression, isSelected }: ExpressionRowProps) {
             )
           }
           aria-pressed={expression.visible}
-          aria-label={expression.visible ? 'Hide expression' : 'Show expression'}
+          aria-label={expression.visible ? t.hideAria : t.showAria}
           onClick={() => dispatch({ type: 'TOGGLE_EXPRESSION_VISIBILITY', id: expression.id })}
         />
         <Button
           size="sm"
           variant="ghost"
           icon={<TrashIcon className="h-4 w-4" />}
-          aria-label={`Delete ${expression.label}`}
+          aria-label={format(t.deleteAriaTemplate, { label: expression.label })}
           onClick={() => dispatch({ type: 'REMOVE_EXPRESSION', id: expression.id })}
         />
       </div>

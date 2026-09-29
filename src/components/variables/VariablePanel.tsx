@@ -28,6 +28,8 @@ import {
 } from '../../lib/math/variables.js';
 import { formatNumber } from '../../lib/math/format.js';
 import type { Expression, PrecisionSettings, VariableDefinition } from '../../types/calculator.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 /** Trailing debounce before a slider drag writes to the store. */
 const SLIDER_COMMIT_DELAY_MS = 70;
@@ -109,6 +111,7 @@ function VariableRow({
   precision,
   onTogglePlay,
   onPause,
+  strings,
 }: {
   def: VariableDefinition;
   value: number;
@@ -118,9 +121,11 @@ function VariableRow({
   precision: PrecisionSettings;
   onTogglePlay: () => void;
   onPause: () => void;
+  strings: CalculatorShellStrings;
 }) {
   const { dispatch } = useCalculator();
   const [nameDraft, setNameDraft] = useState(def.name);
+  const t = strings.variables;
   const [sliderMirror, setSliderMirror] = useState<number | null>(null);
   const commitTimer = useRef<number | null>(null);
 
@@ -177,7 +182,7 @@ function VariableRow({
       <div className="flex items-center gap-2">
         <div className="w-20 shrink-0">
           <label htmlFor={`var-name-${def.name}`} className="sr-only">
-            Variable name
+            {t.nameLabel}
           </label>
           <input
             id={`var-name-${def.name}`}
@@ -203,7 +208,7 @@ function VariableRow({
         </span>
         <div className="min-w-0 flex-1">
           <TextInput
-            label={`${def.name} value`}
+            label={format(t.valueAriaTemplate, { name: def.name })}
             value={def.expression}
             onChange={(expr) =>
               dispatch({ type: 'UPDATE_VARIABLE', name: def.name, patch: { expression: expr } })
@@ -213,7 +218,7 @@ function VariableRow({
         </div>
         <div
           className="w-20 shrink-0 text-right font-mono text-sm text-slate-600 dark:text-slate-300"
-          title="Current resolved value"
+          title={t.currentValueTitle}
         >
           {formatValue(value, precision)}
         </div>
@@ -221,16 +226,20 @@ function VariableRow({
           size="sm"
           variant="ghost"
           icon={playing ? <PauseIcon className="h-4 w-4" /> : <PlayIcon className="h-4 w-4" />}
-          aria-label={playing ? `Pause ${def.name} animation` : `Animate ${def.name}`}
+          aria-label={
+            playing
+              ? format(t.pauseAriaTemplate, { name: def.name })
+              : format(t.animateAriaTemplate, { name: def.name })
+          }
           aria-pressed={playing}
           title={
             animationBlocked
-              ? 'Animation disabled: your system prefers reduced motion.'
+              ? t.animationDisabledReducedMotion
               : !slidable
-                ? 'Animation needs a plain numeric value (not a formula).'
+                ? t.animationNeedsPlainValue
                 : playing
-                  ? `Pause ${def.name} animation`
-                  : `Animate ${def.name} across its range`
+                  ? format(t.pauseAriaTemplate, { name: def.name })
+                  : format(t.animateAcrossRangeTemplate, { name: def.name })
           }
           disabled={animationBlocked || !slidable}
           onClick={onTogglePlay}
@@ -239,7 +248,7 @@ function VariableRow({
           size="sm"
           variant="ghost"
           icon={<TrashIcon className="h-4 w-4" />}
-          aria-label={`Delete variable ${def.name}`}
+          aria-label={format(t.deleteVariableAriaTemplate, { name: def.name })}
           onClick={() => dispatch({ type: 'REMOVE_VARIABLE', name: def.name })}
         />
       </div>
@@ -258,7 +267,7 @@ function VariableRow({
       <div className="mt-2 flex items-center gap-2">
         <span className="shrink-0 font-mono text-xs text-slate-500">{def.min}</span>
         <label htmlFor={`var-slider-${def.name}`} className="sr-only">
-          {`${def.name} slider`}
+          {format(t.sliderAriaTemplate, { name: def.name })}
         </label>
         <input
           id={`var-slider-${def.name}`}
@@ -271,16 +280,14 @@ function VariableRow({
           onChange={(event) => handleSliderChange(Number(event.target.value))}
           className="h-2 w-full accent-brand-600 disabled:cursor-not-allowed disabled:opacity-40"
           title={
-            slidable
-              ? `Drag to change ${def.name}`
-              : 'Slider unavailable: value comes from a formula.'
+            slidable ? format(t.dragToChangeTemplate, { name: def.name }) : t.sliderUnavailable
           }
         />
         <span className="shrink-0 font-mono text-xs text-slate-500">{def.max}</span>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2">
         <TextInput
-          label="Min"
+          label={t.min}
           type="number"
           value={String(def.min)}
           onChange={(raw) => {
@@ -290,7 +297,7 @@ function VariableRow({
           inputClassName="font-mono"
         />
         <TextInput
-          label="Max"
+          label={t.max}
           type="number"
           value={String(def.max)}
           onChange={(raw) => {
@@ -300,7 +307,7 @@ function VariableRow({
           inputClassName="font-mono"
         />
         <TextInput
-          label="Step"
+          label={t.stepLabel}
           type="number"
           value={String(def.step)}
           onChange={(raw) => {
@@ -314,11 +321,12 @@ function VariableRow({
   );
 }
 
-export function VariablePanel() {
+export function VariablePanel({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
   const [playing, setPlaying] = useState<Record<string, boolean>>({});
   const [speed, setSpeed] = useState<SpeedKey>('normal');
   const reducedMotion = usePrefersReducedMotion();
+  const t = strings.variables;
 
   const { env, issuesByName } = useMemo(() => {
     const environment = new VariableEnvironment(state.variables);
@@ -431,47 +439,47 @@ export function VariablePanel() {
 
   return (
     <Panel
-      title="Variables"
+      title={t.panelTitle}
       actions={
         <>
           <label htmlFor="variable-animation-speed" className="sr-only">
-            Animation speed
+            {t.animationSpeed}
           </label>
           <select
             id="variable-animation-speed"
             value={speed}
             onChange={(event) => setSpeed(event.target.value as SpeedKey)}
             className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-            title="Animation sweep speed"
+            title={t.animationSpeedTitle}
           >
-            <option value="slow">Slow</option>
-            <option value="normal">Normal</option>
-            <option value="fast">Fast</option>
+            {(['slow', 'normal', 'fast'] as const).map((value) => (
+              <option key={value} value={value}>
+                {t.speeds[value]}
+              </option>
+            ))}
           </select>
           <Button
             size="sm"
             icon={<PlusIcon className="h-4 w-4" />}
             onClick={() => dispatch({ type: 'ADD_VARIABLE' })}
           >
-            Add
+            {t.add}
           </Button>
         </>
       }
     >
       {reducedMotion ? (
-        <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
-          Animation is off because your system prefers reduced motion.
-        </p>
+        <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">{t.reducedMotionNote}</p>
       ) : null}
       {state.variables.length === 0 ? (
         <p className="py-2 text-sm text-slate-500 dark:text-slate-400">
-          No variables yet. Add one, then use it in any expression — e.g.{' '}
-          <span className="font-mono">y = a·sin(b·x)</span>.
+          {t.emptyStateLead} <span className="font-mono">y = a·sin(b·x)</span>.
         </p>
       ) : (
         <div className="space-y-2">
           {state.variables.map((def) => (
             <VariableRow
+              strings={strings}
               key={def.name}
               def={def}
               value={env.get(def.name)}
@@ -487,9 +495,7 @@ export function VariablePanel() {
       )}
       {candidates.length > 0 ? (
         <div className="mt-3 border-t border-slate-200 pt-2 dark:border-slate-700">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Used in expressions but not defined:
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t.undefinedHeading}</p>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {candidates.map((name) => (
               <Button
@@ -498,7 +504,7 @@ export function VariablePanel() {
                 variant="ghost"
                 icon={<PlusIcon className="h-3.5 w-3.5" />}
                 onClick={() => dispatch({ type: 'ADD_VARIABLE', name })}
-                aria-label={`Define variable ${name}`}
+                aria-label={format(t.defineVariableAriaTemplate, { name })}
               >
                 <span className="font-mono">{name}</span>
               </Button>

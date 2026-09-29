@@ -3,9 +3,20 @@
  * Footer — brand blurb, per-column navigation, social placeholders
  * (empty hrefs render as text marked "soon", never as dead links),
  * and the copyright bar.
+ *
+ * Copy comes from the chrome dictionary; internal hrefs are localized.
+ * The "(soon)" marker and empty social-link text are preserved exactly.
  */
 import { siteConfig } from '../../data/site';
+import { format, getDictionary, localizePath, type Locale } from '../../i18n/index.js';
 
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' }: Props = Astro.props;
+const dict = getDictionary(locale);
+const footer = dict.chrome.footer;
 const year = new Date().getFullYear();
 ---
 
@@ -14,19 +25,17 @@ const year = new Date().getFullYear();
     <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <p class="text-sm font-semibold text-slate-900 dark:text-white">{siteConfig.name}</p>
-        <p class="mt-2 max-w-xs text-sm text-slate-600 dark:text-slate-400">
-          {siteConfig.description}
-        </p>
+        <p class="mt-2 max-w-xs text-sm text-slate-600 dark:text-slate-400">{footer.description}</p>
       </div>
 
-      {siteConfig.footerColumns.map((column) => (
+      {footer.columns.map((column) => (
         <nav aria-label={column.heading}>
           <h2 class="text-sm font-semibold text-slate-900 dark:text-white">{column.heading}</h2>
           <ul class="mt-3 space-y-2">
             {column.links.map((link) => (
               <li>
                 <a
-                  href={link.href}
+                  href={localizePath(link.href, locale)}
                   class="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 >
                   {link.label}
@@ -40,10 +49,10 @@ const year = new Date().getFullYear();
 
     <div class="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-8 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
       <p class="text-sm text-slate-600 dark:text-slate-400">
-        &copy; {year} {siteConfig.name}. All rights reserved.
+        &copy; {format(footer.copyrightTemplate, { year, name: siteConfig.name })}
       </p>
-      <ul aria-label="Social links" class="flex items-center gap-4">
-        {siteConfig.socialLinks.map((social) =>
+      <ul aria-label={footer.social.groupLabel} class="flex items-center gap-4">
+        {footer.social.links.map((social) =>
           social.href ? (
             <li>
               <a
@@ -55,8 +64,11 @@ const year = new Date().getFullYear();
             </li>
           ) : (
             <li>
-              <span title="Coming soon" class="text-sm text-slate-500 dark:text-slate-500">
-                {social.label} <span class="text-xs">(soon)</span>
+              <span
+                title={footer.social.comingSoonTitle}
+                class="text-sm text-slate-500 dark:text-slate-500"
+              >
+                {social.label} <span class="text-xs">{footer.social.comingSoon}</span>
               </span>
             </li>
           )

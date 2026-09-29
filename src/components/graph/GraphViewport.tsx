@@ -28,6 +28,7 @@ import {
 } from '../../lib/graph/viewport.js';
 import type { GraphViewport as Viewport } from '../../types/calculator.js';
 import type { Expression, VariableDefinition } from '../../types/calculator.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 import type {
   GraphDrawable,
   GraphRenderInput,
@@ -60,7 +61,7 @@ function viewportsEqual(a: Viewport, b: Viewport): boolean {
   );
 }
 
-export function GraphViewport() {
+export function GraphViewport({ strings }: { strings: CalculatorShellStrings }) {
   const { state, dispatch } = useCalculator();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -502,11 +503,12 @@ export function GraphViewport() {
       <GraphCanvas
         ref={canvasRef}
         className="absolute inset-0 block h-full w-full touch-none select-none"
+        label={strings.graph.canvasDefaultLabel}
       />
       <div className="absolute right-2 top-2">
-        <GraphToolbar getDrawables={getDrawables} />
+        <GraphToolbar getDrawables={getDrawables} strings={strings} />
       </div>
-      <CoordinateDisplay ref={coordRef} />
+      <CoordinateDisplay ref={coordRef} strings={strings} />
     </div>
   );
 }

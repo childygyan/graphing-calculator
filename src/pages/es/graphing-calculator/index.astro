@@ -1,0 +1,44 @@
+---
+/**
+ * Graphing calculator workspace + landing content (es): mirrors the
+ * English page. Strings from the locale dictionary.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import ArticleSections from '../../../components/content/ArticleSections.astro';
+import FaqBlock from '../../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import { CalculatorPage } from '../../../components/calculator/CalculatorPage.js';
+import { faqSchema, webApplicationSchema } from '../../../lib/seo/metadata.js';
+import { getDictionary, type Locale } from '../../../i18n/index.js';
+
+const locale: Locale = 'es';
+const dict = getDictionary(locale);
+const ns = dict.calculator;
+
+// FaqBlock consumes ContentFaq ({q, a}); the dictionary uses {question, answer}.
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/es/graphing-calculator/"
+  locale={locale}
+  mainClass="flex flex-col"
+>
+  <JsonLd schemas={[webApplicationSchema(), faqSchema(faqs)]} />
+  <h1 class="sr-only">Graphing Calculator</h1>
+  <CalculatorPage client:load strings={ns.shell} />
+
+  <div class="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
+    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {ns.intro.heading}
+    </h2>
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">{ns.intro.lede}</p>
+
+    <ArticleSections sections={ns.sections} />
+    <FaqBlock faqs={faqs} locale={locale} />
+    <RelatedLinks paths={ns.related} locale={locale} />
+  </div>
+</BaseLayout>

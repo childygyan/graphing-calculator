@@ -1,0 +1,30 @@
+---
+/**
+ * Integral calculator tool page (de): mirrors the English page. Strings from the locale dictionary.
+ */
+import ToolPageShell from '../../../../components/content/ToolPageShell.astro';
+import { IntegralTool } from '../../../../components/tools/MathTools.js';
+import { getDictionary, type Locale } from '../../../../i18n/index.js';
+
+const locale: Locale = 'de';
+const dict = getDictionary(locale);
+const ns = dict.calculators.integral;
+
+// FaqBlock consumes ContentFaq ({q, a}); the dictionary uses {question, answer}.
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+---
+
+<ToolPageShell
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/de/calculators/integral/"
+  breadcrumbs={ns.crumbs}
+  heading={ns.heading}
+  intro={ns.intro}
+  sections={ns.sections}
+  faqs={faqs}
+  related={ns.related}
+  locale={locale}
+>
+  <IntegralTool client:load slot="tool" strings={ns.tool} />
+</ToolPageShell>

@@ -11,7 +11,14 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const HERE = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'pages', 'desmos-alternative');
+const HERE = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '..',
+  '..',
+  '..',
+  'pages',
+  'desmos-alternative'
+);
 const source = readFileSync(join(HERE, 'index.astro'), 'utf8');
 
 function descriptionValue(): string {

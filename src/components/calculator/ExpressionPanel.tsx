@@ -10,26 +10,32 @@ import { PlusIcon } from '../ui/icons.js';
 import { useCalculator } from './CalculatorStore.js';
 import { ErrorBoundary } from './ErrorBoundary.js';
 import { ExpressionList } from '../expressions/ExpressionList.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
-export function ExpressionPanel() {
+export function ExpressionPanel({ strings }: { strings: CalculatorShellStrings }) {
   const { dispatch } = useCalculator();
+  const t = strings.expressions;
 
   return (
     <Panel
-      title="Expressions"
+      title={t.panelTitle}
       actions={
         <Button
           size="sm"
           icon={<PlusIcon className="h-4 w-4" />}
-          aria-label="Add expression"
+          aria-label={t.addAriaLabel}
           onClick={() => dispatch({ type: 'ADD_EXPRESSION', kind: 'cartesian' })}
         >
-          Add
+          {t.add}
         </Button>
       }
     >
-      <ErrorBoundary fallbackTitle="Expression list failed to load">
-        <ExpressionList />
+      <ErrorBoundary
+        fallbackTitle={t.fallbackTitle}
+        fallbackMessage={strings.errorFallback.message}
+        retryLabel={strings.errorFallback.retry}
+      >
+        <ExpressionList strings={strings} />
       </ErrorBoundary>
     </Panel>
   );

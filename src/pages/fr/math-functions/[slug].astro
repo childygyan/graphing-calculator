@@ -1,0 +1,183 @@
+---
+/**
+ * Notable-function pages (fr), e.g. /fr/math-functions/sine/.
+ * Mirrors the English template: strings from the locale dictionary and
+ * locale content data; the "Computed properties" panel is derived at build
+ * time from the project's own math library.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import ArticleSections from '../../../components/content/ArticleSections.astro';
+import FaqBlock from '../../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import { getDictionary, localizePath, format, type Locale } from '../../../i18n/index.js';
+import { FUNCTION_PAGES } from '../../../data/seo/fr/functions.js';
+import { computeFunctionFacts } from '../../../lib/seo/content-engine.js';
+import { faqSchema } from '../../../lib/seo/metadata.js';
+
+const locale: Locale = 'fr';
+const dict = getDictionary(locale);
+const ns = dict.functions;
+
+export function getStaticPaths() {
+  return FUNCTION_PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const facts = computeFunctionFacts(page.expression);
+const canonicalPath = `/fr/math-functions/${page.slug}/`;
+const title = `${format(ns.template.slugTitleTemplate, {
+  displayName: page.displayName,
+})} | Graphing Calculator`;
+
+const sampleRows = facts.samples.map((sample) => ({
+  x: sample.x,
+  y: sample.y === null ? ns.template.undefinedValue : sample.y.toFixed(4).replace(/\.?0+$/, ''),
+}));
+
+const computedNoteParts = ns.template.computedNoteTemplate.split('{expression}');
+---
+
+<BaseLayout
+  title={title}
+  description={page.description}
+  canonicalPath={canonicalPath}
+  locale={locale}
+>
+  <JsonLd schemas={[faqSchema(page.faqs)]} />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[{ ...ns.crumbs[0] }, { ...ns.crumbs[1] }, { label: page.displayName }]}
+      locale={locale}
+    />
+
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      {ns.template.eyebrow}
+    </p>
+    <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {page.displayName}
+    </h1>
+    <p class="mt-3 font-mono text-lg text-slate-600 dark:text-slate-300">{page.notation}</p>
+    <p class="mt-4 text-xl text-slate-600 dark:text-slate-300">{page.tagline}</p>
+
+    {page.intro.map((paragraph) => (
+      <p class="mt-6 leading-7 text-slate-600 dark:text-slate-300">{paragraph}</p>
+    ))}
+
+    <section
+      class="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50"
+      aria-labelledby="computed-properties"
+    >
+      <h2
+        id="computed-properties"
+        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+      >
+        {ns.template.computedHeading}
+      </h2>
+      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        {computedNoteParts[0]}
+        <code class="font-mono">{page.expression}</code>
+        {computedNoteParts[1]}
+      </p>
+      {facts.ok ? (
+        <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.rootsLabel}
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.roots.length > 0
+                ? facts.formatted.roots.join(', ')
+                : ns.template.noneFound}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.yInterceptLabel}
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.yIntercept}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.extremaLabel}
+            </dt>
+            <dd class="mt-1 text-slate-900 dark:text-white">
+              {facts.formatted.extrema.length > 0 ? (
+                <ul class="list-disc pl-5 font-mono text-sm">
+                  {facts.formatted.extrema.slice(0, 6).map((extremum) => (
+                    <li>
+                      {extremum.kind} at ({extremum.x}, {extremum.y})
+                    </li>
+                  ))}
+                  {facts.formatted.extrema.length > 6 && (
+                    <li>
+                      {format(ns.template.moreTemplate, {
+                        count: facts.formatted.extrema.length - 6,
+                      })}
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                ns.template.noneFound
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.samplesLabel}
+            </dt>
+            <dd class="mt-1 font-mono text-sm text-slate-900 dark:text-white">
+              {sampleRows.map((row) => `f(${row.x}) = ${row.y}`).join(' · ')}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.derivativeLabel}
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.derivativeAtOne}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              {ns.template.integralLabel}
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.integralZeroToOne}
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <p class="mt-4 text-slate-600 dark:text-slate-300">{ns.template.computeFailed}</p>
+      )}
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        {ns.template.keyFactsHeading}
+      </h2>
+      <ul class="mt-4 list-disc space-y-2 pl-6 text-slate-600 dark:text-slate-300">
+        {page.keyFacts.map((fact) => (
+          <li class="leading-7">{fact}</li>
+        ))}
+      </ul>
+    </section>
+
+    <ArticleSections sections={page.sections} />
+
+    <div class="mt-10">
+      <a
+        href={localizePath('/graphing-calculator/', locale)}
+        class="inline-block rounded-md bg-brand-600 px-6 py-3 font-medium text-white hover:bg-brand-700"
+      >
+        {format(ns.template.ctaTemplate, { notation: page.notation })}
+      </a>
+    </div>
+
+    <FaqBlock faqs={page.faqs} locale={locale} />
+    <RelatedLinks paths={page.related} locale={locale} />
+  </div>
+</BaseLayout>

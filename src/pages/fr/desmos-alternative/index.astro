@@ -1,0 +1,194 @@
+---
+/**
+ * Desmos alternative comparison page (fr): mirrors the English page.
+ * Prose and the comparison table come from the locale dictionary.
+ *
+ * Legal notes (do not weaken): "Desmos" appears only in nominative,
+ * comparative use; about Desmos, state only publicly well-known facts;
+ * no reviews, ratings, statistics, or user counts.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../../components/seo/JsonLd.astro';
+import FaqBlock from '../../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import { getDictionary, localizePath, type Locale } from '../../../i18n/index.js';
+import { articleSchema, faqSchema } from '../../../lib/seo/metadata.js';
+
+const locale: Locale = 'fr';
+const dict = getDictionary(locale);
+const ns = dict.desmosAlt;
+
+const canonicalPath = `/fr/desmos-alternative/`;
+
+/** Splits a "Independent product. …" notice into its bold lead and the rest. */
+function splitLead(text: string): [string, string] {
+  const match = text.match(/^(.+?\.)\s+([\s\S]*)$/);
+  return match ? [match[1], match[2]] : [text, ''];
+}
+
+/**
+ * Renders the brand name "Graphing Calculator" (never translated) as a link
+ * to the localized calculator page wherever it occurs in the intro.
+ */
+function brandLinked(text: string): Array<string | { key: string }> {
+  const label = 'Graphing Calculator';
+  const parts: Array<string | { key: string }> = [];
+  let rest = text;
+  let i = 0;
+  while (true) {
+    const idx = rest.indexOf(label);
+    if (idx === -1) {
+      parts.push(rest);
+      break;
+    }
+    if (idx > 0) parts.push(rest.slice(0, idx));
+    parts.push({ key: `brand-${i++}` });
+    rest = rest.slice(idx + label.length);
+  }
+  return parts;
+}
+
+type InlineLink = { label: string; href: string };
+
+/**
+ * Splits text on the first occurrence of each link label so the label can
+ * be rendered as an anchor at the same position (see I18N-CONTRACTS.md).
+ */
+function inlineParts(
+  text: string,
+  links: InlineLink[] | undefined
+): Array<{ text: string } | { link: InlineLink }> {
+  let parts: Array<{ text: string } | { link: InlineLink }> = [{ text }];
+  for (const link of links ?? []) {
+    const next: Array<{ text: string } | { link: InlineLink }> = [];
+    for (const part of parts) {
+      if (!('text' in part)) {
+        next.push(part);
+        continue;
+      }
+      const idx = part.text.indexOf(link.label);
+      if (idx === -1) {
+        next.push(part);
+        continue;
+      }
+      if (idx > 0) next.push({ text: part.text.slice(0, idx) });
+      next.push({ link });
+      const rest = part.text.slice(idx + link.label.length);
+      if (rest) next.push({ text: rest });
+    }
+    parts = next;
+  }
+  return parts;
+}
+
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+const [disclaimerLead, disclaimerRest] = splitLead(ns.disclaimer);
+const introParts = brandLinked(ns.sections[0].body[0]);
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath={canonicalPath}
+  locale={locale}
+>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: ns.heading,
+        description: ns.seo.description,
+      }),
+      faqSchema(faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={ns.crumbs} locale={locale} />
+
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {ns.heading}
+    </h1>
+
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      {introParts.map((part) =>
+        typeof part === 'string' ? (
+          part
+        ) : (
+          <a
+            href={localizePath('/graphing-calculator/', locale)}
+            class="text-brand-700 hover:underline dark:text-brand-300"
+          >
+            Graphing Calculator
+          </a>
+        )
+      )}
+    </p>
+
+    <aside
+      class="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-300"
+      aria-label={ns.asideAriaLabel}
+    >
+      <p>
+        <strong class="font-semibold text-slate-900 dark:text-white">{disclaimerLead}</strong>
+        {disclaimerRest}
+      </p>
+    </aside>
+
+    <section class="mt-10" aria-labelledby="comparison">
+      <h2 id="comparison" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        {ns.sections[0].heading}
+      </h2>
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">{ns.sections[0].body[1]}</p>
+      <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+        <table class="w-full min-w-[560px] border-collapse text-left text-sm">
+          <thead>
+            <tr class="bg-slate-50 dark:bg-slate-800/60">
+              {ns.table.headers.map((header) => (
+                <th scope="col" class="px-4 py-3 font-semibold text-slate-900 dark:text-white">
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+            {ns.table.rows.map((row) => (
+              <tr>
+                <th scope="row" class="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                  {row.feature}
+                </th>
+                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{row.theirs}</td>
+                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{row.ours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="mt-10" aria-labelledby="beyond">
+      <h2 id="beyond" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        {ns.sections[1].heading}
+      </h2>
+      {ns.sections[1].body.map((paragraph) => (
+        <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+          {inlineParts(paragraph, ns.sections[1].links).map((part) =>
+            'link' in part ? (
+              <a
+                href={localizePath(part.link.href, locale)}
+                class="text-brand-700 hover:underline dark:text-brand-300"
+              >
+                {part.link.label}
+              </a>
+            ) : (
+              part.text
+            )
+          )}
+        </p>
+      ))}
+    </section>
+
+    <FaqBlock faqs={faqs} locale={locale} />
+    <RelatedLinks paths={ns.related} locale={locale} />
+  </div>
+</BaseLayout>

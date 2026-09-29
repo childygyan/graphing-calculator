@@ -12,6 +12,12 @@ import { AlertTriangleIcon } from '../ui/icons.js';
 
 export interface GraphErrorBoundaryProps {
   children: ReactNode;
+  /** Translated strings; English literals are the defaults. */
+  strings?: {
+    title: string;
+    message: string;
+    retry: string;
+  };
 }
 
 interface GraphErrorBoundaryState {
@@ -37,6 +43,7 @@ export class GraphErrorBoundary extends Component<
   };
 
   render(): ReactNode {
+    const t = this.props.strings;
     if (this.state.hasError) {
       return (
         <div
@@ -45,13 +52,13 @@ export class GraphErrorBoundary extends Component<
         >
           <AlertTriangleIcon className="h-8 w-8 text-amber-500" />
           <p className="font-medium text-slate-900 dark:text-slate-100">
-            The interactive graph ran into a problem
+            {t?.title ?? 'The interactive graph ran into a problem'}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Your expressions and settings are unaffected.
+            {t?.message ?? 'Your expressions and settings are unaffected.'}
           </p>
           <Button size="sm" variant="secondary" onClick={this.handleRetry}>
-            Reload graph
+            {t?.retry ?? 'Reload graph'}
           </Button>
         </div>
       );

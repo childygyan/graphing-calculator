@@ -9,8 +9,11 @@
 import { useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { ErrorBoundary } from '../calculator/ErrorBoundary.js';
+import type { ErrorFallbackStrings } from '../calculator/ErrorBoundary.js';
 import type { AngleMode } from '../../lib/math/scientific.js';
 import { calculatorKeyAction, evaluateScientificExpression } from '../../lib/math/scientific.js';
+import type { ScientificStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 type Output = { type: 'value'; display: string } | { type: 'error'; message: string } | null;
 
@@ -79,13 +82,30 @@ const KIND_CLASS: Record<KeyDef['kind'], string> = {
     'bg-brand-600 text-lg text-white hover:bg-brand-700 dark:bg-brand-600 dark:hover:bg-brand-500',
 };
 
-export function ScientificCalculator() {
+export function ScientificCalculator({
+  strings,
+  fallback,
+}: {
+  strings: ScientificStrings['island'];
+  fallback?: ErrorFallbackStrings;
+}) {
   const [expression, setExpression] = useState('');
   const [angleMode, setAngleMode] = useState<AngleMode>('deg');
   const [output, setOutput] = useState<Output>(null);
   const [justEvaluated, setJustEvaluated] = useState(false);
   const [lastValue, setLastValue] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = strings;
+  // Localized key labels/aria-labels by index; insert text, actions, and
+  // styling kinds stay in code (math syntax is never translated).
+  const keys: KeyDef[] = KEYS.map((key, index) => {
+    const localized = t.keys[index];
+    return {
+      ...key,
+      label: localized?.label ?? key.label,
+      ariaLabel: localized?.ariaLabel ?? key.ariaLabel,
+    };
+  });
 
   const focusInput = () => {
     inputRef.current?.focus({ preventScroll: true });
@@ -194,15 +214,19 @@ export function ScientificCalculator() {
   };
 
   return (
-    <ErrorBoundary fallbackTitle="Scientific calculator failed to load">
+    <ErrorBoundary
+      fallbackTitle={t.loadFailedTitle}
+      fallbackMessage={fallback?.message}
+      retryLabel={fallback?.retry}
+    >
       <div className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 dark:border-slate-700 dark:bg-slate-900">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Scientific Calculator
-          </h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t.heading}</h2>
           <span
             className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800 dark:bg-brand-900/50 dark:text-brand-200"
-            aria-label={`Angle mode: ${angleMode === 'deg' ? 'degrees' : 'radians'}`}
+            aria-label={format(t.angleModeTemplate, {
+              mode: angleMode === 'deg' ? t.degrees : t.radians,
+            })}
           >
             {angleMode === 'deg' ? 'DEG' : 'RAD'}
           </span>
@@ -210,7 +234,7 @@ export function ScientificCalculator() {
 
         <div className="mt-4">
           <label htmlFor="scientific-expression" className="sr-only">
-            Expression
+            {t.expressionLabel}
           </label>
           <input
             id="scientific-expression"
@@ -223,7 +247,7 @@ export function ScientificCalculator() {
               setJustEvaluated(false);
             }}
             onKeyDown={onKeyDown}
-            placeholder="e.g. sin(30) + √(16)"
+            placeholder={t.expressionPlaceholder}
             spellCheck={false}
             autoComplete="off"
             autoCapitalize="off"
@@ -249,14 +273,14 @@ export function ScientificCalculator() {
             )}
             {!output && (
               <p className="text-right text-base text-slate-400 dark:text-slate-500">
-                Press = or Enter to evaluate
+                {t.idleHint}
               </p>
             )}
           </div>
         </div>
 
-        <div role="group" aria-label="Calculator keypad" className="mt-4 grid grid-cols-5 gap-2">
-          {KEYS.map((key) => (
+        <div role="group" aria-label={t.keypadLabel} className="mt-4 grid grid-cols-5 gap-2">
+          {keys.map((key) => (
             <button
               key={key.ariaLabel + key.label}
               type="button"
@@ -271,17 +295,19 @@ export function ScientificCalculator() {
                 key.span === 2 ? 'col-span-2' : '',
                 KIND_CLASS[key.kind],
                 key.action === 'toggle-angle' ? 'font-bold text-brand-800 dark:text-brand-200' : '',
-                key.label === 'AC' ? 'font-bold text-red-700 dark:text-red-300' : '',
+                key.action === 'clear' ? 'font-bold text-red-700 dark:text-red-300' : '',
               ].join(' ')}
             >
-              {key.action === 'toggle-angle' ? (angleMode === 'deg' ? 'DEG' : 'RAD') : key.label}
+              {key.action === 'toggle-angle'
+                ? angleMode === 'deg'
+                  ? key.label
+                  : 'RAD'
+                : key.label}
             </button>
           ))}
         </div>
 
-        <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-          Tip: type on your keyboard — Enter evaluates, Esc clears, × ÷ and ^ work as usual.
-        </p>
+        <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">{t.tip}</p>
       </div>
     </ErrorBoundary>
   );

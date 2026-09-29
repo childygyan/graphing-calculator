@@ -1,0 +1,110 @@
+---
+/**
+ * LanguageSwitcher — native <details>/<summary> locale picker.
+ *
+ * Preserves the current route: any locale prefix is stripped, then the
+ * remaining path is re-prefixed for the chosen locale (English stays
+ * unprefixed). The current locale's entry is marked aria-current="true".
+ * CSS-only, like the mobile menu in Header — no JavaScript needed.
+ */
+import {
+  LOCALES,
+  LOCALE_METADATA,
+  format,
+  getDictionary,
+  getLocaleFromPath,
+  localizePath,
+  stripLocale,
+  type Locale,
+} from '../../i18n/index.js';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'en' }: Props = Astro.props;
+const dict = getDictionary(locale);
+const language = dict.chrome.language;
+const currentRoute = stripLocale(Astro.url.pathname);
+const currentLocale = getLocaleFromPath(Astro.url.pathname);
+const currentName = LOCALE_METADATA[currentLocale].nativeLabel;
+
+/**
+ * English-canonical routes that exist under every locale
+ * (mirrors src/pages/<locale>/). Dynamic content routes mirror every
+ * single-slug sub-path; the calculators section mirrors its tool pages.
+ * Routes outside this list (404/500 error pages, the /graph/ share route,
+ * any unmatched URL) have no locale mirror.
+ */
+const MIRRORED_EXACT = new Set([
+  '/',
+  '/3d/',
+  '/about/',
+  '/calculators/',
+  '/contact/',
+  '/desmos-alternative/',
+  '/disclaimer/',
+  '/examples/',
+  '/graphing-calculator/',
+  '/learn/',
+  '/math-functions/',
+  '/methodology/',
+  '/privacy-policy/',
+  '/scientific-calculator/',
+  '/terms/',
+]);
+const MIRRORED_PREFIXES = ['/calculators/', '/examples/', '/learn/', '/math-functions/'];
+
+function hasMirror(canonical: string): boolean {
+  return (
+    MIRRORED_EXACT.has(canonical) ||
+    MIRRORED_PREFIXES.some((prefix) => canonical.startsWith(prefix))
+  );
+}
+
+/**
+ * Target href for a locale: keep the current route when it has a mirror,
+ * otherwise fall back to the locale's homepage so the switcher never links
+ * to a nonexistent /<locale>/... page. The current locale's entry always
+ * points at the current page (it exists by definition).
+ */
+function switcherHref(target: Locale): string {
+  if (target === currentLocale || hasMirror(currentRoute)) {
+    return localizePath(currentRoute, target);
+  }
+  return localizePath('/', target);
+}
+---
+
+<details class="relative [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
+  <summary
+    aria-label={format(language.summaryTemplate, { language: currentName })}
+    title={format(language.summaryTemplate, { language: currentName })}
+    class="cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+  >
+    {currentName}
+  </summary>
+  <ul
+    aria-label={language.label}
+    class="absolute right-0 top-full z-50 mt-2 w-48 rounded-lg border border-slate-200 bg-white p-2 shadow-lg dark:border-slate-700 dark:bg-slate-900"
+  >
+    {LOCALES.map((target) => {
+      const meta = LOCALE_METADATA[target];
+      return (
+        <li>
+          <a
+            href={switcherHref(target)}
+            lang={meta.htmlLang}
+            aria-current={target === currentLocale ? 'true' : undefined}
+            class="block rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+          >
+            {meta.nativeLabel}
+            {target !== currentLocale && (
+              <span class="text-slate-400 dark:text-slate-500"> · {meta.label}</span>
+            )}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</details>

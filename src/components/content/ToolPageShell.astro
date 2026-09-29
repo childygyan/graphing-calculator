@@ -2,6 +2,9 @@
 /**
  * ToolPageShell — shared layout for the functional calculator tool pages:
  * functional island on top, explanatory prose below, FAQs, related links.
+ *
+ * The `locale` prop threads through to BaseLayout, Breadcrumbs, FaqBlock,
+ * and RelatedLinks (all default to English, preserving current output).
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../seo/Breadcrumbs.astro';
@@ -12,6 +15,7 @@ import RelatedLinks from './RelatedLinks.astro';
 import type { BreadcrumbItem } from '../../lib/seo/metadata';
 import type { ContentFaq, ContentSection } from '../../data/seo/types';
 import { faqSchema } from '../../lib/seo/metadata';
+import type { Locale } from '../../i18n/index.js';
 
 interface Props {
   title: string;
@@ -23,6 +27,7 @@ interface Props {
   sections: ContentSection[];
   faqs: ContentFaq[];
   related: string[];
+  locale?: Locale;
 }
 
 const {
@@ -35,13 +40,14 @@ const {
   sections,
   faqs,
   related,
+  locale = 'en',
 }: Props = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath} locale={locale}>
   <JsonLd schemas={[faqSchema(faqs)]} />
   <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-    <Breadcrumbs items={breadcrumbs} />
+    <Breadcrumbs items={breadcrumbs} locale={locale} />
     <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{heading}</h1>
     {intro.map((paragraph) => (
       <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">{paragraph}</p>
@@ -52,7 +58,7 @@ const {
     </div>
 
     <ArticleSections sections={sections} />
-    <FaqBlock faqs={faqs} />
-    <RelatedLinks paths={related} />
+    <FaqBlock faqs={faqs} locale={locale} />
+    <RelatedLinks paths={related} locale={locale} />
   </div>
 </BaseLayout>

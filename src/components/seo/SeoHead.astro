@@ -2,15 +2,49 @@
 /**
  * SeoHead — everything that belongs inside <head> for a page.
  * Rendered by BaseLayout; pages only supply SeoProps.
+ *
+ * Locale additions (i18n foundation): per-language <link rel="alternate">
+ * tags (including x-default), the current og:locale, and
+ * og:locale:alternate entries. Canonicals use the localized path, so a
+ * non-English page canonicalizes to its own locale URL. English output is
+ * unchanged apart from the added tags.
  */
 import { siteConfig } from '../../data/site';
 import { buildCanonical, type SeoProps } from '../../lib/seo/metadata';
+import {
+  LOCALES,
+  htmlLangFor,
+  localizePath,
+  ogLocaleFor,
+  stripLocale,
+  type Locale,
+} from '../../i18n/index.js';
 
-interface Props extends SeoProps {}
+interface Props extends SeoProps {
+  locale?: Locale;
+}
 
-const { title, description, canonicalPath, robots, ogImage, ogType, noindex }: Props = Astro.props;
+const {
+  title,
+  description,
+  canonicalPath,
+  robots,
+  ogImage,
+  ogType,
+  noindex,
+  locale = 'en',
+}: Props = Astro.props;
 
-const canonical = buildCanonical(canonicalPath ?? Astro.url.pathname);
+/**
+ * The English-canonical path everything else derives from. Locale pages
+ * pass their localized canonicalPath (e.g. '/es/about/'); stripping the
+ * prefix recovers the English path so the `en` and `x-default` alternates
+ * always point at the English URL. For English pages `stripLocale` is the
+ * identity, so their output is unchanged.
+ */
+const englishPath = stripLocale(canonicalPath ?? Astro.url.pathname);
+const localizedPath = locale === 'en' ? englishPath : localizePath(englishPath, locale);
+const canonical = buildCanonical(localizedPath);
 const robotsContent = noindex ? 'noindex, nofollow' : (robots ?? 'index, follow');
 const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
 /**
@@ -24,12 +58,24 @@ const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION as st
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{LOCALES.map((language) => (
+  <link
+    rel="alternate"
+    hreflang={htmlLangFor(language)}
+    href={buildCanonical(language === 'en' ? englishPath : localizePath(englishPath, language))}
+  />
+))}
+<link rel="alternate" hreflang="x-default" href={buildCanonical(englishPath)} />
 <meta name="robots" content={robotsContent} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:type" content={ogType ?? 'website'} />
 <meta property="og:site_name" content={siteConfig.name} />
+<meta property="og:locale" content={ogLocaleFor(locale)} />
+{LOCALES.filter((language) => language !== locale).map((language) => (
+  <meta property="og:locale:alternate" content={ogLocaleFor(language)} />
+))}
 {absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}
 {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
 <meta name="twitter:card" content="summary" />

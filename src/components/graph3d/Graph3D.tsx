@@ -31,30 +31,11 @@ import {
   type SurfaceFunction,
 } from '../../lib/graph3d/surface.js';
 import { drawAxes, drawSurface } from '../../lib/graph3d/render.js';
+import type { Graph3DStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
-interface Preset {
-  label: string;
-  expression: string;
-  description: string;
-}
-
-const PRESETS: Preset[] = [
-  {
-    label: 'Paraboloid',
-    expression: 'x^2+y^2',
-    description: 'A bowl opening upward; minimum 0 at the origin.',
-  },
-  {
-    label: 'Ripple',
-    expression: 'sin(sqrt(x^2+y^2))',
-    description: 'Concentric waves radiating from the origin.',
-  },
-  {
-    label: 'Saddle',
-    expression: 'x^2-y^2',
-    description: 'Curves up along x, down along y — a saddle point at the origin.',
-  },
-];
+/** Preset expressions (math syntax — never translated); labels come from the dictionary. */
+const PRESET_EXPRESSIONS = ['x^2+y^2', 'sin(sqrt(x^2+y^2))', 'x^2-y^2'];
 
 const RESOLUTIONS = [24, 36, 48, 64];
 const DRAG_SENSITIVITY = 0.008;
@@ -92,9 +73,11 @@ function formatZ(value: number): string {
 export interface Graph3DProps {
   /** Expression plotted on first render. */
   initialExpression?: string;
+  strings: Graph3DStrings['island'];
 }
 
-export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
+export function Graph3D({ initialExpression = 'x^2+y^2', strings }: Graph3DProps) {
+  const t = strings;
   const [source, setSource] = useState(initialExpression);
   const [plot, setPlot] = useState<{ expression: string; fn: SurfaceFunction } | null>(null);
   const [compileError, setCompileError] = useState<string | null>(null);
@@ -142,7 +125,7 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
     (raw: string): void => {
       const trimmed = raw.trim();
       if (trimmed === '') {
-        setCompileError('Enter an expression in x and y, for example x^2+y^2.');
+        setCompileError(t.emptyError);
         return;
       }
       try {
@@ -151,12 +134,13 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
         setCompileError(null);
         markInteracted();
       } catch (error) {
-        const message =
-          error instanceof SurfaceCompileError ? error.message : 'Could not plot that expression.';
+        // SurfaceCompileError messages come from the math library and stay
+        // unwired (supporting-library errors are deferred per I18N-CONTRACTS.md).
+        const message = error instanceof SurfaceCompileError ? error.message : t.genericError;
         setCompileError(message);
       }
     },
-    [markInteracted]
+    [markInteracted, t]
   );
 
   // Compile the initial expression on mount.
@@ -336,13 +320,30 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
   const stats = surface
     ? { zMin: surface.zMin, zMax: surface.zMax, finite: surface.finiteCount }
     : null;
+  // Stats clause inside the canvas aria label; trailing spaces are part of the
+  // dictionary values so localized concatenation stays byte-identical.
+  const ariaStatsText =
+    stats && stats.finite > 0
+      ? format(t.canvasAriaStatsTemplate, {
+          zMin: formatZ(stats.zMin),
+          zMax: formatZ(stats.zMax),
+        })
+      : t.canvasAriaNoFiniteStats;
   const ariaLabel = plot
-    ? `3D surface plot of z equals ${plot.expression}. ` +
-      (stats && stats.finite > 0
-        ? `Over x and y from -5 to 5, z ranges from ${formatZ(stats.zMin)} to ${formatZ(stats.zMax)}. `
-        : 'No finite values on the current grid. ') +
-      'Drag to rotate, scroll or pinch to zoom. When focused, arrow keys rotate and plus/minus zoom.'
-    : '3D surface plotter. No expression plotted yet.';
+    ? format(t.canvasAriaTemplate, { expression: plot.expression, stats: ariaStatsText })
+    : t.canvasAriaEmpty;
+
+  const summaryStatsText =
+    stats && stats.finite > 0
+      ? format(t.summaryStatsTemplate, {
+          zMin: formatZ(stats.zMin),
+          zMax: formatZ(stats.zMax),
+          count: stats.finite,
+        })
+      : t.summaryNoFinite;
+  const summaryText = plot
+    ? format(t.summaryTemplate, { expression: plot.expression, stats: summaryStatsText })
+    : t.summaryEmpty;
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-6">
@@ -355,7 +356,7 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
       >
         <label className="block flex-1">
           <span className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Surface: z = f(x, y)
+            {t.surfaceLabel}
           </span>
           <input
             type="text"
@@ -364,12 +365,12 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
             className={inputClass}
             spellCheck={false}
             autoComplete="off"
-            placeholder="e.g. x^2 + y^2"
+            placeholder={t.placeholder}
             aria-describedby="graph3d-hint"
           />
         </label>
         <button type="submit" className={buttonClass}>
-          Plot
+          {t.plot}
         </button>
       </form>
 
@@ -382,21 +383,24 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
         </p>
       )}
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Preset surfaces">
-        {PRESETS.map((preset) => (
-          <button
-            key={preset.label}
-            type="button"
-            title={preset.description}
-            className={presetButtonClass(plot?.expression === preset.expression)}
-            onClick={() => {
-              setSource(preset.expression);
-              applyExpression(preset.expression);
-            }}
-          >
-            {preset.label}
-          </button>
-        ))}
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t.presetGroup}>
+        {t.presets.map((preset, index) => {
+          const expression = PRESET_EXPRESSIONS[index] ?? '';
+          return (
+            <button
+              key={preset.label}
+              type="button"
+              title={preset.description}
+              className={presetButtonClass(plot?.expression === expression)}
+              onClick={() => {
+                setSource(expression);
+                applyExpression(expression);
+              }}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
       </div>
 
       <div
@@ -417,20 +421,13 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
         />
       </div>
       <p id="graph3d-hint" className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-        Drag to rotate · scroll or pinch to zoom · focus the plot and use arrow keys / + / −
+        {t.hint}
       </p>
-      <p className="sr-only">
-        {plot
-          ? `Surface summary: z = ${plot.expression} on x and y from -5 to 5. ` +
-            (stats && stats.finite > 0
-              ? `Minimum z ${formatZ(stats.zMin)}, maximum z ${formatZ(stats.zMax)}, computed at ${stats.finite} grid points.`
-              : 'No finite z values on the current grid.')
-          : 'No surface plotted.'}
-      </p>
+      <p className="sr-only">{summaryText}</p>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1" role="group" aria-label="Grid resolution">
-          <span className="mr-1 text-sm text-slate-600 dark:text-slate-300">Detail:</span>
+        <div className="flex items-center gap-1" role="group" aria-label={t.detailGroup}>
+          <span className="mr-1 text-sm text-slate-600 dark:text-slate-300">{t.detailLabel}</span>
           {RESOLUTIONS.map((value) => (
             <button
               key={value}
@@ -445,19 +442,20 @@ export function Graph3D({ initialExpression = 'x^2+y^2' }: Graph3DProps) {
         </div>
         {stats && stats.finite > 0 && (
           <p className="text-sm tabular-nums text-slate-600 dark:text-slate-300" aria-live="polite">
-            z min <span className="font-semibold">{formatZ(stats.zMin)}</span>
-            {' · '}z max <span className="font-semibold">{formatZ(stats.zMax)}</span>
+            {t.zMin} <span className="font-semibold">{formatZ(stats.zMin)}</span>
+            {' · '}
+            {t.zMax} <span className="font-semibold">{formatZ(stats.zMax)}</span>
             {zScale < 1 && (
               <span className="text-slate-500 dark:text-slate-400">
                 {' '}
-                (z-axis auto-scaled ×{zScale.toFixed(2)} to fit)
+                {format(t.autoScaledTemplate, { scale: zScale.toFixed(2) })}
               </span>
             )}
           </p>
         )}
         {stats && stats.finite === 0 && plot && (
           <p className="text-sm text-amber-700 dark:text-amber-300" aria-live="polite">
-            No finite values on this grid — try a different expression.
+            {t.noFiniteGrid}
           </p>
         )}
       </div>

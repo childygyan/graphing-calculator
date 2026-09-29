@@ -5,6 +5,9 @@
  */
 import ToolPageShell from '../../../components/content/ToolPageShell.astro';
 import { DerivativeTool } from '../../../components/tools/MathTools.js';
+import { getDictionary } from '../../../i18n/index.js';
+
+const dict = getDictionary('en');
 
 const title = 'Derivative Calculator — Compute f′(x) Instantly | Graphing Calculator';
 const description =
@@ -62,5 +65,10 @@ const description =
     '/graphing-calculator/',
   ]}
 >
-  <DerivativeTool client:load slot="tool" />
+  <DerivativeTool
+    client:load
+    slot="tool"
+    strings={dict.calculators.derivative.tool}
+    fallback={dict.calculator.shell.errorFallback}
+  />
 </ToolPageShell>

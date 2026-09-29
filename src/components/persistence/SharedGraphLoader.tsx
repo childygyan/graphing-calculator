@@ -13,14 +13,16 @@ import { CalculatorPage } from '../calculator/CalculatorPage.js';
 import { ErrorBoundary } from '../calculator/ErrorBoundary.js';
 import type { GraphDocument } from '../../lib/persistence/document.js';
 import { decodeSharedDocumentFromHash } from '../../lib/persistence/share.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
 type LoaderState =
   | { status: 'loading' }
   | { status: 'ready'; document: GraphDocument }
   | { status: 'error'; error: string };
 
-export function SharedGraphLoader() {
+export function SharedGraphLoader({ strings }: { strings: CalculatorShellStrings }) {
   const [loaderState, setLoaderState] = useState<LoaderState>({ status: 'loading' });
+  const t = strings.persistence.shared;
 
   useEffect(() => {
     let cancelled = false;
@@ -30,7 +32,7 @@ export function SharedGraphLoader() {
         if (result === null) {
           setLoaderState({
             status: 'error',
-            error: 'This link does not contain a shared graph.',
+            error: t.noGraph,
           });
           return;
         }
@@ -42,7 +44,7 @@ export function SharedGraphLoader() {
       })
       .catch(() => {
         if (!cancelled) {
-          setLoaderState({ status: 'error', error: 'The shared graph could not be opened.' });
+          setLoaderState({ status: 'error', error: t.openFailed });
         }
       });
     return () => {
@@ -54,7 +56,7 @@ export function SharedGraphLoader() {
     return (
       <div className="flex h-[calc(100dvh-4rem)] items-center justify-center">
         <p className="text-sm text-slate-600 dark:text-slate-400" role="status">
-          Opening the shared graph…
+          {t.opening}
         </p>
       </div>
     );
@@ -65,14 +67,14 @@ export function SharedGraphLoader() {
       <div className="flex h-[calc(100dvh-4rem)] items-center justify-center p-6">
         <div className="max-w-md rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-            Couldn&apos;t open this shared graph
+            {t.heading}
           </h2>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{loaderState.error}</p>
           <a
             href="/graphing-calculator/"
             className="mt-4 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
-            Open the graphing calculator
+            {t.openCalculator}
           </a>
         </div>
       </div>
@@ -80,8 +82,16 @@ export function SharedGraphLoader() {
   }
 
   return (
-    <ErrorBoundary fallbackTitle="Shared graph failed to load">
-      <CalculatorPage initialDocument={loaderState.document} persistStorage={false} />
+    <ErrorBoundary
+      fallbackTitle={t.fallbackTitle}
+      fallbackMessage={strings.errorFallback.message}
+      retryLabel={strings.errorFallback.retry}
+    >
+      <CalculatorPage
+        initialDocument={loaderState.document}
+        persistStorage={false}
+        strings={strings}
+      />
     </ErrorBoundary>
   );
 }

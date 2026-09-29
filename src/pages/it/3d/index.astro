@@ -1,0 +1,30 @@
+---
+/**
+ * 3D Grapher page (it): mirrors the English page. Strings from the locale dictionary.
+ */
+import ToolPageShell from '../../../components/content/ToolPageShell.astro';
+import { Graph3D } from '../../../components/graph3d/Graph3D.js';
+import { getDictionary, type Locale } from '../../../i18n/index.js';
+
+const locale: Locale = 'it';
+const dict = getDictionary(locale);
+const ns = dict.graph3d;
+
+// FaqBlock consumes ContentFaq ({q, a}); the dictionary uses {question, answer}.
+const faqs = ns.faqs.map((faq) => ({ q: faq.question, a: faq.answer }));
+---
+
+<ToolPageShell
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/it/3d/"
+  breadcrumbs={ns.crumbs}
+  heading={ns.heading}
+  intro={ns.intro}
+  sections={ns.sections}
+  faqs={faqs}
+  related={ns.related}
+  locale={locale}
+>
+  <Graph3D client:load slot="tool" strings={ns.island} />
+</ToolPageShell>

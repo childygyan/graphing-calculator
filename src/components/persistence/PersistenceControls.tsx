@@ -28,6 +28,7 @@ import {
   exportGraphPng,
 } from '../../lib/persistence/transfer.js';
 import { ImportDialog, LibraryDialog, SaveDialog, ShareDialog } from './PersistenceDialogs.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 
 type DialogKind = 'save' | 'library' | 'share' | 'import';
 
@@ -39,11 +40,16 @@ function ShortcutHint({ label }: { label: string }) {
   );
 }
 
-export function PersistenceControls() {
+export function PersistenceControls({
+  strings,
+}: {
+  strings: CalculatorShellStrings['persistence'];
+}) {
   const { state, undo, redo, canUndo, canRedo, isDirty } = useCalculator();
   const { notify } = useToast();
   const [dialog, setDialog] = useState<DialogKind | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
+  const t = strings;
 
   // Close the export menu on Escape.
   useEffect(() => {
@@ -61,9 +67,9 @@ export function PersistenceControls() {
     setExportOpen(false);
     try {
       downloadDocumentJson(stateToDocument(state));
-      notify('Graph exported as JSON.', 'success');
+      notify(t.toasts.exportedJson, 'success');
     } catch {
-      notify('JSON export failed.', 'error');
+      notify(t.toasts.exportJsonFailed, 'error');
     }
   };
 
@@ -71,7 +77,7 @@ export function PersistenceControls() {
     setExportOpen(false);
     const result = await exportGraphPng(2);
     if (result.ok) {
-      notify('Graph exported as PNG (2x).', 'success');
+      notify(t.toasts.exportedPng, 'success');
     } else {
       notify(result.error, 'error');
     }
@@ -79,24 +85,21 @@ export function PersistenceControls() {
 
   const handleCopyEquations = async (): Promise<void> => {
     if (state.expressions.length === 0) {
-      notify('There are no expressions to copy.', 'info');
+      notify(t.toasts.noExpressions, 'info');
       return;
     }
     const text = state.expressions.map((expression) => getExpressionSummary(expression)).join('\n');
     const ok = await copyTextToClipboard(text);
-    notify(
-      ok ? 'Equations copied to the clipboard.' : 'Copying failed in this browser.',
-      ok ? 'success' : 'error'
-    );
+    notify(ok ? t.toasts.copied : t.toasts.copyFailed, ok ? 'success' : 'error');
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1" aria-label="Graph persistence">
+    <div className="flex flex-wrap items-center gap-1" aria-label={t.regionLabel}>
       <Button
         variant="ghost"
         size="sm"
-        aria-label="Undo"
-        title="Undo"
+        aria-label={t.undo}
+        title={t.undo}
         disabled={!canUndo}
         onClick={undo}
       >
@@ -106,8 +109,8 @@ export function PersistenceControls() {
       <Button
         variant="ghost"
         size="sm"
-        aria-label="Redo"
-        title="Redo"
+        aria-label={t.redo}
+        title={t.redo}
         disabled={!canRedo}
         onClick={redo}
       >
@@ -122,15 +125,15 @@ export function PersistenceControls() {
         size="sm"
         onClick={() => setDialog('save')}
         icon={<SaveIcon className="h-4 w-4" />}
-        aria-label={isDirty ? 'Save graph (unsaved changes)' : 'Save graph'}
+        aria-label={isDirty ? t.saveUnsaved : t.save}
       >
         Save
         {isDirty && (
           <span
             className="ml-1 inline-block h-2 w-2 rounded-full bg-amber-500"
             role="img"
-            aria-label="Unsaved changes"
-            title="Unsaved changes"
+            aria-label={t.unsavedChanges}
+            title={t.unsavedChanges}
           />
         )}
       </Button>
@@ -140,7 +143,7 @@ export function PersistenceControls() {
         onClick={() => setDialog('library')}
         icon={<FolderIcon className="h-4 w-4" />}
       >
-        My graphs
+        {t.myGraphs}
       </Button>
       <Button
         variant="ghost"
@@ -148,7 +151,7 @@ export function PersistenceControls() {
         onClick={() => setDialog('share')}
         icon={<ShareIcon className="h-4 w-4" />}
       >
-        Share
+        {t.share}
       </Button>
 
       <div className="relative">
@@ -160,20 +163,20 @@ export function PersistenceControls() {
           aria-expanded={exportOpen}
           icon={<DownloadIcon className="h-4 w-4" />}
         >
-          Export
+          {t.export}
           <ChevronDownIcon className="h-3 w-3" />
         </Button>
         {exportOpen && (
           <>
             <button
               type="button"
-              aria-label="Close export menu"
+              aria-label={t.closeExportMenu}
               className="fixed inset-0 z-10 cursor-default"
               onClick={() => setExportOpen(false)}
             />
             <div
               role="menu"
-              aria-label="Export options"
+              aria-label={t.exportOptions}
               className="absolute right-0 z-20 mt-1 w-52 rounded-lg border border-slate-200 bg-white py-1
                 shadow-lg dark:border-slate-700 dark:bg-slate-900"
             >
@@ -185,7 +188,7 @@ export function PersistenceControls() {
                   hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <DownloadIcon className="h-4 w-4" />
-                Download JSON
+                {t.downloadJson}
               </button>
               <button
                 type="button"
@@ -195,7 +198,7 @@ export function PersistenceControls() {
                   hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <ImageIcon className="h-4 w-4" />
-                Download PNG (2x)
+                {t.downloadPng}
               </button>
             </div>
           </>
@@ -208,23 +211,31 @@ export function PersistenceControls() {
         onClick={() => setDialog('import')}
         icon={<UploadIcon className="h-4 w-4" />}
       >
-        Import
+        {t.import}
       </Button>
       <Button
         variant="ghost"
         size="sm"
         onClick={() => void handleCopyEquations()}
         icon={<DuplicateIcon className="h-4 w-4" />}
-        aria-label="Copy equations as text"
-        title="Copy equations as text"
+        aria-label={t.copyEquationsAria}
+        title={t.copyEquationsAria}
       >
-        Copy equations
+        {t.copyEquations}
       </Button>
 
-      {dialog === 'save' && <SaveDialog onClose={closeDialog} />}
-      {dialog === 'library' && <LibraryDialog onClose={closeDialog} />}
-      {dialog === 'share' && <ShareDialog onClose={closeDialog} />}
-      {dialog === 'import' && <ImportDialog onClose={closeDialog} />}
+      {dialog === 'save' && (
+        <SaveDialog onClose={closeDialog} strings={t.saveDialog} modal={t.modal} />
+      )}
+      {dialog === 'library' && (
+        <LibraryDialog onClose={closeDialog} strings={t.libraryDialog} modal={t.modal} />
+      )}
+      {dialog === 'share' && (
+        <ShareDialog onClose={closeDialog} strings={t.shareDialog} modal={t.modal} />
+      )}
+      {dialog === 'import' && (
+        <ImportDialog onClose={closeDialog} strings={t.importDialog} modal={t.modal} />
+      )}
     </div>
   );
 }

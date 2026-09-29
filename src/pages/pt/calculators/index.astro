@@ -1,0 +1,66 @@
+---
+/**
+ * Calculators collection (pt): mirrors the English hub. Strings from the
+ * locale dictionary; internal links are localized.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/seo/Breadcrumbs.astro';
+import RelatedLinks from '../../../components/content/RelatedLinks.astro';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '../../../components/ui/index.js';
+import { ArrowRightIcon } from '../../../components/ui/icons.js';
+import { getDictionary, localizePath, type Locale } from '../../../i18n/index.js';
+
+const locale: Locale = 'pt';
+const dict = getDictionary(locale);
+const ns = dict.calculators.index;
+
+// Mirror the English trail: the final crumb (the current page) carries no link.
+// Breadcrumbs localizes the remaining hrefs itself via `locale`.
+const crumbs = ns.crumbs.map((crumb, index) => ({
+  label: crumb.label,
+  href: index < ns.crumbs.length - 1 ? crumb.href : undefined,
+}));
+---
+
+<BaseLayout
+  title={ns.seo.title}
+  description={ns.seo.description}
+  canonicalPath="/pt/calculators/"
+  locale={locale}
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <Breadcrumbs items={crumbs} locale={locale} />
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{ns.heading}</h1>
+  <p class="mt-3 text-slate-600 dark:text-slate-300">{ns.intro}</p>
+
+  <div class="mt-8 grid gap-4">
+    {ns.tools.map((tool) => (
+      <Card className="flex flex-col">
+        <CardHeader>
+          <CardTitle>{tool.title}</CardTitle>
+          <CardDescription>{tool.description}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <p class="text-sm text-slate-600 dark:text-slate-300">{tool.blurb}</p>
+        </CardContent>
+        <CardFooter>
+          <a
+            href={localizePath(tool.href, locale)}
+            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+          >
+            {tool.cta} <ArrowRightIcon className="h-4 w-4" />
+          </a>
+        </CardFooter>
+      </Card>
+    ))}
+  </div>
+
+  <RelatedLinks paths={ns.related} locale={locale} />
+</BaseLayout>

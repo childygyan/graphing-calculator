@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import { useCalculator } from '../calculator/CalculatorStore.js';
 import { fitViewportToDrawables, zoomViewport } from '../../lib/graph/viewport.js';
 import type { GraphDrawable } from '../../lib/graph/types.js';
+import type { CalculatorShellStrings } from '../../i18n/types.js';
 import {
   AxesIcon,
   FitViewIcon,
@@ -51,20 +52,23 @@ function ToolbarButton({ label, pressed, onClick, children }: ToolbarButtonProps
 
 export function GraphToolbar({
   getDrawables,
+  strings,
 }: {
   /** Builds the current drawables (used by Fit view). Defaults to none. */
   getDrawables?: () => GraphDrawable[];
+  strings: CalculatorShellStrings;
 }) {
   const { state, dispatch } = useCalculator();
+  const t = strings.graph;
 
   return (
     <div
       role="toolbar"
-      aria-label="Graph view controls"
+      aria-label={t.toolbarLabel}
       className="flex gap-1 rounded-lg border border-slate-200 bg-white/90 p-1 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/90"
     >
       <ToolbarButton
-        label="Zoom in"
+        label={t.zoomIn}
         onClick={() =>
           dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 0.8) })
         }
@@ -72,18 +76,18 @@ export function GraphToolbar({
         <PlusIcon className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
-        label="Zoom out"
+        label={t.zoomOut}
         onClick={() =>
           dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 1.25) })
         }
       >
         <MinusIcon className="h-4 w-4" />
       </ToolbarButton>
-      <ToolbarButton label="Reset view" onClick={() => dispatch({ type: 'RESET_VIEWPORT' })}>
+      <ToolbarButton label={t.resetView} onClick={() => dispatch({ type: 'RESET_VIEWPORT' })}>
         <ResetViewIcon className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
-        label="Fit view"
+        label={t.fitView}
         onClick={() =>
           dispatch({
             type: 'SET_VIEWPORT',
@@ -94,7 +98,7 @@ export function GraphToolbar({
         <FitViewIcon className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
-        label="Toggle grid"
+        label={t.toggleGrid}
         pressed={state.settings.showGrid}
         onClick={() =>
           dispatch({ type: 'UPDATE_SETTINGS', patch: { showGrid: !state.settings.showGrid } })
@@ -103,7 +107,7 @@ export function GraphToolbar({
         <GridIcon className="h-4 w-4" />
       </ToolbarButton>
       <ToolbarButton
-        label="Toggle axes"
+        label={t.toggleAxes}
         pressed={state.settings.showAxes}
         onClick={() =>
           dispatch({ type: 'UPDATE_SETTINGS', patch: { showAxes: !state.settings.showAxes } })

@@ -13,7 +13,10 @@ import ArticleSections from '../../components/content/ArticleSections.astro';
 import FaqBlock from '../../components/content/FaqBlock.astro';
 import RelatedLinks from '../../components/content/RelatedLinks.astro';
 import { CalculatorPage } from '../../components/calculator/CalculatorPage.js';
+import { getDictionary } from '../../i18n/index.js';
 import { faqSchema, webApplicationSchema } from '../../lib/seo/metadata.js';
+
+const dict = getDictionary('en');
 
 const faqs = [
   {
@@ -64,7 +67,7 @@ const sections = [
 >
   <JsonLd schemas={[webApplicationSchema(), faqSchema(faqs)]} />
   <h1 class="sr-only">Graphing Calculator</h1>
-  <CalculatorPage client:load />
+  <CalculatorPage client:load strings={dict.calculator.shell} />
 
   <div class="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
     <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">

@@ -7,9 +7,12 @@
  */
 import { useState } from 'react';
 import { ErrorBoundary } from '../calculator/ErrorBoundary.js';
+import type { ErrorFallbackStrings } from '../calculator/ErrorBoundary.js';
 import { compileExpression } from '../../lib/math/engine.js';
 import { adaptiveSimpson, centralDerivative, findAllRoots } from '../../lib/math/analysis.js';
 import { formatNumber } from '../../lib/math/format.js';
+import type { CalculatorsStrings } from '../../i18n/types.js';
+import { format } from '../../i18n/locales.js';
 
 const inputClass =
   'w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 ' +
@@ -18,11 +21,14 @@ const buttonClass =
   'rounded-md bg-brand-600 px-5 py-2 font-medium text-white hover:bg-brand-700 ' +
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500';
 
-function compile(source: string): ((x: number) => number) | { error: string } {
+function compile(
+  source: string,
+  parseFallback: string
+): ((x: number) => number) | { error: string } {
   try {
     return compileExpression(source).fn;
   } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Could not parse that expression.' };
+    return { error: error instanceof Error ? error.message : parseFallback };
   }
 }
 
@@ -39,10 +45,12 @@ function ExpressionField({
   value,
   onChange,
   label,
+  placeholder = 'e.g. x^2 - 4',
 }: {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  placeholder?: string;
 }) {
   return (
     <label className="block">
@@ -56,7 +64,7 @@ function ExpressionField({
         className={inputClass}
         spellCheck={false}
         autoComplete="off"
-        placeholder="e.g. x^2 - 4"
+        placeholder={placeholder}
       />
     </label>
   );
@@ -88,7 +96,14 @@ function NumberField({
 }
 
 /** Numerically differentiate f at a point: f'(a). */
-export function DerivativeTool() {
+export function DerivativeTool({
+  strings,
+  fallback,
+}: {
+  strings: CalculatorsStrings['derivative']['tool'];
+  fallback?: ErrorFallbackStrings;
+}) {
+  const t = strings;
   const [expression, setExpression] = useState('x^2');
   const [point, setPoint] = useState('2');
   const [result, setResult] = useState<string | null>(null);
@@ -96,7 +111,7 @@ export function DerivativeTool() {
 
   const compute = () => {
     setError(null);
-    const fn = compile(expression);
+    const fn = compile(expression, t.parseFallback);
     if (typeof fn !== 'function') {
       setError(fn.error);
       setResult(null);
@@ -104,35 +119,45 @@ export function DerivativeTool() {
     }
     const a = Number(point);
     if (!Number.isFinite(a)) {
-      setError('Enter a finite number for the point.');
+      setError(t.pointFiniteError);
       setResult(null);
       return;
     }
     try {
       const derivative = centralDerivative(fn, a);
       if (!Number.isFinite(derivative)) {
-        setError(
-          'The derivative could not be estimated there (the function may not be differentiable at that point).'
-        );
+        setError(t.notDifferentiableError);
         setResult(null);
         return;
       }
       setResult(
-        `f'(${formatNumber(a)}) ≈ ${formatNumber(derivative, { mode: 'decimals', digits: 6 })}`
+        format(t.resultLineTemplate, {
+          a: formatNumber(a),
+          value: formatNumber(derivative, { mode: 'decimals', digits: 6 }),
+        })
       );
     } catch {
-      setError('The derivative could not be estimated there.');
+      setError(t.estimateError);
       setResult(null);
     }
   };
 
   return (
-    <ErrorBoundary fallbackTitle="Derivative tool failed to load">
-      <ToolShell title="Differentiate">
-        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
-        <NumberField value={point} onChange={setPoint} label="Point a" />
+    <ErrorBoundary
+      fallbackTitle={t.loadFailedTitle}
+      fallbackMessage={fallback?.message}
+      retryLabel={fallback?.retry}
+    >
+      <ToolShell title={t.panelTitle}>
+        <ExpressionField
+          value={expression}
+          onChange={setExpression}
+          label={t.functionNameLabel}
+          placeholder={t.examplePlaceholder}
+        />
+        <NumberField value={point} onChange={setPoint} label={t.pointLabel} />
         <button type="button" onClick={compute} className={buttonClass}>
-          Compute f′(a)
+          {t.compute}
         </button>
         {result && (
           <p
@@ -156,7 +181,14 @@ export function DerivativeTool() {
 }
 
 /** Numerically integrate f from a to b. */
-export function IntegralTool() {
+export function IntegralTool({
+  strings,
+  fallback,
+}: {
+  strings: CalculatorsStrings['integral']['tool'];
+  fallback?: ErrorFallbackStrings;
+}) {
+  const t = strings;
   const [expression, setExpression] = useState('x^2');
   const [lower, setLower] = useState('0');
   const [upper, setUpper] = useState('1');
@@ -165,7 +197,7 @@ export function IntegralTool() {
 
   const compute = () => {
     setError(null);
-    const fn = compile(expression);
+    const fn = compile(expression, t.parseFallback);
     if (typeof fn !== 'function') {
       setError(fn.error);
       setResult(null);
@@ -174,36 +206,49 @@ export function IntegralTool() {
     const a = Number(lower);
     const b = Number(upper);
     if (!Number.isFinite(a) || !Number.isFinite(b)) {
-      setError('Enter finite numbers for both bounds.');
+      setError(t.boundsFiniteError);
       setResult(null);
       return;
     }
     try {
       const integral = adaptiveSimpson(fn, a, b);
       if (!Number.isFinite(integral.value)) {
-        setError('The integral could not be estimated on that interval.');
+        setError(t.estimateError);
         setResult(null);
         return;
       }
       setResult(
-        `∫[${formatNumber(a)}, ${formatNumber(b)}] f(x) dx ≈ ${formatNumber(integral.value, { mode: 'decimals', digits: 6 })}`
+        format(t.resultTemplate, {
+          a: formatNumber(a),
+          b: formatNumber(b),
+          value: formatNumber(integral.value, { mode: 'decimals', digits: 6 }),
+        })
       );
     } catch {
-      setError('The integral could not be estimated on that interval.');
+      setError(t.estimateError);
       setResult(null);
     }
   };
 
   return (
-    <ErrorBoundary fallbackTitle="Integral tool failed to load">
-      <ToolShell title="Integrate">
-        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
+    <ErrorBoundary
+      fallbackTitle={t.loadFailedTitle}
+      fallbackMessage={fallback?.message}
+      retryLabel={fallback?.retry}
+    >
+      <ToolShell title={t.panelTitle}>
+        <ExpressionField
+          value={expression}
+          onChange={setExpression}
+          label={t.functionNameLabel}
+          placeholder={t.examplePlaceholder}
+        />
         <div className="grid grid-cols-2 gap-4">
-          <NumberField value={lower} onChange={setLower} label="Lower bound" />
-          <NumberField value={upper} onChange={setUpper} label="Upper bound" />
+          <NumberField value={lower} onChange={setLower} label={t.lowerBoundLabel} />
+          <NumberField value={upper} onChange={setUpper} label={t.upperBoundLabel} />
         </div>
         <button type="button" onClick={compute} className={buttonClass}>
-          Compute integral
+          {t.calculate}
         </button>
         {result && (
           <p
@@ -227,7 +272,14 @@ export function IntegralTool() {
 }
 
 /** Find all roots of f in [a, b]. */
-export function RootFinderTool() {
+export function RootFinderTool({
+  strings,
+  fallback,
+}: {
+  strings: CalculatorsStrings['rootFinder']['tool'];
+  fallback?: ErrorFallbackStrings;
+}) {
+  const t = strings;
   const [expression, setExpression] = useState('x^2 - 4');
   const [lower, setLower] = useState('-10');
   const [upper, setUpper] = useState('10');
@@ -236,7 +288,7 @@ export function RootFinderTool() {
 
   const compute = () => {
     setError(null);
-    const fn = compile(expression);
+    const fn = compile(expression, t.parseFallback);
     if (typeof fn !== 'function') {
       setError(fn.error);
       setResult(null);
@@ -245,7 +297,7 @@ export function RootFinderTool() {
     const a = Number(lower);
     const b = Number(upper);
     if (!Number.isFinite(a) || !Number.isFinite(b) || a >= b) {
-      setError('Enter a valid interval with lower bound < upper bound.');
+      setError(t.intervalValidError);
       setResult(null);
       return;
     }
@@ -253,27 +305,40 @@ export function RootFinderTool() {
       const roots = findAllRoots(fn, a, b);
       setResult(
         roots.length === 0
-          ? `No roots found in [${formatNumber(a)}, ${formatNumber(b)}].`
-          : `Roots in [${formatNumber(a)}, ${formatNumber(b)}]: ${roots
-              .map((root) => formatNumber(root, { mode: 'decimals', digits: 6 }))
-              .join(', ')}`
+          ? format(t.noRootsTemplate, { a: formatNumber(a), b: formatNumber(b) })
+          : format(t.rootsListTemplate, {
+              a: formatNumber(a),
+              b: formatNumber(b),
+              roots: roots
+                .map((root) => formatNumber(root, { mode: 'decimals', digits: 6 }))
+                .join(', '),
+            })
       );
     } catch {
-      setError('Roots could not be found on that interval.');
+      setError(t.searchError);
       setResult(null);
     }
   };
 
   return (
-    <ErrorBoundary fallbackTitle="Root finder failed to load">
-      <ToolShell title="Find roots">
-        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
+    <ErrorBoundary
+      fallbackTitle={t.loadFailedTitle}
+      fallbackMessage={fallback?.message}
+      retryLabel={fallback?.retry}
+    >
+      <ToolShell title={t.panelTitle}>
+        <ExpressionField
+          value={expression}
+          onChange={setExpression}
+          label={t.functionNameLabel}
+          placeholder={t.expressionPlaceholder}
+        />
         <div className="grid grid-cols-2 gap-4">
-          <NumberField value={lower} onChange={setLower} label="Interval start" />
-          <NumberField value={upper} onChange={setUpper} label="Interval end" />
+          <NumberField value={lower} onChange={setLower} label={t.intervalStartLabel} />
+          <NumberField value={upper} onChange={setUpper} label={t.intervalEndLabel} />
         </div>
         <button type="button" onClick={compute} className={buttonClass}>
-          Find roots
+          {t.calculate}
         </button>
         {result && (
           <p

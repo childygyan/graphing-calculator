@@ -4,9 +4,15 @@
  * The mark is drawn inline (rounded square in a brand gradient, white
  * coordinate axes, and a sine-like curve) and is original to this project.
  */
+interface Props {
+  /** Accessible label for the home link; defaults to the English brand text. */
+  label?: string;
+}
+
+const { label = 'Graphing Calculator home' }: Props = Astro.props;
 ---
 
-<a href="/" aria-label="Graphing Calculator home" class="flex shrink-0 items-center gap-2">
+<a href="/" aria-label={label} class="flex shrink-0 items-center gap-2">
   <svg
     width="32"
     height="32"
