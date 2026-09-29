@@ -19,7 +19,9 @@ export const lightGraphTheme: GraphTheme = {
   background: '#ffffff',
   gridMajor: '#e2e8f0',
   gridMinor: '#f1f5f9',
-  axis: '#94a3b8',
+  // Phase 9 a11y: axis was slate-400 (#94a3b8, 2.56:1) — below the WCAG
+  // 3:1 minimum for essential UI. Slate-500 is 4.76:1 on white.
+  axis: '#64748b',
   tickLabel: '#475569',
   origin: '#64748b',
 };
@@ -28,7 +30,9 @@ export const darkGraphTheme: GraphTheme = {
   background: '#0f172a',
   gridMajor: '#1e293b',
   gridMinor: '#162032',
-  axis: '#475569',
+  // Phase 9 a11y: axis was slate-600 (#475569, 2.36:1) on slate-900.
+  // Slate-400 is 6.96:1.
+  axis: '#94a3b8',
   tickLabel: '#94a3b8',
   origin: '#cbd5e1',
 };

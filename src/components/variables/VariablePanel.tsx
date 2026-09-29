@@ -344,8 +344,13 @@ export function VariablePanel() {
   // Animation loop: one rAF drives every playing variable (ping-pong across
   // its range), throttling store writes to ~20fps. Refs keep the loop
   // reading current definitions without restarting it.
+  //
+  // Phase 9 perf: the loop only runs while at least one variable is
+  // playing. Previously it spun at 60fps for the life of the page even
+  // with nothing playing, burning CPU/battery on every frame.
+  const anyPlaying = !reducedMotion && Object.values(playing).some((p) => p === true);
   useEffect(() => {
-    if (reducedMotion) return;
+    if (!anyPlaying) return;
     let raf = 0;
     let last = 0;
     let lastDispatch = 0;
@@ -395,7 +400,7 @@ export function VariablePanel() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reducedMotion, dispatch]);
+  }, [anyPlaying, dispatch]);
 
   // Undefined-variable candidates: free identifiers in expressions that no
   // variable defines yet, offered as one-click quick-adds.

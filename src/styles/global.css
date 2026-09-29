@@ -3,8 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply scroll-smooth;
+  /* Smooth scrolling is motion: only enable it for users who have not
+     asked for reduced motion (WCAG 2.2 AA — 2.3.3 Animation from
+     Interactions). */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      @apply scroll-smooth;
+    }
   }
 
   body {
@@ -18,5 +23,23 @@
 
   ::selection {
     @apply bg-brand-200 text-brand-950 dark:bg-brand-800 dark:text-brand-50;
+  }
+}
+
+/*
+ * Phase 9 accessibility: honor `prefers-reduced-motion` globally. Any
+ * transition/animation the component layer adds (hover fades, tooltip
+ * opacity, toast appearance) is collapsed to near-instant so vestibular-
+ * sensitive users get no unexpected motion. The slider animation loop in
+ * VariablePanel is additionally gated off in JS.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

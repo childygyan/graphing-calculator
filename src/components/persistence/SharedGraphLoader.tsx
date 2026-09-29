@@ -10,6 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import { CalculatorPage } from '../calculator/CalculatorPage.js';
+import { ErrorBoundary } from '../calculator/ErrorBoundary.js';
 import type { GraphDocument } from '../../lib/persistence/document.js';
 import { decodeSharedDocumentFromHash } from '../../lib/persistence/share.js';
 
@@ -78,7 +79,11 @@ export function SharedGraphLoader() {
     );
   }
 
-  return <CalculatorPage initialDocument={loaderState.document} persistStorage={false} />;
+  return (
+    <ErrorBoundary fallbackTitle="Shared graph failed to load">
+      <CalculatorPage initialDocument={loaderState.document} persistStorage={false} />
+    </ErrorBoundary>
+  );
 }
 
 export default SharedGraphLoader;

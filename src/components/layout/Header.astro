@@ -5,7 +5,7 @@
  */
 import { siteConfig } from '../../data/site';
 import Logo from './Logo.astro';
-import ThemeToggle from '../ui/ThemeToggle.tsx';
+import ThemeToggle from '../ui/ThemeToggle.astro';
 import { MenuIcon } from '../ui/icons.tsx';
 
 const linkClass = (isCurrent: boolean) =>
@@ -31,7 +31,7 @@ const linkClass = (isCurrent: boolean) =>
     </nav>
 
     <div class="flex items-center gap-2">
-      <ThemeToggle client:load />
+      <ThemeToggle />
 
       <details class="relative md:hidden [&>summary]:list-none [&>summary::-webkit-details-marker]:hidden">
         <summary

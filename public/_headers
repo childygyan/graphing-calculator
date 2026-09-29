@@ -1,0 +1,22 @@
+# Phase 9 security headers for Cloudflare Pages (static hosting).
+#
+# The Content-Security-Policy below is generated from
+# src/lib/security/csp.ts (buildDefaultCspHeader). The sha256 hashes
+# allow-list the inline scripts the production build emits:
+#   - BaseLayout no-FOUC theme script (every page)
+#   - ThemeToggle vanilla switcher script (every page, via Header)
+#   - Astro island-loader snippets (pages with client islands only)
+# After upgrading Astro or editing those inline scripts: rebuild, recompute
+# the hashes from dist/*.html, and update this file. The test suite
+# (src/lib/security/__tests__/headers.test.ts) verifies the hashes against
+# the current build.
+#
+# If PUBLIC_ANALYTICS_SCRIPT_SRC is ever enabled, its external script host
+# must be added to script-src AND connect-src, with its own hash documented.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-gNs96FXVRssm5joLF7KPAxTDrwPfoOWYrLPo7iLWP/E=' 'sha256-C/lXU9H0b6FRTyU+eorZni/GlhGl/oy7SKmrQGUzuEI=' 'sha256-QzWFZi+FLIx23tnm9SBU4aEgx4x8DsuASP07mfqol/c=' 'sha256-U7a72oKuFFz8D7GUHLA1NZ0ciymHmDOc9T9aVDg2rWU='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Frame-Options: SAMEORIGIN

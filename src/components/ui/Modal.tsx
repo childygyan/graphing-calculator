@@ -15,20 +15,53 @@ export function Modal({ open, onClose, title, children, titleId }: ModalProps) {
   const generatedId = useId();
   const headingId = titleId ?? `modal-title-${generatedId}`;
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<Element | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // On open: remember the previously focused element and move focus into
+  // the dialog. On close: restore focus so keyboard users don't lose
+  // their place (WCAG 2.4.3).
   useEffect(() => {
     if (!mounted || !open) return;
+    previouslyFocusedRef.current = document.activeElement;
     closeButtonRef.current?.focus();
+    return () => {
+      const previous = previouslyFocusedRef.current;
+      previouslyFocusedRef.current = null;
+      if (previous instanceof HTMLElement) previous.focus();
+    };
   }, [mounted, open]);
 
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+      // Focus trap: keep Tab cycling inside the dialog (WCAG 2.1.2 —
+      // with aria-modal="true" the dialog must behave modally).
+      if (event.key !== 'Tab') return;
+      const dialog = dialogRef.current;
+      if (!dialog) return;
+      const focusables = dialog.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea, input:not([disabled]), ' +
+          'select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -45,6 +78,7 @@ export function Modal({ open, onClose, title, children, titleId }: ModalProps) {
         className="absolute inset-0 bg-slate-950/50 transition-colors dark:bg-slate-950/70"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}

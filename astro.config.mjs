@@ -11,7 +11,7 @@ export default defineConfig({
   site: 'https://example.com',
   integrations: [
     react(),
-    tailwind(),
+    tailwind({ applyBaseStyles: false }),
     sitemap({
       // /graph/ is user share content (noindex) and /api/ is not content —
       // neither belongs in the sitemap. /404/ is an error page, not content.

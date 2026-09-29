@@ -1,0 +1,145 @@
+---
+/**
+ * ThemeToggle — zero-JavaScript-bundle theme switcher.
+ *
+ * Plain Astro component (no React island): cycles light → dark → system →
+ * light, persists the choice in localStorage under the same key the
+ * no-FOUC head script in BaseLayout uses, and follows OS changes while in
+ * `system` mode. Replacing the old React island removes the React runtime
+ * (~66 KB gzip) from every content page that only needed this button.
+ */
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Theme: system. Activate to switch theme."
+  title="Theme: system. Activate to switch theme."
+  class="rounded-md p-2 text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+>
+  <svg
+    id="theme-icon-light"
+    class="hidden h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <circle cx="12" cy="12" r="4"></circle>
+    <line x1="12" y1="2" x2="12" y2="5"></line>
+    <line x1="12" y1="19" x2="12" y2="22"></line>
+    <line x1="2" y1="12" x2="5" y2="12"></line>
+    <line x1="19" y1="12" x2="22" y2="12"></line>
+    <line x1="4.2" y1="4.2" x2="6.3" y2="6.3"></line>
+    <line x1="17.7" y1="17.7" x2="19.8" y2="19.8"></line>
+    <line x1="4.2" y1="19.8" x2="6.3" y2="17.7"></line>
+    <line x1="17.7" y1="6.3" x2="19.8" y2="4.2"></line>
+  </svg>
+  <svg
+    id="theme-icon-dark"
+    class="hidden h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M20 13.5A8 8 0 0 1 10.5 4 6.5 6.5 0 1 0 20 13.5Z"></path>
+  </svg>
+  <svg
+    id="theme-icon-system"
+    class="h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+    <line x1="9" y1="20" x2="15" y2="20"></line>
+    <line x1="12" y1="16" x2="12" y2="20"></line>
+  </svg>
+</button>
+<script is:inline>
+  (function () {
+    var key = 'graphing-calculator-theme';
+    var order = ['light', 'dark', 'system'];
+    function read() {
+      try {
+        var s = localStorage.getItem(key);
+        if (s === 'light' || s === 'dark' || s === 'system') return s;
+      } catch {
+        /* storage unavailable — fall through to default */
+      }
+      return 'system';
+    }
+    function darkFor(mode) {
+      if (mode === 'dark') return true;
+      if (mode === 'light') return false;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    function apply(mode) {
+      var dark = darkFor(mode);
+      document.documentElement.classList.toggle('dark', dark);
+      document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+    }
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var icons = {
+      light: document.getElementById('theme-icon-light'),
+      dark: document.getElementById('theme-icon-dark'),
+      system: document.getElementById('theme-icon-system'),
+    };
+    var media = window.matchMedia('(prefers-color-scheme: dark)');
+    var mediaHandler = null;
+    function watchSystem(on) {
+      if (mediaHandler) {
+        media.removeEventListener('change', mediaHandler);
+        mediaHandler = null;
+      }
+      if (on) {
+        mediaHandler = function () {
+          apply('system');
+        };
+        media.addEventListener('change', mediaHandler);
+      }
+    }
+    function render(mode) {
+      for (var k in icons) {
+        var el = icons[k];
+        if (el) el.classList.toggle('hidden', k !== mode);
+      }
+      var label = 'Theme: ' + mode + '. Activate to switch theme.';
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('title', label);
+    }
+    function setMode(mode) {
+      try {
+        localStorage.setItem(key, mode);
+      } catch {
+        /* persisting is best-effort; the visual toggle still works */
+      }
+      apply(mode);
+      render(mode);
+      watchSystem(mode === 'system');
+    }
+    btn.addEventListener('click', function () {
+      var current = read();
+      setMode(order[(order.indexOf(current) + 1) % order.length]);
+    });
+    var initial = read();
+    apply(initial);
+    render(initial);
+    watchSystem(initial === 'system');
+  })();
+</script>

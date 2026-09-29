@@ -6,6 +6,7 @@
  * are fabricated; invalid input produces an honest error message.
  */
 import { useState } from 'react';
+import { ErrorBoundary } from '../calculator/ErrorBoundary.js';
 import { compileExpression } from '../../lib/math/engine.js';
 import { adaptiveSimpson, centralDerivative, findAllRoots } from '../../lib/math/analysis.js';
 import { formatNumber } from '../../lib/math/format.js';
@@ -126,29 +127,31 @@ export function DerivativeTool() {
   };
 
   return (
-    <ToolShell title="Differentiate">
-      <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
-      <NumberField value={point} onChange={setPoint} label="Point a" />
-      <button type="button" onClick={compute} className={buttonClass}>
-        Compute f′(a)
-      </button>
-      {result && (
-        <p
-          role="status"
-          className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
-        >
-          {result}
-        </p>
-      )}
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
-        >
-          {error}
-        </p>
-      )}
-    </ToolShell>
+    <ErrorBoundary fallbackTitle="Derivative tool failed to load">
+      <ToolShell title="Differentiate">
+        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
+        <NumberField value={point} onChange={setPoint} label="Point a" />
+        <button type="button" onClick={compute} className={buttonClass}>
+          Compute f′(a)
+        </button>
+        {result && (
+          <p
+            role="status"
+            className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
+          >
+            {result}
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
+          >
+            {error}
+          </p>
+        )}
+      </ToolShell>
+    </ErrorBoundary>
   );
 }
 
@@ -192,32 +195,34 @@ export function IntegralTool() {
   };
 
   return (
-    <ToolShell title="Integrate">
-      <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
-      <div className="grid grid-cols-2 gap-4">
-        <NumberField value={lower} onChange={setLower} label="Lower bound" />
-        <NumberField value={upper} onChange={setUpper} label="Upper bound" />
-      </div>
-      <button type="button" onClick={compute} className={buttonClass}>
-        Compute integral
-      </button>
-      {result && (
-        <p
-          role="status"
-          className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
-        >
-          {result}
-        </p>
-      )}
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
-        >
-          {error}
-        </p>
-      )}
-    </ToolShell>
+    <ErrorBoundary fallbackTitle="Integral tool failed to load">
+      <ToolShell title="Integrate">
+        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
+        <div className="grid grid-cols-2 gap-4">
+          <NumberField value={lower} onChange={setLower} label="Lower bound" />
+          <NumberField value={upper} onChange={setUpper} label="Upper bound" />
+        </div>
+        <button type="button" onClick={compute} className={buttonClass}>
+          Compute integral
+        </button>
+        {result && (
+          <p
+            role="status"
+            className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
+          >
+            {result}
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
+          >
+            {error}
+          </p>
+        )}
+      </ToolShell>
+    </ErrorBoundary>
   );
 }
 
@@ -260,31 +265,33 @@ export function RootFinderTool() {
   };
 
   return (
-    <ToolShell title="Find roots">
-      <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
-      <div className="grid grid-cols-2 gap-4">
-        <NumberField value={lower} onChange={setLower} label="Interval start" />
-        <NumberField value={upper} onChange={setUpper} label="Interval end" />
-      </div>
-      <button type="button" onClick={compute} className={buttonClass}>
-        Find roots
-      </button>
-      {result && (
-        <p
-          role="status"
-          className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
-        >
-          {result}
-        </p>
-      )}
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
-        >
-          {error}
-        </p>
-      )}
-    </ToolShell>
+    <ErrorBoundary fallbackTitle="Root finder failed to load">
+      <ToolShell title="Find roots">
+        <ExpressionField value={expression} onChange={setExpression} label="Function f(x)" />
+        <div className="grid grid-cols-2 gap-4">
+          <NumberField value={lower} onChange={setLower} label="Interval start" />
+          <NumberField value={upper} onChange={setUpper} label="Interval end" />
+        </div>
+        <button type="button" onClick={compute} className={buttonClass}>
+          Find roots
+        </button>
+        {result && (
+          <p
+            role="status"
+            className="rounded-md bg-slate-100 p-3 font-mono text-slate-900 dark:bg-slate-800 dark:text-white"
+          >
+            {result}
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md bg-red-50 p-3 text-red-700 dark:bg-red-950 dark:text-red-300"
+          >
+            {error}
+          </p>
+        )}
+      </ToolShell>
+    </ErrorBoundary>
   );
 }
