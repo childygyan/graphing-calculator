@@ -1,0 +1,12 @@
+# Redirects for the AI Graphing Calculator site.
+# Cloudflare Pages / Netlify `_redirects` format: <from> <to> <status>.
+# These cover legacy / typo entry points; the canonical routes are the
+# <to> targets. No mass redirects — one rule per genuine alias.
+
+/calculator/ /graphing-calculator/ 301
+/graphing-calculator.html /graphing-calculator/ 301
+/calculators.html /calculators/ 301
+/functions.html /functions/ 301
+/examples.html /examples/ 301
+/learn.html /learn/ 301
+/home/ / 301

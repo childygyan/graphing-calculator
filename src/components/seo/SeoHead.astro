@@ -13,6 +13,12 @@ const { title, description, canonicalPath, robots, ogImage, ogType, noindex }: P
 const canonical = buildCanonical(canonicalPath ?? Astro.url.pathname);
 const robotsContent = noindex ? 'noindex, nofollow' : (robots ?? 'index, follow');
 const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
+/**
+ * Search Console verification slot. Env-driven and empty by default —
+ * no verification code is fabricated; set PUBLIC_GOOGLE_SITE_VERIFICATION
+ * at build time once a real Search Console property exists.
+ */
+const googleVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION as string | undefined;
 ---
 
 <title>{title}</title>
@@ -25,6 +31,7 @@ const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
 <meta property="og:type" content={ogType ?? 'website'} />
 <meta property="og:site_name" content={siteConfig.name} />
 {absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}
+{googleVerification && <meta name="google-site-verification" content={googleVerification} />}
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />

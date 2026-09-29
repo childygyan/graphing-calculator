@@ -1,0 +1,16 @@
+---
+/**
+ * JsonLd — renders one or more JSON-LD structured-data blocks.
+ * Schemas are built by `src/lib/seo/metadata.ts` from the page's own
+ * visible content; nothing is fabricated.
+ */
+interface Props {
+  schemas: Record<string, unknown>[];
+}
+
+const { schemas }: Props = Astro.props;
+---
+
+{schemas.map((schema) => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}

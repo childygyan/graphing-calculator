@@ -1,0 +1,28 @@
+---
+/**
+ * FaqBlock — visible FAQ list. Pages that pass faqs also emit FAQPage
+ * JSON-LD built from the same data (see the page template).
+ */
+import type { ContentFaq } from '../../data/seo/types';
+
+interface Props {
+  faqs: ContentFaq[];
+  heading?: string;
+}
+
+const { faqs, heading = 'Frequently asked questions' }: Props = Astro.props;
+---
+
+{faqs.length > 0 && (
+  <section class="mt-12">
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{heading}</h2>
+    <div class="mt-6 space-y-6">
+      {faqs.map((faq) => (
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-800/50">
+          <h3 class="font-semibold text-slate-900 dark:text-white">{faq.q}</h3>
+          <p class="mt-2 leading-7 text-slate-600 dark:text-slate-300">{faq.a}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}

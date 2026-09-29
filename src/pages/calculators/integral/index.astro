@@ -1,0 +1,66 @@
+---
+/**
+ * Integral calculator tool page: functional definite-integral tool plus
+ * an explanation of numerical integration.
+ */
+import ToolPageShell from '../../../components/content/ToolPageShell.astro';
+import { IntegralTool } from '../../../components/tools/MathTools.js';
+
+const title = 'Integral Calculator — Definite Integrals Online | AI Graphing Calculator';
+const description =
+  'Free online integral calculator: compute definite integrals ∫[a,b] f(x) dx numerically with adaptive Simpson’s rule, explained step by step.';
+---
+
+<ToolPageShell
+  title={title}
+  description={description}
+  canonicalPath="/calculators/integral/"
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Calculators', href: '/calculators/' },
+    { label: 'Integral Calculator' },
+  ]}
+  heading="Integral Calculator"
+  intro={[
+    'The definite integral of f from a to b measures the signed area between the graph and the x-axis on that interval. Enter a function and bounds below to compute it numerically.',
+  ]}
+  sections={[
+    {
+      heading: 'How the calculation works',
+      body: [
+        'This tool uses adaptive Simpson’s rule: it approximates the function with parabolas on small subintervals and recursively subdivides wherever the estimate is not yet accurate enough. It is the same quadrature routine behind the shaded integral regions in the graphing calculator, so the numbers agree.',
+        'Because the method is adaptive, smooth functions converge quickly while tricky regions — sharp peaks, oscillations — automatically receive more subdivisions. The result is rounded to 6 decimal places; the underlying estimate is typically accurate well beyond that.',
+      ],
+    },
+    {
+      heading: 'Reading the result',
+      body: [
+        'Area above the x-axis counts positive and area below counts negative, so an integral can be zero even when the function is not — for example, ∫[−1,1] x³ dx = 0 because the two lobes cancel exactly. If you want total geometric area, integrate the absolute value instead.',
+        'Integrals also accumulate quantities: if f(x) is a rate (liters per minute, say), the integral over a time interval is the total amount. Try f(x) = x² from 0 to 1 (result: 1/3 ≈ 0.333333) — a classic every calculus student meets.',
+      ],
+    },
+  ]}
+  faqs={[
+    {
+      q: 'Is this an exact antiderivative evaluation?',
+      a: 'No — the tool integrates numerically with adaptive Simpson’s rule rather than finding a symbolic antiderivative. For well-behaved functions the approximation is accurate to many decimal places.',
+    },
+    {
+      q: 'Why is my integral zero when the function clearly has area?',
+      a: 'The definite integral is signed area: regions below the x-axis subtract from regions above it. Symmetric functions like sin(x) over [0, 2π] integrate to exactly zero for this reason.',
+    },
+    {
+      q: 'What if the function is undefined somewhere in the interval?',
+      a: 'Functions with singularities inside [a, b] (like 1/x across x = 0) do not have ordinary definite integrals there. The tool will report that the integral could not be estimated instead of returning a wrong number.',
+    },
+  ]}
+  related={[
+    '/calculators/derivative/',
+    '/calculators/root-finder/',
+    '/learn/understanding-integrals/',
+    '/functions/sine/',
+    '/graphing-calculator/',
+  ]}
+>
+  <IntegralTool client:load slot="tool" />
+</ToolPageShell>

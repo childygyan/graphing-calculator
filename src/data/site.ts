@@ -37,6 +37,9 @@ export const siteConfig = {
   stateStorageKey: 'graphing-calculator-state-v1',
   navigation: [
     { label: 'Graphing Calculator', href: '/graphing-calculator/' },
+    { label: 'Functions', href: '/functions/' },
+    { label: 'Examples', href: '/examples/' },
+    { label: 'Learn', href: '/learn/' },
     { label: 'Calculators', href: '/calculators/' },
     { label: 'About', href: '/about/' },
   ] as NavLink[],
@@ -50,8 +53,20 @@ export const siteConfig = {
       ] as NavLink[],
     },
     {
+      heading: 'Explore',
+      links: [
+        { label: 'Function Library', href: '/functions/' },
+        { label: 'Graph Examples', href: '/examples/' },
+        { label: 'Learn Graphing', href: '/learn/' },
+      ] as NavLink[],
+    },
+    {
       heading: 'Calculators',
-      links: [{ label: 'Graphing Calculator', href: '/graphing-calculator/' }] as NavLink[],
+      links: [
+        { label: 'Derivative Calculator', href: '/calculators/derivative/' },
+        { label: 'Integral Calculator', href: '/calculators/integral/' },
+        { label: 'Root Finder', href: '/calculators/root-finder/' },
+      ] as NavLink[],
     },
     {
       heading: 'Legal',

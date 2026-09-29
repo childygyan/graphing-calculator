@@ -1,0 +1,14 @@
+---
+/**
+ * AnalyticsStub — privacy-conscious analytics placeholder.
+ *
+ * Disabled by default: it renders nothing unless the
+ * PUBLIC_ANALYTICS_SCRIPT_SRC build-time env var is set. When set, the
+ * external script is loaded with `defer` and no cookies are configured by
+ * this component — choose a cookieless provider and document the choice
+ * before enabling it in production (see docs/PHASE8-REPORT.md).
+ */
+const src = import.meta.env.PUBLIC_ANALYTICS_SCRIPT_SRC as string | undefined;
+---
+
+{src && <script is:inline defer data-analytics-stub src={src}></script>}

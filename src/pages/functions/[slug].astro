@@ -1,0 +1,160 @@
+---
+/**
+ * Notable-function pages, e.g. /functions/sine/.
+ *
+ * The "Computed properties" panel is derived at build time from the
+ * project's own math library (content-engine.ts) — every number on the
+ * page is actually computed, never written by hand.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import ArticleSections from '../../components/content/ArticleSections.astro';
+import FaqBlock from '../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { FUNCTION_PAGES } from '../../data/seo/functions.js';
+import { computeFunctionFacts } from '../../lib/seo/content-engine.js';
+import { faqSchema } from '../../lib/seo/metadata.js';
+
+export function getStaticPaths() {
+  return FUNCTION_PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const facts = computeFunctionFacts(page.expression);
+const canonicalPath = `/functions/${page.slug}/`;
+const title = `${page.displayName} — Graph & Properties | AI Graphing Calculator`;
+
+const sampleRows = facts.samples.map((sample) => ({
+  x: sample.x,
+  y: sample.y === null ? 'undefined' : sample.y.toFixed(4).replace(/\.?0+$/, ''),
+}));
+---
+
+<BaseLayout title={title} description={page.description} canonicalPath={canonicalPath}>
+  <JsonLd schemas={[faqSchema(page.faqs)]} />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Functions', href: '/functions/' },
+        { label: page.displayName },
+      ]}
+    />
+
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      Function library
+    </p>
+    <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {page.displayName}
+    </h1>
+    <p class="mt-3 font-mono text-lg text-slate-600 dark:text-slate-300">{page.notation}</p>
+    <p class="mt-4 text-xl text-slate-600 dark:text-slate-300">{page.tagline}</p>
+
+    {page.intro.map((paragraph) => (
+      <p class="mt-6 leading-7 text-slate-600 dark:text-slate-300">{paragraph}</p>
+    ))}
+
+    <section
+      class="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50"
+      aria-labelledby="computed-properties"
+    >
+      <h2
+        id="computed-properties"
+        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
+      >
+        Computed properties
+      </h2>
+      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        Calculated by the graphing calculator's own math engine at build time for{' '}
+        <code class="font-mono">{page.expression}</code>.
+      </p>
+      {facts.ok ? (
+        <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Roots in [−10, 10]
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.roots.length > 0 ? facts.formatted.roots.join(', ') : 'none found'}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">y-intercept f(0)</dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.yIntercept}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Local extrema in [−10, 10]
+            </dt>
+            <dd class="mt-1 text-slate-900 dark:text-white">
+              {facts.formatted.extrema.length > 0 ? (
+                <ul class="list-disc pl-5 font-mono text-sm">
+                  {facts.formatted.extrema.slice(0, 6).map((extremum) => (
+                    <li>
+                      {extremum.kind} at ({extremum.x}, {extremum.y})
+                    </li>
+                  ))}
+                  {facts.formatted.extrema.length > 6 && (
+                    <li>…and {facts.formatted.extrema.length - 6} more</li>
+                  )}
+                </ul>
+              ) : (
+                'none found'
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Sample values</dt>
+            <dd class="mt-1 font-mono text-sm text-slate-900 dark:text-white">
+              {sampleRows.map((row) => `f(${row.x}) = ${row.y}`).join(' · ')}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Derivative f′(1)</dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.derivativeAtOne}
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">
+              Integral ∫₀¹ f(x) dx
+            </dt>
+            <dd class="mt-1 font-mono text-slate-900 dark:text-white">
+              {facts.formatted.integralZeroToOne}
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <p class="mt-4 text-slate-600 dark:text-slate-300">
+          Properties could not be computed for this expression.
+        </p>
+      )}
+    </section>
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Key facts</h2>
+      <ul class="mt-4 list-disc space-y-2 pl-6 text-slate-600 dark:text-slate-300">
+        {page.keyFacts.map((fact) => (
+          <li class="leading-7">{fact}</li>
+        ))}
+      </ul>
+    </section>
+
+    <ArticleSections sections={page.sections} />
+
+    <div class="mt-10">
+      <a
+        href="/graphing-calculator/"
+        class="inline-block rounded-md bg-brand-600 px-6 py-3 font-medium text-white hover:bg-brand-700"
+      >
+        Graph {page.notation} in the calculator
+      </a>
+    </div>
+
+    <FaqBlock faqs={page.faqs} />
+    <RelatedLinks paths={page.related} />
+  </div>
+</BaseLayout>

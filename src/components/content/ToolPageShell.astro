@@ -1,0 +1,58 @@
+---
+/**
+ * ToolPageShell — shared layout for the functional calculator tool pages:
+ * functional island on top, explanatory prose below, FAQs, related links.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../seo/Breadcrumbs.astro';
+import JsonLd from '../seo/JsonLd.astro';
+import ArticleSections from './ArticleSections.astro';
+import FaqBlock from './FaqBlock.astro';
+import RelatedLinks from './RelatedLinks.astro';
+import type { BreadcrumbItem } from '../../lib/seo/metadata';
+import type { ContentFaq, ContentSection } from '../../data/seo/types';
+import { faqSchema } from '../../lib/seo/metadata';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  breadcrumbs: BreadcrumbItem[];
+  heading: string;
+  intro: string[];
+  sections: ContentSection[];
+  faqs: ContentFaq[];
+  related: string[];
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  breadcrumbs,
+  heading,
+  intro,
+  sections,
+  faqs,
+  related,
+}: Props = Astro.props;
+---
+
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath}>
+  <JsonLd schemas={[faqSchema(faqs)]} />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={breadcrumbs} />
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">{heading}</h1>
+    {intro.map((paragraph) => (
+      <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">{paragraph}</p>
+    ))}
+
+    <div class="mt-8">
+      <slot name="tool" />
+    </div>
+
+    <ArticleSections sections={sections} />
+    <FaqBlock faqs={faqs} />
+    <RelatedLinks paths={related} />
+  </div>
+</BaseLayout>

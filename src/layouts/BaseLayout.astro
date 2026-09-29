@@ -5,6 +5,7 @@
  */
 import '../styles/global.css';
 import SeoHead from '../components/seo/SeoHead.astro';
+import AnalyticsStub from '../components/seo/AnalyticsStub.astro';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 
@@ -69,5 +70,6 @@ const { title, description, canonicalPath, noindex, robots, ogImage, mainClass }
       <slot />
     </main>
     <Footer />
+    <AnalyticsStub />
   </body>
 </html>

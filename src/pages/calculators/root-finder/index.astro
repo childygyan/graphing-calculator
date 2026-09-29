@@ -1,0 +1,66 @@
+---
+/**
+ * Root finder tool page: functional root-finding tool plus an explanation
+ * of the numerical method.
+ */
+import ToolPageShell from '../../../components/content/ToolPageShell.astro';
+import { RootFinderTool } from '../../../components/tools/MathTools.js';
+
+const title = 'Root Finder — Solve f(x) = 0 Online | AI Graphing Calculator';
+const description =
+  'Free online root finder: enter any function f(x) and an interval to find all its roots (x-intercepts) using Brent’s method, with honest reporting.';
+---
+
+<ToolPageShell
+  title={title}
+  description={description}
+  canonicalPath="/calculators/root-finder/"
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Calculators', href: '/calculators/' },
+    { label: 'Root Finder' },
+  ]}
+  heading="Root Finder"
+  intro={[
+    'A root of f is an x-value where f(x) = 0 — the points where the graph crosses or touches the x-axis. Enter a function and a search interval below to find every root inside it.',
+  ]}
+  sections={[
+    {
+      heading: 'How the calculation works',
+      body: [
+        'The tool first scans the interval for sign changes, then refines each bracketed root with Brent’s method — a robust algorithm that combines the safety of bisection with the speed of secant and inverse-quadratic interpolation. It is the same routine the graphing calculator uses for its root analysis.',
+        'Roots where the function merely touches the axis without changing sign (like x² at x = 0) are found by a separate extrema-aware scan, since pure sign-change detection would miss them. Every reported root is verified by evaluating f at the result.',
+      ],
+    },
+    {
+      heading: 'Tips for good results',
+      body: [
+        'Choose an interval that brackets the roots you care about: the tool only searches where you tell it to. For x² − 4 on [−10, 10] it finds −2 and 2; shrink the interval to [0, 10] and it reports just 2.',
+        'If no roots are reported, either the function truly has none on the interval (like x² + 1 on the real line) or the roots sit exactly at your interval endpoints — nudge the bounds slightly and try again.',
+      ],
+    },
+  ]}
+  faqs={[
+    {
+      q: 'Can it find complex (non-real) roots?',
+      a: 'No — this tool finds real roots only. Functions like x² + 1 have no real roots, so the tool honestly reports none on any real interval.',
+    },
+    {
+      q: 'Why did it miss a root I can see on the graph?',
+      a: 'The most common cause is a root exactly at an interval endpoint or a root the scan step jumps over in a wildly oscillating function. Narrow the interval around the suspected root and search again.',
+    },
+    {
+      q: 'How accurate are the reported roots?',
+      a: 'Brent’s method converges to near machine precision; reported values are rounded to 6 decimal places. Plugging a reported root back into f(x) gives a value extremely close to zero.',
+    },
+  ]}
+  related={[
+    '/calculators/derivative/',
+    '/calculators/integral/',
+    '/functions/quadratic/',
+    '/functions/sine/',
+    '/graphing-calculator/',
+  ]}
+>
+  <RootFinderTool client:load slot="tool" />
+</ToolPageShell>

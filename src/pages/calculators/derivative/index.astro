@@ -1,0 +1,66 @@
+---
+/**
+ * Derivative calculator tool page: functional f'(a) tool plus an
+ * explanation of what derivatives mean and how the tool computes them.
+ */
+import ToolPageShell from '../../../components/content/ToolPageShell.astro';
+import { DerivativeTool } from '../../../components/tools/MathTools.js';
+
+const title = 'Derivative Calculator — Compute f′(x) Instantly | AI Graphing Calculator';
+const description =
+  'Free online derivative calculator: enter any function f(x) and a point to get f′(a) numerically, with an explanation of what the derivative means.';
+---
+
+<ToolPageShell
+  title={title}
+  description={description}
+  canonicalPath="/calculators/derivative/"
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Calculators', href: '/calculators/' },
+    { label: 'Derivative Calculator' },
+  ]}
+  heading="Derivative Calculator"
+  intro={[
+    'The derivative of a function at a point measures its instantaneous rate of change — geometrically, the slope of the tangent line to the graph at that point. Enter any function below and this tool estimates f′(a) numerically.',
+  ]}
+  sections={[
+    {
+      heading: 'How the calculation works',
+      body: [
+        'This tool uses the central difference formula: f′(a) ≈ (f(a + h) − f(a − h)) / 2h, with a small step h. It is the same numerical method the graphing calculator uses for its tangent-line analysis, so results here match what you see when you inspect a tangent on the graph.',
+        'Numerical differentiation is an approximation. For smooth functions like polynomials, trigonometric functions, and exponentials, the estimate is accurate to many decimal places. At sharp corners (such as |x| at x = 0) or discontinuities, the derivative may not exist, and the tool will tell you so honestly instead of returning a misleading number.',
+      ],
+    },
+    {
+      heading: 'What the derivative tells you',
+      body: [
+        'A positive derivative means the function is increasing at that point; a negative derivative means it is decreasing. The larger the magnitude, the steeper the graph. Where the derivative is zero, the graph momentarily flattens — these are the candidate locations for local maxima and minima.',
+        'Derivatives also carry physical meaning: if f(x) is position over time, f′(x) is velocity; if f(x) is velocity, f′(x) is acceleration. Try f(x) = x² at a = 2 (result: 4) and at a = −2 (result: −4) to see the sign change across the minimum.',
+      ],
+    },
+  ]}
+  faqs={[
+    {
+      q: 'Is this an exact symbolic derivative?',
+      a: 'No — this tool computes a numerical approximation using the central difference method. It is highly accurate for smooth functions but remains an estimate, shown rounded to 6 decimal places.',
+    },
+    {
+      q: 'Why does it fail at some points?',
+      a: 'Some functions are not differentiable everywhere: |x| has a corner at x = 0, and functions with jumps or vertical asymptotes have no meaningful slope there. The tool reports that it cannot estimate the derivative rather than guessing.',
+    },
+    {
+      q: 'How is this related to the tangent line feature?',
+      a: 'The tangent line to f at x = a has slope f′(a) — exactly what this tool computes. In the graphing calculator you can draw the tangent line on the graph and read off the same slope visually.',
+    },
+  ]}
+  related={[
+    '/calculators/integral/',
+    '/calculators/root-finder/',
+    '/learn/understanding-derivatives/',
+    '/functions/quadratic/',
+    '/graphing-calculator/',
+  ]}
+>
+  <DerivativeTool client:load slot="tool" />
+</ToolPageShell>

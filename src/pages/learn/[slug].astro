@@ -1,0 +1,102 @@
+---
+/**
+ * Learn articles, e.g. /learn/understanding-derivatives/.
+ * Reading time is computed from the article's own word count.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import ArticleSections from '../../components/content/ArticleSections.astro';
+import FaqBlock from '../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { LEARN_ARTICLES } from '../../data/seo/learn.js';
+import { articleSchema, faqSchema } from '../../lib/seo/metadata.js';
+
+export function getStaticPaths() {
+  return LEARN_ARTICLES.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const canonicalPath = `/learn/${article.slug}/`;
+const title = `${article.title} | AI Graphing Calculator`;
+
+const wordCount = article.sections
+  .flatMap((section) => [section.heading, ...section.body])
+  .join(' ')
+  .split(/\s+/).length;
+const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+---
+
+<BaseLayout title={title} description={article.description} canonicalPath={canonicalPath}>
+  <JsonLd
+    schemas={[
+      articleSchema({
+        path: canonicalPath,
+        headline: article.title,
+        description: article.description,
+      }),
+      faqSchema(article.faqs),
+    ]}
+  />
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Learn', href: '/learn/' },
+        { label: article.title },
+      ]}
+    />
+
+    <p class="text-sm font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-400">
+      Learn · {readingMinutes} min read
+    </p>
+    <h1 class="mt-2 text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {article.title}
+    </h1>
+
+    <ArticleSections sections={article.sections} />
+
+    {article.tryExpressions.length > 0 && (
+      <section
+        class="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50"
+        aria-labelledby="try-it"
+      >
+        <h2 id="try-it" class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Try it in the calculator
+        </h2>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">
+          Type any of these into the{' '}
+          <a
+            href="/graphing-calculator/"
+            class="text-brand-700 hover:underline dark:text-brand-300"
+          >
+            graphing calculator
+          </a>{' '}
+          to see the ideas above in action:
+        </p>
+        <ul class="mt-4 space-y-2 font-mono text-slate-900 dark:text-white">
+          {article.tryExpressions.map((expression) => (
+            <li class="rounded bg-white px-3 py-2 dark:bg-slate-900">{expression}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="mt-10">
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        Key takeaways
+      </h2>
+      <ul class="mt-4 list-disc space-y-2 pl-6 text-slate-600 dark:text-slate-300">
+        {article.keyTakeaways.map((takeaway) => (
+          <li class="leading-7">{takeaway}</li>
+        ))}
+      </ul>
+    </section>
+
+    <FaqBlock faqs={article.faqs} />
+    <RelatedLinks paths={article.related} />
+  </div>
+</BaseLayout>

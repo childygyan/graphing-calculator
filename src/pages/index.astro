@@ -2,9 +2,12 @@
 /**
  * Homepage — static marketing page. No client directives: the Card
  * components render to plain HTML with zero JavaScript.
+ *
+ * Copy describes only shipped functionality (Phases 1–7): interactive
+ * graphing, expression engine, analysis tools, sliders/parametric/polar,
+ * AI assistant, and save/share.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { siteConfig } from '../data/site.js';
 import {
   Card,
   CardHeader,
@@ -17,8 +20,8 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
 ---
 
 <BaseLayout
-  title="AI Graphing Calculator — Graph Functions Online"
-  description={siteConfig.description}
+  title="AI Graphing Calculator — Graph Functions Online Free"
+  description="Free online graphing calculator: plot functions, analyze roots, derivatives and integrals, explore with sliders, and get AI math help. No sign-up needed."
   canonicalPath="/"
   mainClass="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16"
 >
@@ -27,8 +30,9 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
       AI Graphing Calculator
     </h1>
     <p class="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-      Graph mathematical functions in your browser — fast, accessible, and free. AI-assisted math
-      exploration is on the roadmap.
+      Graph mathematical functions in your browser — fast, accessible, and free. Plot expressions,
+      analyze them with real numerical methods, and ask the AI assistant for help. No sign-up, no
+      download.
     </p>
     <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
       <a
@@ -38,10 +42,10 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
         Open Graphing Calculator
       </a>
       <a
-        href="/calculators/"
+        href="/learn/"
         class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
       >
-        Explore Calculators
+        Learn Graphing
       </a>
     </div>
   </section>
@@ -51,12 +55,13 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
       <Card className="flex flex-col">
         <CardHeader>
           <CardTitle>Interactive graphing</CardTitle>
-          <CardDescription>In active development</CardDescription>
+          <CardDescription>Zoom, pan, and explore</CardDescription>
         </CardHeader>
         <CardContent className="flex-1">
           <p class="text-sm text-slate-600 dark:text-slate-300">
-            The 2D graph renderer lands next. Today&rsquo;s foundation is real: an expression panel
-            plus viewport state that zoom and reset act on.
+            A fast canvas graph with adaptive gridlines, smooth zoom-to-cursor, panning, and touch
+            support. Plot Cartesian functions, parametric curves, polar equations, and inequalities
+            — each expression with its own color and visibility toggle.
           </p>
         </CardContent>
         <CardFooter>
@@ -71,55 +76,14 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
 
       <Card className="flex flex-col">
         <CardHeader>
-          <CardTitle>Expression-first</CardTitle>
-          <CardDescription>Available now</CardDescription>
+          <CardTitle>Real mathematical analysis</CardTitle>
+          <CardDescription>Roots, derivatives, integrals</CardDescription>
         </CardHeader>
         <CardContent className="flex-1">
           <p class="text-sm text-slate-600 dark:text-slate-300">
-            Manage multiple expressions, each with its own color and visibility toggle. Your
-            workspace persists in your browser between visits.
-          </p>
-        </CardContent>
-        <CardFooter>
-          <a
-            href="/graphing-calculator/"
-            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
-          >
-            Try it out <ArrowRightIcon className="h-4 w-4" />
-          </a>
-        </CardFooter>
-      </Card>
-
-      <Card className="flex flex-col">
-        <CardHeader>
-          <CardTitle>AI assistance</CardTitle>
-          <CardDescription>Planned</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1">
-          <p class="text-sm text-slate-600 dark:text-slate-300">
-            On the roadmap: natural-language math commands and step-by-step explanations, powered by
-            a real provider — never by the calculator itself.
-          </p>
-        </CardContent>
-        <CardFooter>
-          <a
-            href="/about/"
-            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
-          >
-            See the roadmap <ArrowRightIcon className="h-4 w-4" />
-          </a>
-        </CardFooter>
-      </Card>
-
-      <Card className="flex flex-col">
-        <CardHeader>
-          <CardTitle>More calculators</CardTitle>
-          <CardDescription>Planned</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1">
-          <p class="text-sm text-slate-600 dark:text-slate-300">
-            A small collection of focused math tools is planned. The graphing calculator is the
-            first; the rest will arrive as they are genuinely ready.
+            Find roots with Brent&rsquo;s method, compute derivatives and definite integrals
+            numerically, inspect tables of values, and draw tangent lines — all with the same
+            engine, honestly reported when a result can&rsquo;t be computed.
           </p>
         </CardContent>
         <CardFooter>
@@ -127,10 +91,89 @@ import { ArrowRightIcon } from '../components/ui/icons.js';
             href="/calculators/"
             class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
           >
-            Browse the collection <ArrowRightIcon className="h-4 w-4" />
+            Try the math tools <ArrowRightIcon className="h-4 w-4" />
           </a>
         </CardFooter>
       </Card>
+
+      <Card className="flex flex-col">
+        <CardHeader>
+          <CardTitle>AI math assistant</CardTitle>
+          <CardDescription>Ask in plain language</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <p class="text-sm text-slate-600 dark:text-slate-300">
+            Ask questions in plain English — the assistant translates them into calculator commands,
+            plots what you ask for, and explains step by step. The math engine always does the
+            actual computing; the AI never invents results.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <a
+            href="/graphing-calculator/"
+            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+          >
+            Ask the assistant <ArrowRightIcon className="h-4 w-4" />
+          </a>
+        </CardFooter>
+      </Card>
+
+      <Card className="flex flex-col">
+        <CardHeader>
+          <CardTitle>Variables, sliders & sharing</CardTitle>
+          <CardDescription>Explore and share</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1">
+          <p class="text-sm text-slate-600 dark:text-slate-300">
+            Define variables, animate them with sliders, save named graphs in your browser, and
+            share graphs as compact links. Your workspace persists between visits — everything stays
+            on your device.
+          </p>
+        </CardContent>
+        <CardFooter>
+          <a
+            href="/examples/"
+            class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+          >
+            See example graphs <ArrowRightIcon className="h-4 w-4" />
+          </a>
+        </CardFooter>
+      </Card>
+    </div>
+  </section>
+
+  <section aria-label="Explore" class="mt-14">
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+      Explore the mathematics
+    </h2>
+    <div class="mt-6 grid gap-4 sm:grid-cols-3">
+      <a
+        href="/functions/"
+        class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+      >
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Function library</h3>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Sine, quadratics, exponentials and more — each with computed properties.
+        </p>
+      </a>
+      <a
+        href="/examples/"
+        class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+      >
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Example graphs</h3>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Curated graphs that open preloaded in the calculator, with notes.
+        </p>
+      </a>
+      <a
+        href="/learn/"
+        class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+      >
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Learn graphing</h3>
+        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+          Short guides to functions, derivatives, integrals, and asymptotes.
+        </p>
+      </a>
     </div>
   </section>
 </BaseLayout>

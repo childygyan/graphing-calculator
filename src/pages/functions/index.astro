@@ -1,0 +1,45 @@
+---
+/**
+ * Function library hub: every notable-function page, each with
+ * math-derived content computed at build time.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { FUNCTION_PAGES } from '../../data/seo/functions.js';
+
+const title = 'Function Library — Graph & Explore Common Functions | AI Graphing Calculator';
+const description =
+  'Browse the function library: sine, cosine, quadratics, exponentials, logarithms and more — each with computed roots, extrema, and key properties.';
+---
+
+<BaseLayout title={title} description={description} canonicalPath="/functions/">
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Function Library' }]} />
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      Function Library
+    </h1>
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      Each page below covers one notable function in depth: what it is, its key mathematical
+      properties, where it shows up — plus a panel of properties computed live by the calculator's
+      own math engine (roots, extrema, intercepts, derivatives, and integrals).
+    </p>
+
+    <div class="mt-10 grid gap-4 sm:grid-cols-2">
+      {FUNCTION_PAGES.map((page) => (
+        <a
+          href={`/functions/${page.slug}/`}
+          class="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+        >
+          <h2 class="text-xl font-bold text-slate-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
+            {page.displayName}
+          </h2>
+          <p class="mt-1 font-mono text-sm text-slate-500 dark:text-slate-400">{page.notation}</p>
+          <p class="mt-2 text-slate-600 dark:text-slate-300">{page.tagline}</p>
+        </a>
+      ))}
+    </div>
+
+    <RelatedLinks paths={['/graphing-calculator/', '/learn/', '/examples/', '/calculators/']} />
+  </div>
+</BaseLayout>

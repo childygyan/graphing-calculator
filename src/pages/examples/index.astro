@@ -1,0 +1,43 @@
+---
+/**
+ * Graph examples hub: curated, preloaded graphs with real explanations.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/seo/Breadcrumbs.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
+import { EXAMPLE_GRAPHS } from '../../data/seo/examples.js';
+
+const title = 'Graph Examples — Curated Interactive Graphs | AI Graphing Calculator';
+const description =
+  'Explore curated graph examples — projectile motion, damped oscillation, logistic growth, Lissajous curves and more — each opens preloaded in the calculator.';
+---
+
+<BaseLayout title={title} description={description} canonicalPath="/examples/">
+  <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Examples' }]} />
+    <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      Graph Examples
+    </h1>
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      Hand-picked graphs that show what the calculator can do — from physics and engineering to pure
+      mathematical beauty. Every example opens preloaded in the calculator, with notes on what to
+      look for.
+    </p>
+
+    <div class="mt-10 grid gap-4 sm:grid-cols-2">
+      {EXAMPLE_GRAPHS.map((example) => (
+        <a
+          href={`/examples/${example.slug}/`}
+          class="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-300 hover:shadow dark:border-slate-700 dark:bg-slate-900"
+        >
+          <h2 class="text-xl font-bold text-slate-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
+            {example.title}
+          </h2>
+          <p class="mt-2 line-clamp-3 text-slate-600 dark:text-slate-300">{example.description}</p>
+        </a>
+      ))}
+    </div>
+
+    <RelatedLinks paths={['/graphing-calculator/', '/functions/', '/learn/', '/calculators/']} />
+  </div>
+</BaseLayout>

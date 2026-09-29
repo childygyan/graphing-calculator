@@ -1,18 +1,92 @@
 ---
 /**
- * The graphing calculator workspace. CalculatorPage is the only
- * client:load island on this page (besides the header theme toggle).
+ * The graphing calculator workspace + landing content.
+ *
+ * CalculatorPage is the only client:load island on this page (besides the
+ * header theme toggle). The content below the workspace is static prose
+ * describing the tool: features, how-to, and FAQs, with WebApplication and
+ * FAQPage structured data.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import JsonLd from '../../components/seo/JsonLd.astro';
+import ArticleSections from '../../components/content/ArticleSections.astro';
+import FaqBlock from '../../components/content/FaqBlock.astro';
+import RelatedLinks from '../../components/content/RelatedLinks.astro';
 import { CalculatorPage } from '../../components/calculator/CalculatorPage.js';
+import { faqSchema, webApplicationSchema } from '../../lib/seo/metadata.js';
+
+const faqs = [
+  {
+    q: 'Is this graphing calculator free?',
+    a: 'Yes. The calculator runs entirely in your browser and is free to use with no sign-up. Your graphs are saved on your own device, not on a server.',
+  },
+  {
+    q: 'What kinds of expressions can I graph?',
+    a: 'Cartesian functions like sin(x) or x^2 - 4, parametric curves, polar equations, inequalities, and individual points. You can plot many expressions at once, each with its own color.',
+  },
+  {
+    q: 'Can it find roots, derivatives, and integrals?',
+    a: 'Yes. The analysis panel finds roots with Brent\u2019s method, estimates derivatives with central differences, computes definite integrals with adaptive Simpson\u2019s rule, and draws tangent lines. Results that cannot be computed are reported honestly.',
+  },
+  {
+    q: 'How does the AI assistant work?',
+    a: 'You can ask questions in plain English. The assistant translates your request into calculator commands — plotting expressions, setting the viewport, or explaining a concept step by step. The math engine always performs the actual calculations; the AI never invents numerical results.',
+  },
+  {
+    q: 'Do I need an account to save or share graphs?',
+    a: 'No accounts exist. You can save named graphs in your browser, export them as JSON or PNG, and share them as compact links that anyone can open.',
+  },
+];
+
+const sections = [
+  {
+    heading: 'What you can do',
+    body: [
+      'Type an expression such as x^2, sin(x), or 1/x and watch it plot instantly. Add more expressions to compare them, toggle visibility, and restyle colors. The graph supports smooth zoom centered on your cursor, panning, and full touch gestures including pinch-to-zoom.',
+      'Beyond plotting, the analysis tools turn the graph into a laboratory: locate x-intercepts, compute the slope at any point, measure the area under a curve, generate tables of values, and draw tangent and normal lines. Variables and sliders let you animate parameters — drag a slider and watch a whole family of curves morph in real time.',
+    ],
+  },
+  {
+    heading: 'How to graph a function',
+    body: [
+      'Enter your expression in the expression list using x as the variable — for example, x^3 - 3*x. The graph updates as you type. Scroll to zoom toward your cursor, drag to pan, and double-click (or use the toolbar) to reset the view.',
+      'To go deeper, select an expression and open the analysis panel: find its roots, extrema, and intercepts, or evaluate the derivative and integral at points you choose. If you prefer words to formulas, open the AI assistant and ask — for instance, "plot sin(x) and show me its roots".',
+    ],
+  },
+];
 ---
 
 <BaseLayout
-  title="Graphing Calculator"
-  description="Open the graphing calculator: manage expressions and explore the graph workspace."
+  title="Graphing Calculator — Free Online Function Grapher"
+  description="Free online graphing calculator: plot functions, parametric and polar curves, find roots, derivatives and integrals, and explore math with an AI assistant. No sign-up."
   canonicalPath="/graphing-calculator/"
   mainClass="flex flex-col"
 >
+  <JsonLd schemas={[webApplicationSchema(), faqSchema(faqs)]} />
   <h1 class="sr-only">Graphing Calculator</h1>
   <CalculatorPage client:load />
+
+  <div class="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
+    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      About this graphing calculator
+    </h2>
+    <p class="mt-4 text-xl leading-8 text-slate-600 dark:text-slate-300">
+      A free, no-sign-up graphing calculator that runs entirely in your browser. Plot functions,
+      analyze them with real numerical methods, animate parameters with sliders, and get
+      plain-English help from the AI assistant.
+    </p>
+
+    <ArticleSections sections={sections} />
+    <FaqBlock faqs={faqs} />
+    <RelatedLinks
+      paths={[
+        '/functions/',
+        '/examples/',
+        '/learn/',
+        '/calculators/derivative/',
+        '/calculators/integral/',
+        '/calculators/root-finder/',
+      ]}
+    />
+  </div>
 </BaseLayout>

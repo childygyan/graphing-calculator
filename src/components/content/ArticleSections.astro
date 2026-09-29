@@ -1,0 +1,24 @@
+---
+/**
+ * ArticleSections — renders hand-written content sections with
+ * consistent typography for function, example, and learn pages.
+ */
+import type { ContentSection } from '../../data/seo/types';
+
+interface Props {
+  sections: ContentSection[];
+}
+
+const { sections }: Props = Astro.props;
+---
+
+{sections.map((section) => (
+  <section class="mt-10">
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+      {section.heading}
+    </h2>
+    {section.body.map((paragraph) => (
+      <p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">{paragraph}</p>
+    ))}
+  </section>
+))}
