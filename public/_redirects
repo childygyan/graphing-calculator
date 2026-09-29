@@ -4,9 +4,15 @@
 # <to> targets. No mass redirects — one rule per genuine alias.
 
 # Canonical domain migration (Firoz, 2026-09-29): the *.pages.dev origin
-# now permanently redirects to the production domain. Host-specific source,
-# so it never fires on graphingcalculator.online itself (no loop).
-https://graphing-calc.pages.dev/* https://graphingcalculator.online/:splat 301
+# should permanently redirect to the production domain. Cloudflare Pages
+# `_redirects` matches on path only (verified: a host-specific source rule
+# never fires), and the Pages worker only sees /api/* routes, so a
+# server-side host redirect is not possible here. The redirect is therefore
+# implemented as a tiny inline script in src/layouts/BaseLayout.astro
+# (allow-listed by sha256 in public/_headers), which bounces browsers from
+# graphing-calc.pages.dev to graphingcalculator.online, preserving path,
+# query, and hash. Canonical tags + sitemap already point at the apex
+# domain, so search engines consolidate there regardless.
 
 /calculator/ /graphing-calculator/ 301
 /graphing-calculator.html /graphing-calculator/ 301
