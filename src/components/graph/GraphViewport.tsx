@@ -16,6 +16,8 @@ import type { CoordinateDisplayHandle } from './CoordinateDisplay.js';
 import { GraphInteractionController } from '../../lib/graph/interaction.js';
 import { createTransform } from '../../lib/graph/coordinate-system.js';
 import { buildFunctionDrawables } from '../../lib/graph/drawables.js';
+import { buildAnalysisDrawables } from '../../lib/graph/analysisDrawables.js';
+import { compileExpression } from '../../lib/math/engine.js';
 import {
   createDefaultViewport,
   panViewport,
@@ -34,6 +36,9 @@ import type {
 
 /** Trailing debounce before the live renderer viewport is written to the store. */
 const STORE_SYNC_DELAY_MS = 150;
+
+/** Tap within this many CSS px of a curve snaps to it for inspection. */
+const TAP_SNAP_DISTANCE_PX = 28;
 
 /** Relative epsilon for comparing the renderer viewport against the store. */
 const VIEWPORT_EPSILON = 1e-12;
@@ -94,11 +99,13 @@ export function GraphViewport() {
   const expressionsRef = useRef<Expression[]>(state.expressions);
   const settingsRef = useRef(state.settings);
   const themeRef = useRef<GraphThemeMode>(graphTheme);
+  const analysisRef = useRef(state.analysis);
   useEffect(() => {
     storeViewportRef.current = state.viewport;
     expressionsRef.current = state.expressions;
     settingsRef.current = state.settings;
     themeRef.current = graphTheme;
+    analysisRef.current = state.analysis;
   });
 
   // Memoized drawable builder: pure function of (expressions, viewport,
@@ -131,10 +138,16 @@ export function GraphViewport() {
       ]),
       viewport,
       size,
+      // Analysis overlays are part of the drawable output, so they join the
+      // cache key. JSON of the analysis slice is small (markers, integrals…).
+      analysisRef.current,
     ]);
     const cached = drawablesCacheRef.current;
     if (cached.key === key) return cached.drawables;
-    const drawables = buildFunctionDrawables(expressions, viewport, size);
+    const drawables: GraphDrawable[] = [
+      ...buildFunctionDrawables(expressions, viewport, size),
+      ...buildAnalysisDrawables(expressions, analysisRef.current, viewport, size),
+    ];
     drawablesCacheRef.current = { key, drawables };
     return drawables;
   }, []);
@@ -237,6 +250,91 @@ export function GraphViewport() {
     coordRef.current?.setCoordinates(world);
   }, []);
 
+  /**
+   * Tap/click on the canvas: snap to the nearest point on a visible
+   * cartesian curve (within a screen-space threshold) and store it as the
+   * inspected point; tapping empty space clears the inspection.
+   */
+  const handleTap = useCallback(
+    (screen: ScreenPoint) => {
+      const renderer = canvasRef.current?.getRenderer();
+      if (!renderer) return;
+      const viewport = renderer.getViewport();
+      const size = renderer.getSize();
+      if (size.width <= 0 || size.height <= 0) return;
+      const transform = createTransform(viewport, size);
+      const xSpan = viewport.xMax - viewport.xMin;
+      if (!Number.isFinite(xSpan) || xSpan <= 0) return;
+
+      interface Candidate {
+        expressionId: string;
+        x: number;
+        y: number;
+        dist: number;
+      }
+      let best: Candidate | null = null;
+
+      for (const expression of expressionsRef.current) {
+        if (expression.kind !== 'cartesian' || expression.visible !== true) continue;
+        let fn: (x: number) => number;
+        try {
+          fn = compileExpression(expression.definition.rhs).fn;
+        } catch {
+          continue;
+        }
+        // Coarse scan: 240 samples across the viewport.
+        const coarse = 240;
+        let bestX = 0;
+        let bestY = 0;
+        let bestDist = Number.POSITIVE_INFINITY;
+        for (let i = 0; i <= coarse; i++) {
+          const x = viewport.xMin + (xSpan * i) / coarse;
+          const y = fn(x);
+          if (!Number.isFinite(y)) continue;
+          const sp = transform.worldToScreen({ x, y });
+          if (!Number.isFinite(sp.x) || !Number.isFinite(sp.y)) continue;
+          const dist = Math.hypot(sp.x - screen.x, sp.y - screen.y);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestX = x;
+            bestY = y;
+          }
+        }
+        if (!Number.isFinite(bestDist)) continue;
+        // Refine around the coarse hit: 60 samples over ±1 coarse step,
+        // minimizing screen-space distance (handles steep curves better
+        // than refining on x alone).
+        const window = xSpan / coarse;
+        for (let i = 0; i <= 60; i++) {
+          const x = bestX - window + (2 * window * i) / 60;
+          const y = fn(x);
+          if (!Number.isFinite(y)) continue;
+          const sp = transform.worldToScreen({ x, y });
+          if (!Number.isFinite(sp.x) || !Number.isFinite(sp.y)) continue;
+          const dist = Math.hypot(sp.x - screen.x, sp.y - screen.y);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestX = x;
+            bestY = y;
+          }
+        }
+        if (!best || bestDist < best.dist) {
+          best = { expressionId: expression.id, x: bestX, y: bestY, dist: bestDist };
+        }
+      }
+
+      if (best && best.dist <= TAP_SNAP_DISTANCE_PX) {
+        dispatch({
+          type: 'SET_INSPECTED_POINT',
+          point: { expressionId: best.expressionId, x: best.x, y: best.y },
+        });
+      } else {
+        dispatch({ type: 'SET_INSPECTED_POINT', point: null });
+      }
+    },
+    [dispatch]
+  );
+
   const handleInteractionStart = useCallback(() => {
     // No-op in Phase 2: kept as a seam for later phases (e.g. suppressing
     // hover readouts while a gesture is in progress).
@@ -264,6 +362,7 @@ export function GraphViewport() {
         onZoom: handleZoom,
         onPan: handlePan,
         onHover: handleHover,
+        onTap: handleTap,
         onInteractionStart: handleInteractionStart,
         onInteractionEnd: handleInteractionEnd,
       }
@@ -272,7 +371,7 @@ export function GraphViewport() {
     return () => {
       controller.detach();
     };
-  }, [handleZoom, handlePan, handleHover, handleInteractionStart, handleInteractionEnd]);
+  }, [handleZoom, handlePan, handleHover, handleTap, handleInteractionStart, handleInteractionEnd]);
 
   // Keep the renderer sized to the container and render after every resize.
   useEffect(() => {
@@ -329,6 +428,17 @@ export function GraphViewport() {
     const input = buildInput();
     if (input) renderer.render(input);
   }, [state.expressions, buildInput]);
+
+  // Analysis overlay changes (markers, integrals, tangents, derivative
+  // plots, annotations, precision) re-render with fresh overlay drawables.
+  // The drawables cache key already includes the analysis slice.
+  useEffect(() => {
+    if (!initializedRef.current) return;
+    const renderer = canvasRef.current?.getRenderer();
+    if (!renderer) return;
+    const input = buildInput();
+    if (input) renderer.render(input);
+  }, [state.analysis, buildInput]);
 
   // On unmount, flush any pending debounced store sync so the persisted
   // state converges instead of dropping the last gesture.

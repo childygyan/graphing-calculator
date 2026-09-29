@@ -20,10 +20,16 @@ import { resolveGraphTheme } from './theme.js';
 import type { GraphTheme } from './theme.js';
 import { setupCanvas, snapToPixel } from './transforms.js';
 import type {
+  AnnotationDrawable,
+  AreaDrawable,
   CanvasSize,
+  FunctionDrawable,
   GraphDrawable,
+  GraphDrawableBase,
   GraphRenderInput,
   GraphThemeMode,
+  PointMarkerDrawable,
+  SegmentDrawable,
   WorldPoint,
 } from './types.js';
 import { createDefaultViewport, validateViewport } from './viewport.js';
@@ -161,7 +167,7 @@ export class CanvasGraphRenderer implements GraphRenderer {
     if (settings.showAxes) this.drawOriginMarker(ctx, transform, theme, axes);
 
     // 6. Drawables.
-    this.drawDrawables(ctx, transform, drawables);
+    this.drawDrawables(ctx, transform, theme, drawables);
   }
 
   /**
@@ -351,22 +357,189 @@ export class CanvasGraphRenderer implements GraphRenderer {
   private drawDrawables(
     ctx: CanvasRenderingContext2D,
     transform: ViewportTransform,
+    theme: GraphTheme,
     drawables: GraphDrawable[]
   ): void {
     for (const drawable of drawables) {
       if (!drawable || drawable.visible !== true) continue;
-      // Later phases add kinds to the union; unknown kinds are ignored.
-      if (drawable.kind !== 'function') continue;
-      ctx.strokeStyle = typeof drawable.color === 'string' ? drawable.color : '#000000';
-      ctx.lineWidth =
-        Number.isFinite(drawable.lineWidth) && drawable.lineWidth > 0 ? drawable.lineWidth : 1;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-      const segments = Array.isArray(drawable.segments) ? drawable.segments : [];
-      for (const segment of segments) {
-        this.strokePolyline(ctx, transform, Array.isArray(segment) ? segment : []);
+      switch (drawable.kind) {
+        case 'function':
+          this.strokeFunctionDrawable(ctx, transform, drawable);
+          break;
+        case 'point':
+          this.drawPointMarkers(ctx, transform, drawable);
+          break;
+        case 'segment':
+          this.drawSegment(ctx, transform, drawable);
+          break;
+        case 'area':
+          this.fillArea(ctx, transform, drawable);
+          break;
+        case 'annotation':
+          this.drawAnnotation(ctx, transform, theme, drawable);
+          break;
+        default:
+          // Later phases add kinds to the union; unknown kinds are ignored.
+          break;
       }
     }
+  }
+
+  private applyStrokeStyle(ctx: CanvasRenderingContext2D, drawable: GraphDrawableBase): void {
+    ctx.strokeStyle = typeof drawable.color === 'string' ? drawable.color : '#000000';
+    ctx.lineWidth =
+      Number.isFinite(drawable.lineWidth) && drawable.lineWidth > 0 ? drawable.lineWidth : 1;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.setLineDash(drawable.dashed === true ? [7, 5] : []);
+  }
+
+  private strokeFunctionDrawable(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: FunctionDrawable
+  ): void {
+    this.applyStrokeStyle(ctx, drawable);
+    const segments = Array.isArray(drawable.segments) ? drawable.segments : [];
+    for (const segment of segments) {
+      this.strokePolyline(ctx, transform, Array.isArray(segment) ? segment : []);
+    }
+    ctx.setLineDash([]);
+  }
+
+  /** Filled marker dots (roots, intersections, extrema). */
+  private drawPointMarkers(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: PointMarkerDrawable
+  ): void {
+    const radius = typeof drawable.radius === 'number' && drawable.radius > 0 ? drawable.radius : 5;
+    ctx.fillStyle = typeof drawable.color === 'string' ? drawable.color : '#000000';
+    const points = Array.isArray(drawable.points) ? drawable.points : [];
+    for (const point of points) {
+      const wx = sanitizeNumber(point.x, Number.NaN);
+      const wy = sanitizeNumber(point.y, Number.NaN);
+      if (!Number.isFinite(wx) || !Number.isFinite(wy)) continue;
+      const screen = transform.worldToScreen({ x: wx, y: wy });
+      if (!Number.isFinite(screen.x) || !Number.isFinite(screen.y)) continue;
+      ctx.beginPath();
+      ctx.arc(screen.x, screen.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      // White ring so markers stay visible on top of their own curve.
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+
+  /** A single straight segment (tangent/normal lines), dashed when flagged. */
+  private drawSegment(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: SegmentDrawable
+  ): void {
+    this.applyStrokeStyle(ctx, drawable);
+    const from = transform.worldToScreen({ x: drawable.from.x, y: drawable.from.y });
+    const to = transform.worldToScreen({ x: drawable.to.x, y: drawable.to.y });
+    if (
+      !Number.isFinite(from.x) ||
+      !Number.isFinite(from.y) ||
+      !Number.isFinite(to.x) ||
+      !Number.isFinite(to.y)
+    ) {
+      ctx.setLineDash([]);
+      return;
+    }
+    ctx.beginPath();
+    ctx.moveTo(from.x, from.y);
+    ctx.lineTo(to.x, to.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  /** Filled polygons (integral shading). Non-finite vertices split the ring. */
+  private fillArea(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    drawable: AreaDrawable
+  ): void {
+    const opacity =
+      typeof drawable.fillOpacity === 'number' &&
+      drawable.fillOpacity >= 0 &&
+      drawable.fillOpacity <= 1
+        ? drawable.fillOpacity
+        : 0.25;
+    ctx.fillStyle = typeof drawable.color === 'string' ? drawable.color : '#000000';
+    ctx.globalAlpha = opacity;
+    const polygons = Array.isArray(drawable.polygons) ? drawable.polygons : [];
+    for (const polygon of polygons) {
+      if (!Array.isArray(polygon) || polygon.length < 3) continue;
+      ctx.beginPath();
+      let penDown = false;
+      for (const point of polygon) {
+        const wx = sanitizeNumber(point.x, Number.NaN);
+        const wy = sanitizeNumber(point.y, Number.NaN);
+        if (!Number.isFinite(wx) || !Number.isFinite(wy)) {
+          penDown = false;
+          continue;
+        }
+        const screen = transform.worldToScreen({ x: wx, y: wy });
+        if (!Number.isFinite(screen.x) || !Number.isFinite(screen.y)) {
+          penDown = false;
+          continue;
+        }
+        if (penDown) ctx.lineTo(screen.x, screen.y);
+        else {
+          ctx.moveTo(screen.x, screen.y);
+          penDown = true;
+        }
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  private static readonly ANNOTATION_FONT = '12px system-ui, sans-serif';
+  private static readonly ANNOTATION_MAX_LABEL = 60;
+
+  /** User annotation: marker dot plus a short text label. */
+  private drawAnnotation(
+    ctx: CanvasRenderingContext2D,
+    transform: ViewportTransform,
+    theme: GraphTheme,
+    drawable: AnnotationDrawable
+  ): void {
+    const wx = sanitizeNumber(drawable.at.x, Number.NaN);
+    const wy = sanitizeNumber(drawable.at.y, Number.NaN);
+    if (!Number.isFinite(wx) || !Number.isFinite(wy)) return;
+    const screen = transform.worldToScreen({ x: wx, y: wy });
+    if (!Number.isFinite(screen.x) || !Number.isFinite(screen.y)) return;
+    const color = typeof drawable.color === 'string' ? drawable.color : '#000000';
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(screen.x, screen.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+    const label =
+      typeof drawable.label === 'string'
+        ? drawable.label.slice(0, CanvasGraphRenderer.ANNOTATION_MAX_LABEL)
+        : '';
+    if (label.length === 0) return;
+    ctx.font = CanvasGraphRenderer.ANNOTATION_FONT;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    // Dark pill behind the text keeps labels readable over curves/grid.
+    const metrics = ctx.measureText(label);
+    const padX = 4;
+    const padY = 3;
+    const boxX = screen.x + 8 - padX;
+    const boxY = screen.y - 10 - 14 - padY;
+    ctx.fillStyle = theme.background;
+    ctx.globalAlpha = 0.85;
+    ctx.fillRect(boxX, boxY, metrics.width + padX * 2, 14 + padY * 2);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    ctx.fillText(label, screen.x + 8, screen.y - 10);
   }
 
   /**

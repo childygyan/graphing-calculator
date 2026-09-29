@@ -11,11 +11,18 @@ import type { Dispatch, ReactNode } from 'react';
 import { siteConfig } from '../../data/site.js';
 import type { ThemeMode } from '../../data/site.js';
 import type {
+  AnalysisMarker,
   CalculatorState,
+  DerivativePlot,
   Expression,
   ExpressionKind,
   GraphSettings,
   GraphViewport,
+  InspectedPoint,
+  IntegralAnalysis,
+  PointAnnotation,
+  PrecisionSettings,
+  TangentAnalysis,
 } from '../../types/calculator.js';
 import {
   createExpression,
@@ -23,6 +30,7 @@ import {
   createInitialCalculatorState,
   DEFAULT_VIEWPORT,
 } from '../../lib/expressions/expressions.js';
+import { sanitizeAnalysisState } from '../../lib/analysis/state.js';
 
 export type CalculatorAction =
   | { type: 'ADD_EXPRESSION'; kind: ExpressionKind }
@@ -35,7 +43,21 @@ export type CalculatorAction =
   | { type: 'RESET_VIEWPORT' }
   | { type: 'UPDATE_SETTINGS'; patch: Partial<GraphSettings> }
   | { type: 'SET_THEME'; theme: ThemeMode }
-  | { type: 'HYDRATE'; state: CalculatorState };
+  | { type: 'HYDRATE'; state: CalculatorState }
+  | { type: 'UPDATE_PRECISION'; precision: PrecisionSettings }
+  | { type: 'SET_INSPECTED_POINT'; point: InspectedPoint | null }
+  | { type: 'SET_MARKERS'; markers: AnalysisMarker[] }
+  | { type: 'CLEAR_MARKERS'; expressionId?: string }
+  | { type: 'ADD_INTEGRAL'; integral: IntegralAnalysis }
+  | { type: 'UPDATE_INTEGRAL'; id: string; patch: Partial<IntegralAnalysis> }
+  | { type: 'REMOVE_INTEGRAL'; id: string }
+  | { type: 'ADD_TANGENT'; tangent: TangentAnalysis }
+  | { type: 'UPDATE_TANGENT'; id: string; patch: Partial<TangentAnalysis> }
+  | { type: 'REMOVE_TANGENT'; id: string }
+  | { type: 'TOGGLE_DERIVATIVE_PLOT'; expressionId: string }
+  | { type: 'ADD_ANNOTATION'; annotation: PointAnnotation }
+  | { type: 'UPDATE_ANNOTATION'; id: string; patch: Partial<PointAnnotation> }
+  | { type: 'REMOVE_ANNOTATION'; id: string };
 
 function isFiniteViewport(value: unknown): value is GraphViewport {
   if (typeof value !== 'object' || value === null) return false;
@@ -83,6 +105,8 @@ function initializeState(initialTheme: ThemeMode | undefined): CalculatorState {
       selectedExpressionId:
         typeof p.selectedExpressionId === 'string' ? p.selectedExpressionId : null,
       theme: isThemeMode(p.theme) ? p.theme : defaults.theme,
+      analysis: sanitizeAnalysisState(p.analysis),
+      inspectedPoint: null,
     };
   } catch {
     // Corrupt or unreadable storage: start from defaults.
@@ -152,6 +176,116 @@ function calculatorReducer(state: CalculatorState, action: CalculatorAction): Ca
       return { ...state, settings: { ...state.settings, ...action.patch } };
     case 'SET_THEME':
       return { ...state, theme: action.theme };
+    case 'UPDATE_PRECISION':
+      return { ...state, analysis: { ...state.analysis, precision: action.precision } };
+    case 'SET_INSPECTED_POINT':
+      return { ...state, inspectedPoint: action.point };
+    case 'SET_MARKERS':
+      return { ...state, analysis: { ...state.analysis, markers: action.markers } };
+    case 'CLEAR_MARKERS':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          markers:
+            action.expressionId === undefined
+              ? []
+              : state.analysis.markers.filter((m) => m.expressionId !== action.expressionId),
+        },
+      };
+    case 'ADD_INTEGRAL':
+      return {
+        ...state,
+        analysis: { ...state.analysis, integrals: [...state.analysis.integrals, action.integral] },
+      };
+    case 'UPDATE_INTEGRAL':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          integrals: state.analysis.integrals.map((i) =>
+            i.id === action.id ? { ...i, ...action.patch } : i
+          ),
+        },
+      };
+    case 'REMOVE_INTEGRAL':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          integrals: state.analysis.integrals.filter((i) => i.id !== action.id),
+        },
+      };
+    case 'ADD_TANGENT':
+      return {
+        ...state,
+        analysis: { ...state.analysis, tangents: [...state.analysis.tangents, action.tangent] },
+      };
+    case 'UPDATE_TANGENT':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          tangents: state.analysis.tangents.map((t) =>
+            t.id === action.id ? { ...t, ...action.patch } : t
+          ),
+        },
+      };
+    case 'REMOVE_TANGENT':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          tangents: state.analysis.tangents.filter((t) => t.id !== action.id),
+        },
+      };
+    case 'TOGGLE_DERIVATIVE_PLOT': {
+      const existing = state.analysis.derivativePlots.find(
+        (p) => p.expressionId === action.expressionId
+      );
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          derivativePlots: existing
+            ? state.analysis.derivativePlots.filter((p) => p.id !== existing.id)
+            : [
+                ...state.analysis.derivativePlots,
+                {
+                  id: createExpressionId(),
+                  expressionId: action.expressionId,
+                  visible: true,
+                } satisfies DerivativePlot,
+              ],
+        },
+      };
+    }
+    case 'ADD_ANNOTATION':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          annotations: [...state.analysis.annotations, action.annotation],
+        },
+      };
+    case 'UPDATE_ANNOTATION':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          annotations: state.analysis.annotations.map((a) =>
+            a.id === action.id ? { ...a, ...action.patch } : a
+          ),
+        },
+      };
+    case 'REMOVE_ANNOTATION':
+      return {
+        ...state,
+        analysis: {
+          ...state.analysis,
+          annotations: state.analysis.annotations.filter((a) => a.id !== action.id),
+        },
+      };
     case 'HYDRATE':
       return action.state;
   }

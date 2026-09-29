@@ -10,6 +10,7 @@ import { CalculatorToolbar } from './CalculatorToolbar.js';
 import { ExpressionPanel } from './ExpressionPanel.js';
 import { GraphPanel } from '../graph/GraphPanel.js';
 import { AiPanel } from '../ai/AiPanel.js';
+import { AnalysisPanel } from '../analysis/AnalysisPanel.js';
 
 export function CalculatorPage() {
   return (
@@ -20,6 +21,7 @@ export function CalculatorPage() {
           <div className="order-2 min-h-0 flex-1 overflow-y-auto border-t border-slate-200 p-3 dark:border-slate-800 md:order-1 md:w-80 md:flex-none md:border-r md:border-t-0">
             <ExpressionPanel />
             <AiPanel />
+            <AnalysisPanel />
           </div>
           <div className="order-1 h-[36dvh] min-h-0 md:order-2 md:h-auto md:flex-1">
             <GraphPanel />

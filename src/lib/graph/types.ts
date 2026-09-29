@@ -27,7 +27,15 @@ export interface CanvasSize {
 }
 
 export type GraphDrawableKind =
-  'function' | 'parametric' | 'polar' | 'point' | 'segment' | 'shape' | 'inequality-region';
+  | 'function'
+  | 'parametric'
+  | 'polar'
+  | 'point'
+  | 'segment'
+  | 'shape'
+  | 'inequality-region'
+  | 'area'
+  | 'annotation';
 
 export interface GraphDrawableBase {
   kind: GraphDrawableKind;
@@ -35,6 +43,8 @@ export interface GraphDrawableBase {
   color: string;
   lineWidth: number;
   visible: boolean;
+  /** Dashed stroke (used for tangent/normal lines and derivative plots). */
+  dashed?: boolean;
 }
 
 /**
@@ -47,8 +57,45 @@ export interface FunctionDrawable extends GraphDrawableBase {
   segments: WorldPoint[][];
 }
 
+/**
+ * Marker dots at world positions (roots, intersections, extrema).
+ * Phase 4 renders these as filled circles.
+ */
+export interface PointMarkerDrawable extends GraphDrawableBase {
+  kind: 'point';
+  points: WorldPoint[];
+  /** Circle radius in CSS pixels. Default 5. */
+  radius?: number;
+}
+
+/** A straight line segment between two world points (tangent/normal lines). */
+export interface SegmentDrawable extends GraphDrawableBase {
+  kind: 'segment';
+  from: WorldPoint;
+  to: WorldPoint;
+}
+
+/**
+ * Filled region(s), e.g. integral shading between a curve and the x-axis.
+ * Each polygon is a closed ring in world coordinates.
+ */
+export interface AreaDrawable extends GraphDrawableBase {
+  kind: 'area';
+  polygons: WorldPoint[][];
+  /** Fill opacity 0–1. Default 0.25. */
+  fillOpacity?: number;
+}
+
+/** A user annotation: a dot plus a short text label at a world position. */
+export interface AnnotationDrawable extends GraphDrawableBase {
+  kind: 'annotation';
+  at: WorldPoint;
+  label: string;
+}
+
 /** Drawable union — extended with new kinds in later phases. */
-export type GraphDrawable = FunctionDrawable;
+export type GraphDrawable =
+  FunctionDrawable | PointMarkerDrawable | SegmentDrawable | AreaDrawable | AnnotationDrawable;
 
 export type GraphThemeMode = 'light' | 'dark';
 

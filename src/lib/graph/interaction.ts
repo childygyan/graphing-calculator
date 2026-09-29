@@ -18,6 +18,11 @@ export interface GraphInteractionCallbacks {
   onHover(world: WorldPoint | null): void;
   onInteractionStart(): void;
   onInteractionEnd(): void;
+  /**
+   * A quick tap/click that is not a drag or pinch, in CSS px. Optional —
+   * Phase 4 uses it for curve point inspection.
+   */
+  onTap?(screen: ScreenPoint): void;
 }
 
 export interface GraphInteractionOptions {
@@ -29,6 +34,10 @@ const MIN_GESTURE_FACTOR = 0.5;
 const MAX_GESTURE_FACTOR = 2;
 /** Wheel deltaMode 1 (lines) -> px per line. */
 const LINE_HEIGHT_PX = 16;
+/** A press counts as a tap when it moves less than this (CSS px) ... */
+const TAP_MAX_DISTANCE_PX = 6;
+/** ... and lasts less than this (ms). */
+const TAP_MAX_DURATION_MS = 500;
 
 function clampFactor(factor: number): number {
   if (!Number.isFinite(factor)) return 1;
@@ -52,6 +61,10 @@ export class GraphInteractionController {
   private dragging = false;
   private lastPos: ScreenPoint | null = null;
   private attached = false;
+  /** Tap tracking: press origin, press time, and the max pointer count. */
+  private downPos: ScreenPoint | null = null;
+  private downTime = 0;
+  private maxPointers = 0;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -93,6 +106,8 @@ export class GraphInteractionController {
     this.pointers.clear();
     this.dragging = false;
     this.lastPos = null;
+    this.downPos = null;
+    this.maxPointers = 0;
   }
 
   private readonly handleWheel = (event: WheelEvent): void => {
@@ -120,7 +135,14 @@ export class GraphInteractionController {
     }
     const wasEmpty = this.pointers.size === 0;
     this.pointers.set(event.pointerId, pos);
-    if (wasEmpty) this.callbacks.onInteractionStart();
+    if (wasEmpty) {
+      this.callbacks.onInteractionStart();
+      this.downPos = pos;
+      this.downTime = Date.now();
+      this.maxPointers = 1;
+    } else {
+      this.maxPointers = Math.max(this.maxPointers, this.pointers.size);
+    }
     if (this.pointers.size === 1) {
       this.dragging = true;
       this.lastPos = pos;
@@ -173,6 +195,14 @@ export class GraphInteractionController {
   };
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
+    // Tap candidate: the press started with one pointer, no second pointer
+    // ever joined, and this is a real pointerup (not a cancel).
+    const tapCandidate =
+      event.type === 'pointerup' &&
+      this.downPos !== null &&
+      this.maxPointers === 1 &&
+      this.pointers.has(event.pointerId);
+    const upPos = this.toLocalPoint(event);
     this.pointers.delete(event.pointerId);
     try {
       if (this.canvas.hasPointerCapture(event.pointerId)) {
@@ -182,8 +212,17 @@ export class GraphInteractionController {
       // Release is best-effort; the pointer is gone either way.
     }
     if (this.pointers.size === 0) {
+      if (tapCandidate && this.downPos) {
+        const moved = distance(upPos, this.downPos);
+        const heldMs = Date.now() - this.downTime;
+        if (moved <= TAP_MAX_DISTANCE_PX && heldMs <= TAP_MAX_DURATION_MS) {
+          this.callbacks.onTap?.(upPos);
+        }
+      }
       this.dragging = false;
       this.lastPos = null;
+      this.downPos = null;
+      this.maxPointers = 0;
       this.callbacks.onInteractionEnd();
     } else if (this.pointers.size === 1) {
       // Back to a single finger: resume drag-panning from its position.

@@ -8,8 +8,11 @@
  * changes the key, which is the invalidation mechanism — plus an explicit
  * clear for tests and memory hygiene.
  *
- * Still out of scope (Phase 4): findRoots, derivative, integral,
- * intersection — those keep throwing MathEngineError.
+ * Phase 4 implements the analysis methods numerically (see analysis.ts):
+ * findRoots, derivative, integral, and intersection all work. The
+ * derivative is numerical — the returned ParsedExpression wraps a
+ * central-difference closure (its AST is the original expression's, kept
+ * for inspection; evaluation goes through the numerical derivative).
  */
 
 import { collectVariables } from './ast.js';
@@ -19,6 +22,7 @@ import { compileAst } from './compiler.js';
 import { normalizeExpressionSource } from './normalize.js';
 import { parse } from './parser.js';
 import { ParseError, tokenize } from './tokenizer.js';
+import { adaptiveSimpson, centralDerivative, findAllRoots, findIntersections } from './analysis.js';
 import type {
   EngineNumber,
   MathEngine,
@@ -26,7 +30,6 @@ import type {
   ParsedExpression,
   ValidationResult,
 } from './MathEngine.js';
-import { MathEngineError } from './MathEngine.js';
 import type { Point } from '../../types/calculator.js';
 
 /** A parsed + compiled expression: satisfies the Phase 1 ParsedExpression. */
@@ -123,10 +126,7 @@ export function validateExpressionSource(source: string): ValidationResult {
   }
 }
 
-const PHASE4_MESSAGE =
-  'Not implemented in Phase 3 — mathematical analysis (roots, derivatives, integrals, intersections) arrives in Phase 4.';
-
-/** Real Phase 3 engine: parse/validate/evaluate work; analysis throws. */
+/** Phase 4 engine: analysis methods are implemented numerically. */
 export class ExpressionMathEngine implements MathEngine {
   parseExpression(source: string): ParsedExpression {
     return compileExpression(source);
@@ -142,19 +142,49 @@ export class ExpressionMathEngine implements MathEngine {
     return compiled.fn(typeof x === 'number' ? x : NaN);
   }
 
-  findRoots(_source: string, _variable: string, _range: NumericRange): number[] {
-    throw new MathEngineError(PHASE4_MESSAGE, 'NOT_IMPLEMENTED');
+  /**
+   * Numerical roots of the expression in `range` (Brent-refined brackets).
+   * Returns an empty array when none are found — never throws for math
+   * reasons (invalid source still throws ParseError).
+   */
+  findRoots(source: string, _variable: string, range: NumericRange): number[] {
+    const compiled = compileExpression(source);
+    return findAllRoots(compiled.fn, range.min, range.max);
   }
 
-  derivative(_source: string, _variable: string): ParsedExpression {
-    throw new MathEngineError(PHASE4_MESSAGE, 'NOT_IMPLEMENTED');
+  /**
+   * Numerical derivative: returns a CompiledExpression whose `fn` is the
+   * central-difference derivative of the source. The AST is the original
+   * expression's (kept for inspection); `source` is marked as a derivative.
+   */
+  derivative(source: string, _variable: string): ParsedExpression {
+    const compiled = compileExpression(source);
+    const fn: CompiledFunction = (x: number) => centralDerivative(compiled.fn, x);
+    const numerical: CompiledExpression = {
+      source: `derivative(${compiled.normalized})`,
+      normalized: `derivative(${compiled.normalized})`,
+      variables: [...compiled.variables],
+      ast: compiled.ast,
+      fn,
+    };
+    return numerical;
   }
 
-  integral(_source: string, _variable: string, _bounds: NumericRange): EngineNumber {
-    throw new MathEngineError(PHASE4_MESSAGE, 'NOT_IMPLEMENTED');
+  /**
+   * Definite integral over `bounds` via adaptive Simpson's rule. Returns
+   * NaN when the quadrature does not converge (e.g. non-integrable
+   * singularities) — the caller reports that honestly.
+   */
+  integral(source: string, _variable: string, bounds: NumericRange): EngineNumber {
+    const compiled = compileExpression(source);
+    const { value } = adaptiveSimpson(compiled.fn, bounds.min, bounds.max);
+    return value;
   }
 
-  intersection(_a: string, _b: string, _variable: string, _range: NumericRange): Point[] {
-    throw new MathEngineError(PHASE4_MESSAGE, 'NOT_IMPLEMENTED');
+  /** Intersections of two expressions in `range`, as (x, y) points. */
+  intersection(a: string, b: string, _variable: string, range: NumericRange): Point[] {
+    const fa = compileExpression(a).fn;
+    const fb = compileExpression(b).fn;
+    return findIntersections(fa, fb, range.min, range.max);
   }
 }

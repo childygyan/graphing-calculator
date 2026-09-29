@@ -13,6 +13,7 @@ import type {
   GraphSettings,
   GraphViewport,
 } from '../../types/calculator.js';
+import { createDefaultAnalysisState } from '../analysis/state.js';
 
 /** 8 original line colors, readable on white and on dark slate. */
 export const EXPRESSION_COLORS: string[] = [
@@ -220,5 +221,7 @@ export function createInitialCalculatorState(theme: ThemeMode): CalculatorState 
     settings: { ...DEFAULT_GRAPH_SETTINGS },
     selectedExpressionId: first.id,
     theme,
+    analysis: createDefaultAnalysisState(),
+    inspectedPoint: null,
   };
 }

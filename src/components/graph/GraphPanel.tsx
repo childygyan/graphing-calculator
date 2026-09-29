@@ -7,12 +7,16 @@
 
 import { GraphErrorBoundary } from './GraphErrorBoundary.js';
 import { GraphViewport } from './GraphViewport.js';
+import { InspectedPointCard } from './InspectedPointCard.js';
 
 export function GraphPanel() {
   return (
     <section aria-label="Graph" className="flex h-full flex-col">
       <GraphErrorBoundary>
-        <GraphViewport />
+        <div className="relative h-full w-full">
+          <GraphViewport />
+          <InspectedPointCard />
+        </div>
       </GraphErrorBoundary>
     </section>
   );

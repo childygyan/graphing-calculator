@@ -99,6 +99,89 @@ export interface CalculatorState {
   settings: GraphSettings;
   selectedExpressionId: string | null;
   theme: ThemeMode;
+  analysis: AnalysisState;
+  /** Transient curve-inspection hit from tapping/clicking the graph. */
+  inspectedPoint: InspectedPoint | null;
+}
+
+/** A point on a curve the user selected by tapping the graph. */
+export interface InspectedPoint {
+  expressionId: string;
+  x: number;
+  y: number;
+}
+
+/** How numbers are formatted across analysis readouts. */
+export interface PrecisionSettings {
+  mode: 'decimals' | 'significant';
+  /** decimals: 0–12 fraction digits; significant: 1–15 significant digits. */
+  digits: number;
+}
+
+export type AnalysisMarkerKind = 'root' | 'intersection' | 'extremum';
+
+/** A computed finding pinned on the graph (root, intersection, extremum). */
+export interface AnalysisMarker {
+  id: string;
+  kind: AnalysisMarkerKind;
+  x: number;
+  y: number;
+  expressionId: string;
+  color: string;
+  visible: boolean;
+}
+
+/** A definite-integral computation with optional area shading on the graph. */
+export interface IntegralAnalysis {
+  id: string;
+  expressionId: string;
+  a: number;
+  b: number;
+  visible: boolean;
+  /** Last computed value (null when never computed or not converged). */
+  value: number | null;
+  converged: boolean;
+}
+
+/** Tangent/normal line inspection at a point on a curve. */
+export interface TangentAnalysis {
+  id: string;
+  expressionId: string;
+  x: number;
+  showTangent: boolean;
+  showNormal: boolean;
+  visible: boolean;
+}
+
+/** Toggle for plotting the numerical derivative f′(x) of an expression. */
+export interface DerivativePlot {
+  id: string;
+  expressionId: string;
+  visible: boolean;
+}
+
+/** A user-placed label pinned to a graph coordinate. */
+export interface PointAnnotation {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
+  color: string;
+  visible: boolean;
+}
+
+/**
+ * Persisted mathematical-analysis state. Findings that must survive reload
+ * (markers, integrals, tangents, derivative plots, annotations, precision)
+ * live here; throwaway numeric results stay in component-local state.
+ */
+export interface AnalysisState {
+  precision: PrecisionSettings;
+  markers: AnalysisMarker[];
+  integrals: IntegralAnalysis[];
+  tangents: TangentAnalysis[];
+  derivativePlots: DerivativePlot[];
+  annotations: PointAnnotation[];
 }
 
 export interface Point {

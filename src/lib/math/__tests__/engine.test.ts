@@ -7,7 +7,7 @@ import {
   EXPRESSION_CACHE_LIMIT,
   ExpressionMathEngine,
 } from '../engine.js';
-import { createMathEngine, MathEngineError } from '../MathEngine.js';
+import { createMathEngine } from '../MathEngine.js';
 import { ParseError } from '../tokenizer.js';
 
 beforeEach(() => {
@@ -95,11 +95,13 @@ describe('ExpressionMathEngine', () => {
     expect(engine.evaluate(node, {})).toBeNaN();
   });
 
-  it('analysis methods throw honest NOT_IMPLEMENTED errors', () => {
+  it('analysis methods are implemented numerically (Phase 4)', () => {
     const engine = createMathEngine();
-    expect(() => engine.findRoots('x', 'x', { min: 0, max: 1 })).toThrow(MathEngineError);
-    expect(() => engine.derivative('x', 'x')).toThrow(MathEngineError);
-    expect(() => engine.integral('x', 'x', { min: 0, max: 1 })).toThrow(MathEngineError);
-    expect(() => engine.intersection('x', 'x', 'x', { min: 0, max: 1 })).toThrow(MathEngineError);
+    // No NOT_IMPLEMENTED throws anymore; spot-check each method works.
+    expect(engine.findRoots('x^2-4', 'x', { min: -10, max: 10 })).toHaveLength(2);
+    const d = engine.derivative('x^2', 'x');
+    expect(engine.evaluate(d, { x: 3 })).toBeCloseTo(6, 6);
+    expect(engine.integral('x^2', 'x', { min: 0, max: 1 })).toBeCloseTo(1 / 3, 9);
+    expect(engine.intersection('x^2', 'x', 'x', { min: -2, max: 2 })).toHaveLength(2);
   });
 });
