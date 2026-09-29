@@ -17,7 +17,7 @@ export interface ContentSection {
   body: string[];
 }
 
-/** A notable-function page, e.g. /functions/sine/. */
+/** A notable-function page, e.g. /math-functions/sine/. */
 export interface FunctionPageData {
   slug: string;
   /** Short name, e.g. "Sine". */
@@ -37,7 +37,7 @@ export interface FunctionPageData {
   /** Hand-written, mathematically certain facts (domain, range, period…). */
   keyFacts: string[];
   faqs: ContentFaq[];
-  /** Full root-relative paths, e.g. '/functions/cosine/'. */
+  /** Full root-relative paths, e.g. '/math-functions/cosine/'. */
   related: string[];
 }
 

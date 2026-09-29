@@ -1,6 +1,6 @@
 ---
 /**
- * Notable-function pages, e.g. /functions/sine/.
+ * Notable-function pages, e.g. /math-functions/sine/.
  *
  * The "Computed properties" panel is derived at build time from the
  * project's own math library (content-engine.ts) — every number on the
@@ -22,7 +22,7 @@ export function getStaticPaths() {
 
 const { page } = Astro.props;
 const facts = computeFunctionFacts(page.expression);
-const canonicalPath = `/functions/${page.slug}/`;
+const canonicalPath = `/math-functions/${page.slug}/`;
 const title = `${page.displayName} — Graph & Properties | AI Graphing Calculator`;
 
 const sampleRows = facts.samples.map((sample) => ({
@@ -37,7 +37,7 @@ const sampleRows = facts.samples.map((sample) => ({
     <Breadcrumbs
       items={[
         { label: 'Home', href: '/' },
-        { label: 'Functions', href: '/functions/' },
+        { label: 'Functions', href: '/math-functions/' },
         { label: page.displayName },
       ]}
     />

@@ -68,8 +68,8 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/cosine/',
-      '/functions/tangent/',
+      '/math-functions/cosine/',
+      '/math-functions/tangent/',
       '/examples/trigonometric-interference/',
       '/examples/damped-oscillation/',
       '/graphing-calculator/',
@@ -134,8 +134,8 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/sine/',
-      '/functions/tangent/',
+      '/math-functions/sine/',
+      '/math-functions/tangent/',
       '/examples/trigonometric-interference/',
       '/examples/damped-oscillation/',
       '/learn/what-is-a-function/',
@@ -200,8 +200,8 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/sine/',
-      '/functions/cosine/',
+      '/math-functions/sine/',
+      '/math-functions/cosine/',
       '/learn/asymptotes-explained/',
       '/learn/what-is-a-function/',
       '/graphing-calculator/',
@@ -268,8 +268,8 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
     ],
     related: [
       '/examples/projectile-motion/',
-      '/functions/square-root/',
-      '/functions/absolute-value/',
+      '/math-functions/square-root/',
+      '/math-functions/absolute-value/',
       '/learn/understanding-derivatives/',
       '/graphing-calculator/',
     ],
@@ -334,7 +334,7 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/quadratic/',
+      '/math-functions/quadratic/',
       '/learn/understanding-derivatives/',
       '/learn/what-is-a-function/',
       '/graphing-calculator/',
@@ -400,7 +400,7 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/natural-logarithm/',
+      '/math-functions/natural-logarithm/',
       '/examples/logistic-growth/',
       '/learn/understanding-derivatives/',
       '/graphing-calculator/',
@@ -466,7 +466,7 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/exponential/',
+      '/math-functions/exponential/',
       '/learn/understanding-integrals/',
       '/learn/understanding-derivatives/',
       '/graphing-calculator/',
@@ -531,8 +531,8 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/quadratic/',
-      '/functions/absolute-value/',
+      '/math-functions/quadratic/',
+      '/math-functions/absolute-value/',
       '/learn/what-is-a-function/',
       '/graphing-calculator/',
     ],
@@ -596,9 +596,9 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
       },
     ],
     related: [
-      '/functions/square-root/',
+      '/math-functions/square-root/',
       '/learn/what-is-a-function/',
-      '/functions/quadratic/',
+      '/math-functions/quadratic/',
       '/graphing-calculator/',
     ],
   },
@@ -662,7 +662,7 @@ export const FUNCTION_PAGES: FunctionPageData[] = [
     ],
     related: [
       '/learn/asymptotes-explained/',
-      '/functions/natural-logarithm/',
+      '/math-functions/natural-logarithm/',
       '/learn/understanding-integrals/',
       '/graphing-calculator/',
     ],

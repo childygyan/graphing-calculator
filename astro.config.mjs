@@ -3,12 +3,22 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+import cloudflare from '@astrojs/cloudflare';
 
-// NOTE: `site` is a build-time placeholder until a production domain exists.
-// Canonical URLs are generated from the centralized config in src/data/site.ts,
-// so updating the domain in one place updates every page.
+// Production deployment: Cloudflare Pages (direct upload).
+// In Astro 5, `output: 'static'` with an adapter prerenders every page
+// at build time and serves server endpoints (POST /api/ai/math) on
+// demand from the Pages Functions worker — the modern equivalent of
+// the old `hybrid` mode.
 export default defineConfig({
-  site: 'https://example.com',
+  // Production origin: Cloudflare Pages (https://graphing-calc.pages.dev).
+  // Update + rebuild if a custom domain is attached later.
+  site: 'https://graphing-calc.pages.dev',
+  output: 'static',
+  adapter: cloudflare({
+    // Static assets are served from the CDN edge; only /api/* hits the worker.
+    imageService: 'passthrough',
+  }),
   integrations: [
     react(),
     tailwind({ applyBaseStyles: false }),

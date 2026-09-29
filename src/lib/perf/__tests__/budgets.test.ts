@@ -60,7 +60,7 @@ describe.skipIf(!hasDist)('production bundle budgets', () => {
 
   it('content pages ship zero React: no client runtime chunk is referenced', () => {
     const clientChunk = astroFiles('.js').find((name) => name.startsWith('client.'));
-    const contentPages = ['index.html', 'about/index.html', 'functions/index.html'];
+    const contentPages = ['index.html', 'about/index.html', 'math-functions/index.html'];
     for (const page of contentPages) {
       const html = readFileSync(join(distDir, page), 'utf8');
       expect(html).not.toContain('component-url=');

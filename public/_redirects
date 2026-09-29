@@ -10,3 +10,5 @@
 /examples.html /examples/ 301
 /learn.html /learn/ 301
 /home/ / 301
+/functions/ /math-functions/ 301
+/functions/* /math-functions/:splat 301

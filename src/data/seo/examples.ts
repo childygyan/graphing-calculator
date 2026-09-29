@@ -29,8 +29,8 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'Try changing cos(2*x) to cos(3*x) and watch how a faster second wave changes the interference pattern.',
     ],
     related: [
-      '/functions/sine/',
-      '/functions/cosine/',
+      '/math-functions/sine/',
+      '/math-functions/cosine/',
       '/examples/damped-oscillation/',
       '/learn/what-is-a-function/',
       '/graphing-calculator/',
@@ -53,7 +53,7 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'The coefficient -4.9 controls how "wide" the flight is; a larger launch speed (the 20x term) stretches the flight longer.',
     ],
     related: [
-      '/functions/quadratic/',
+      '/math-functions/quadratic/',
       '/calculators/root-finder/',
       '/learn/what-is-a-function/',
       '/graphing-calculator/',
@@ -80,8 +80,8 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'Zoom out along the x-axis to watch the wave settle toward zero — the mathematical signature of damping.',
     ],
     related: [
-      '/functions/cosine/',
-      '/functions/exponential/',
+      '/math-functions/cosine/',
+      '/math-functions/exponential/',
       '/examples/trigonometric-interference/',
       '/learn/understanding-derivatives/',
       '/graphing-calculator/',
@@ -104,7 +104,7 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'Try 10 / (1 + 9*exp(-2*x)) to see how a faster growth rate steepens the middle of the S without changing its ceiling.',
     ],
     related: [
-      '/functions/exponential/',
+      '/math-functions/exponential/',
       '/learn/asymptotes-explained/',
       '/learn/understanding-derivatives/',
       '/graphing-calculator/',
@@ -136,8 +136,8 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'Because t runs a full 2π, the curve closes perfectly — shorten the t-range and watch it become an open arc.',
     ],
     related: [
-      '/functions/sine/',
-      '/functions/cosine/',
+      '/math-functions/sine/',
+      '/math-functions/cosine/',
       '/learn/parametric-vs-cartesian/',
       '/examples/polar-rose/',
       '/graphing-calculator/',
@@ -168,7 +168,7 @@ export const EXAMPLE_GRAPHS: ExampleGraphData[] = [
       'Each petal is traced exactly once as θ runs from 0 to π; the second half retraces them.',
     ],
     related: [
-      '/functions/cosine/',
+      '/math-functions/cosine/',
       '/learn/parametric-vs-cartesian/',
       '/examples/lissajous-curve/',
       '/graphing-calculator/',

@@ -1,3 +1,4 @@
+export const prerender = false;
 /**
  * Phase 6: POST /api/ai/math — server-side AI math assistant endpoint.
  *
@@ -13,15 +14,13 @@
  * - When no API key is configured, the deterministic mock provider
  *   answers and the response is labeled `mock: true` so the UI says so.
  *
- * NOTE — server runtime required: this route needs `output: 'server'` /
- * `'hybrid'` with an adapter (or equivalent serverless deployment) to
- * receive POST bodies. With the current static output it builds cleanly
- * but POSTs cannot reach it — neither `astro preview` nor static hosts
- * execute it, and `astro dev` in static mode does not forward POST
- * bodies/headers to it either (verified 2026-09-29). The chat UI is
- * built for this: local intents work fully offline and server failures
- * surface as honest errors. Phase 10 (deployment) owns the adapter
- * choice; this file needs no code changes for it.
+ * NOTE — server runtime: this route runs on demand in the Cloudflare Pages
+ * worker (`output: 'static'` + Cloudflare adapter; `export const prerender =
+ * false` above is what keeps it server-rendered). All content pages are
+ * statically prerendered; only /api/* runs in the worker. Secrets are
+ * read from the runtime bindings first (`locals.runtime.env`), so a
+ * DEEPSEEK_API_KEY configured on the deployed project is picked up
+ * without a rebuild.
  */
 
 import type { APIRoute } from 'astro';
@@ -59,18 +58,33 @@ function getClientIp(request: Request): string {
  * Read the DeepSeek key from the server environment only.
  * Returns null when not configured (mock mode). Never logs the value.
  */
-function readApiKey(): string | null {
-  const fromProcess = typeof process !== 'undefined' ? process.env.DEEPSEEK_API_KEY : undefined;
-  const fromAstro = import.meta.env.DEEPSEEK_API_KEY as string | undefined;
-  const key = fromProcess ?? fromAstro;
-  return key && key.trim().length > 0 ? key : null;
+function readApiKey(locals: unknown): string | null {
+  return readServerEnv(locals, 'DEEPSEEK_API_KEY') ?? null;
 }
 
-function readModel(): string {
-  const fromProcess = typeof process !== 'undefined' ? process.env.DEEPSEEK_MODEL : undefined;
-  const fromAstro = import.meta.env.DEEPSEEK_MODEL as string | undefined;
-  const model = fromProcess ?? fromAstro;
-  return model && model.trim().length > 0 ? model.trim() : DEEPSEEK_DEFAULT_MODEL;
+function readModel(locals: unknown): string {
+  return readServerEnv(locals, 'DEEPSEEK_MODEL') ?? DEEPSEEK_DEFAULT_MODEL;
+}
+
+/**
+ * Read a secret from the Cloudflare Pages runtime bindings first
+ * (`context.locals.runtime.env`), so a key configured on the deployed
+ * project is picked up without a rebuild. Falls back to the standard
+ * Node / Astro build-time sources. Never logs the value.
+ */
+function readServerEnv(locals: unknown, name: string): string | undefined {
+  try {
+    const runtime = (locals as { runtime?: { env?: Record<string, unknown> } } | undefined)
+      ?.runtime;
+    const bound = runtime?.env?.[name];
+    if (typeof bound === 'string' && bound.trim().length > 0) return bound.trim();
+  } catch {
+    /* runtime bindings unavailable — use fallbacks below */
+  }
+  const fromProcess = typeof process !== 'undefined' ? process.env[name] : undefined;
+  const fromAstro = import.meta.env[name] as string | undefined;
+  const value = fromProcess ?? fromAstro;
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
 }
 
 function jsonResponse(
@@ -83,12 +97,17 @@ function jsonResponse(
     headers: {
       'content-type': 'application/json',
       'cache-control': 'no-store',
+      // Defense in depth for a JSON API: never sniff, never leak referrer,
+      // never embeddable.
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'no-referrer',
+      'x-frame-options': 'DENY',
       ...extraHeaders,
     },
   });
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   const ip = getClientIp(request);
   const limit = limiter.check(ip);
   if (!limit.allowed) {
@@ -112,9 +131,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
   const { message, context, history } = validated.body;
 
-  const apiKey = readApiKey();
+  const apiKey = readApiKey(locals);
   const provider: AiProvider = apiKey
-    ? new DeepSeekProvider({ apiKey, model: readModel() })
+    ? new DeepSeekProvider({ apiKey, model: readModel(locals) })
     : new MockAiProvider();
 
   const userPrompt = buildUserPrompt(message, buildContextSummary(context), history);

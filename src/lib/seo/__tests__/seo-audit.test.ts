@@ -27,7 +27,7 @@ if (!existsSync(DIST)) {
 }
 
 interface CrawledPage {
-  /** Route path with trailing slash, e.g. '/functions/sine/'. */
+  /** Route path with trailing slash, e.g. '/math-functions/sine/'. */
   route: string;
   html: string;
   title: string;
@@ -213,7 +213,7 @@ describe('SEO audit — sitemap, robots, llms.txt', () => {
     expect(existsSync(llmsPath), 'llms.txt exists').toBe(true);
     const llms = readFileSync(llmsPath, 'utf8');
     expect(llms.length).toBeGreaterThan(500);
-    expect(llms).toContain('/functions/sine/');
+    expect(llms).toContain('/math-functions/sine/');
     expect(llms).toContain('/learn/');
   });
 });

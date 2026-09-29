@@ -1,9 +1,10 @@
 /**
  * Centralized site configuration.
  *
- * IMPORTANT — `siteUrl` is a placeholder (`https://example.com`).
- * Replace it with the production domain before launch: canonical URLs,
- * sitemap entries, and Open Graph tags are all derived from this value.
+ * Production URL: the Cloudflare Pages deployment
+ * (https://graphing-calc.pages.dev). Canonical URLs, sitemap
+ * entries, and Open Graph tags are all derived from `siteUrl`.
+ * If a custom domain is attached later, update this single value and rebuild.
  *
  * Environment variables are reserved for secrets only; nothing secret
  * belongs in this file or in any client-side JavaScript.
@@ -28,8 +29,8 @@ export const siteConfig = {
   description:
     'A fast, accessible online graphing calculator. Plot mathematical functions, ' +
     'manage multiple expressions, and — in future releases — explore math with AI assistance.',
-  /** PLACEHOLDER — replace with the production domain before launch. */
-  siteUrl: 'https://example.com',
+  /** Production origin (Cloudflare Pages). Update + rebuild if a custom domain is attached. */
+  siteUrl: 'https://graphing-calc.pages.dev',
   /** PLACEHOLDER — replace with a real contact address before launch. */
   contactEmail: 'contact@example.com',
   defaultTheme: 'system' as ThemeMode,
@@ -37,7 +38,7 @@ export const siteConfig = {
   stateStorageKey: 'graphing-calculator-state-v1',
   navigation: [
     { label: 'Graphing Calculator', href: '/graphing-calculator/' },
-    { label: 'Functions', href: '/functions/' },
+    { label: 'Functions', href: '/math-functions/' },
     { label: 'Examples', href: '/examples/' },
     { label: 'Learn', href: '/learn/' },
     { label: 'Calculators', href: '/calculators/' },
@@ -55,7 +56,7 @@ export const siteConfig = {
     {
       heading: 'Explore',
       links: [
-        { label: 'Function Library', href: '/functions/' },
+        { label: 'Function Library', href: '/math-functions/' },
         { label: 'Graph Examples', href: '/examples/' },
         { label: 'Learn Graphing', href: '/learn/' },
       ] as NavLink[],
@@ -73,6 +74,7 @@ export const siteConfig = {
       links: [
         { label: 'Privacy Policy', href: '/privacy-policy/' },
         { label: 'Terms of Service', href: '/terms/' },
+        { label: 'Disclaimer', href: '/disclaimer/' },
         { label: 'Contact', href: '/contact/' },
       ] as NavLink[],
     },

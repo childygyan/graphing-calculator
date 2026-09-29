@@ -1,3 +1,4 @@
+export const prerender = false;
 /**
  * Health endpoint — simple liveness check for the service.
  */

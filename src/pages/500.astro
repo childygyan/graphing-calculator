@@ -1,0 +1,38 @@
+---
+/**
+ * 500 — server error page. Used by the adapter for SSR failures; also
+ * friendly for client-side crashes. Noindex, links home.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Something went wrong"
+  description="An unexpected error occurred. Return to the graphing calculator or homepage."
+  noindex={true}
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <div class="text-center">
+    <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+      Something went wrong
+    </h1>
+    <p class="mx-auto mt-4 max-w-md text-slate-600 dark:text-slate-300">
+      An unexpected error occurred while loading this page. Your saved graphs are stored in your
+      browser and are safe — try reloading, or head back home.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href="/"
+        class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400"
+      >
+        Go back home
+      </a>
+      <a
+        href="/graphing-calculator/"
+        class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-6 py-3 text-base font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+      >
+        Open the calculator
+      </a>
+    </div>
+  </div>
+</BaseLayout>

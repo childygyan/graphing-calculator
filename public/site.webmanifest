@@ -1,0 +1,15 @@
+{
+  "background_color": "#ffffff",
+  "description": "A fast, accessible online graphing calculator. Plot functions, analyze math, and learn with AI assistance.",
+  "display": "standalone",
+  "icons": [
+    { "sizes": "192x192", "src": "/icon-192.png", "type": "image/png" },
+    { "sizes": "512x512", "src": "/icon-512.png", "type": "image/png" },
+    { "purpose": "maskable", "sizes": "512x512", "src": "/icon-512.png", "type": "image/png" }
+  ],
+  "name": "AI Graphing Calculator",
+  "scope": "/",
+  "short_name": "GraphCalc",
+  "start_url": "/graphing-calculator/",
+  "theme_color": "#ffffff"
+}

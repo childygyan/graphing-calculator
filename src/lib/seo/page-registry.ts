@@ -13,7 +13,7 @@ import { EXAMPLE_GRAPHS } from '../../data/seo/examples.js';
 import { LEARN_ARTICLES } from '../../data/seo/learn.js';
 
 export interface PageRegistryEntry {
-  /** Root-relative path with trailing slash, e.g. '/functions/sine/'. */
+  /** Root-relative path with trailing slash, e.g. '/math-functions/sine/'. */
   path: string;
   /** Human label used by related-links and llms.txt. */
   label: string;
@@ -28,7 +28,7 @@ const staticPages: PageRegistryEntry[] = [
   { path: '/calculators/derivative/', label: 'Derivative Calculator', section: 'Tools' },
   { path: '/calculators/integral/', label: 'Integral Calculator', section: 'Tools' },
   { path: '/calculators/root-finder/', label: 'Root Finder', section: 'Tools' },
-  { path: '/functions/', label: 'Function Library', section: 'Functions' },
+  { path: '/math-functions/', label: 'Function Library', section: 'Functions' },
   { path: '/examples/', label: 'Graph Examples', section: 'Examples' },
   { path: '/learn/', label: 'Learn Graphing', section: 'Learn' },
   { path: '/about/', label: 'About', section: 'Site' },
@@ -44,7 +44,7 @@ export function getPageRegistry(): PageRegistryEntry[] {
   return [
     ...staticPages,
     ...FUNCTION_PAGES.map((page): PageRegistryEntry => ({
-      path: `/functions/${page.slug}/`,
+      path: `/math-functions/${page.slug}/`,
       label: page.displayName,
       section: 'Functions',
     })),
