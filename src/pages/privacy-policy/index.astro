@@ -1,0 +1,53 @@
+---
+/**
+ * Privacy Policy — static page. Concise, real policy matching what the
+ * app actually does: no accounts, no analytics, no servers.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../data/site.js';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="Privacy policy for the AI Graphing Calculator: no accounts, no analytics, no data sent to servers."
+  canonicalPath="/privacy-policy/"
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Privacy Policy</h1>
+  <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Last updated: September 29, 2026</p>
+
+  <div class="mt-6 space-y-4 text-slate-600 dark:text-slate-300">
+    <p>
+      The AI Graphing Calculator is designed to work without collecting your personal data. This
+      policy describes, in plain terms, what happens with your information.
+    </p>
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">What we collect</h2>
+    <p>
+      Nothing. There are no accounts, no sign-ups, and no analytics. The site sends no usage data,
+      identifiers, or personal information to any server.
+    </p>
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">
+      What stays in your browser
+    </h2>
+    <p>
+      Your theme preference and your calculator workspace (expressions, viewport, settings) are
+      stored only in your own browser&rsquo;s localStorage. They never leave your device. Clearing
+      your browser&rsquo;s site data removes them permanently.
+    </p>
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">Contact</h2>
+    <p>
+      If you have questions about this policy, email
+      <a
+        href={`mailto:${siteConfig.contactEmail}`}
+        class="font-medium text-brand-600 hover:underline dark:text-brand-400"
+      >
+        {siteConfig.contactEmail}
+      </a>
+      .
+    </p>
+    <p class="text-sm">
+      This policy will be updated if the product&rsquo;s data practices change. The last-updated
+      date above always reflects the current version.
+    </p>
+  </div>
+</BaseLayout>

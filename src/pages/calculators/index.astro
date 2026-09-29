@@ -1,0 +1,62 @@
+---
+/**
+ * Calculators collection — static page. One real entry today; the rest
+ * are honestly marked as on the way rather than listed as if they exist.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '../../components/ui/index.js';
+import { ArrowRightIcon, InfoIcon } from '../../components/ui/icons.js';
+---
+
+<BaseLayout
+  title="Calculators"
+  description="Browse the calculator collection. The graphing calculator is available now; more tools are on the way."
+  canonicalPath="/calculators/"
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Calculators</h1>
+  <p class="mt-3 text-slate-600 dark:text-slate-300">
+    A small collection of focused math tools. Each one is listed here only when it genuinely works —
+    nothing is a placeholder entry.
+  </p>
+
+  <div class="mt-8 grid gap-4">
+    <Card className="flex flex-col">
+      <CardHeader>
+        <CardTitle>Graphing Calculator</CardTitle>
+        <CardDescription>Available now</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1">
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          Manage multiple expressions with colors and visibility controls, and explore the graph
+          workspace. The interactive 2D renderer is in active development.
+        </p>
+      </CardContent>
+      <CardFooter>
+        <a
+          href="/graphing-calculator/"
+          class="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
+        >
+          Open the graphing calculator <ArrowRightIcon className="h-4 w-4" />
+        </a>
+      </CardFooter>
+    </Card>
+
+    <Card>
+      <CardContent className="flex items-start gap-3">
+        <InfoIcon className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          More calculators are on the way. They will appear here as they are built — no fake
+          entries.
+        </p>
+      </CardContent>
+    </Card>
+  </div>
+</BaseLayout>

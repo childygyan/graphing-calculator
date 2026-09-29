@@ -1,0 +1,26 @@
+---
+/**
+ * 404 — served by Astro for unknown routes. Noindex, friendly, links home.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The page you were looking for doesn't exist."
+  noindex={true}
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <div class="text-center">
+    <h1 class="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Page not found</h1>
+    <p class="mx-auto mt-4 max-w-md text-slate-600 dark:text-slate-300">
+      This page doesn&rsquo;t exist. It may have been moved, or the link may be wrong.
+    </p>
+    <a
+      href="/"
+      class="mt-8 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400"
+    >
+      Go back home
+    </a>
+  </div>
+</BaseLayout>

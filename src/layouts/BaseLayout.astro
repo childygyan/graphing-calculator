@@ -1,0 +1,73 @@
+---
+/**
+ * BaseLayout — the shared page shell: head metadata, no-FOUC theme script,
+ * skip link, header, main slot, footer. Every page extends this layout.
+ */
+import '../styles/global.css';
+import SeoHead from '../components/seo/SeoHead.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  noindex?: boolean;
+  robots?: string;
+  ogImage?: string;
+  /** Extra classes for the <main> wrapper (e.g. padding for marketing pages). */
+  mainClass?: string;
+}
+
+const { title, description, canonicalPath, noindex, robots, ogImage, mainClass }: Props =
+  Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <SeoHead
+      title={title}
+      description={description}
+      canonicalPath={canonicalPath}
+      noindex={noindex}
+      robots={robots}
+      ogImage={ogImage}
+    />
+    <!--
+      Apply the stored theme before first paint to avoid a flash of the
+      wrong color scheme. Mirrors the key/defaults in src/data/site.ts;
+      the key is inlined as a literal so this script stays dependency-free.
+    -->
+    <script is:inline>
+      (function () {
+        try {
+          var key = 'graphing-calculator-theme';
+          var stored = localStorage.getItem(key) || 'system';
+          var dark =
+            stored === 'dark' ||
+            (stored === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch {
+          /* ignore */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-brand-600 focus:px-3 focus:py-2 focus:text-white"
+    >
+      Skip to main content
+    </a>
+    <Header />
+    <main id="main-content" class={mainClass}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

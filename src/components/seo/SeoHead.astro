@@ -1,0 +1,32 @@
+---
+/**
+ * SeoHead — everything that belongs inside <head> for a page.
+ * Rendered by BaseLayout; pages only supply SeoProps.
+ */
+import { siteConfig } from '../../data/site';
+import { buildCanonical, type SeoProps } from '../../lib/seo/metadata';
+
+interface Props extends SeoProps {}
+
+const { title, description, canonicalPath, robots, ogImage, ogType, noindex }: Props = Astro.props;
+
+const canonical = buildCanonical(canonicalPath ?? Astro.url.pathname);
+const robotsContent = noindex ? 'noindex, nofollow' : (robots ?? 'index, follow');
+const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="robots" content={robotsContent} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:type" content={ogType ?? 'website'} />
+<meta property="og:site_name" content={siteConfig.name} />
+{absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617" />

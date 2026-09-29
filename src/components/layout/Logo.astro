@@ -1,0 +1,57 @@
+---
+/**
+ * Logo — brand link to the homepage.
+ * The mark is drawn inline (rounded square in a brand gradient, white
+ * coordinate axes, and a sine-like curve) and is original to this project.
+ */
+---
+
+<a href="/" aria-label="AI Graphing Calculator home" class="flex shrink-0 items-center gap-2">
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    role="img"
+    aria-hidden="true"
+    focusable="false"
+    class="h-8 w-8"
+  >
+    <defs>
+      <linearGradient id="logo-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6366f1" />
+        <stop offset="1" stop-color="#4338ca" />
+      </linearGradient>
+    </defs>
+    <rect x="1" y="1" width="30" height="30" rx="8" fill="url(#logo-gradient)" />
+    <!-- coordinate axes -->
+    <line
+      x1="16"
+      y1="5"
+      x2="16"
+      y2="27"
+      stroke="#ffffff"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    />
+    <line
+      x1="5"
+      y1="16"
+      x2="27"
+      y2="16"
+      stroke="#ffffff"
+      stroke-width="1.5"
+      stroke-linecap="round"
+    />
+    <!-- sine-like curve -->
+    <path
+      d="M6 20 C 9 8, 13 8, 16 16 S 23 24, 26 12"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+  </svg>
+  <span class="truncate text-lg font-semibold text-slate-900 dark:text-white">
+    AI Graphing Calculator
+  </span>
+</a>

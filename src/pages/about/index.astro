@@ -1,0 +1,54 @@
+---
+/**
+ * About — static page. Honest description of the product, its current
+ * scope, and the roadmap. No invented stats, team, or history.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="What the AI Graphing Calculator is, its current foundation-phase scope, and what's planned next."
+  canonicalPath="/about/"
+  mainClass="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14"
+>
+  <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">About</h1>
+
+  <div class="mt-6 space-y-4 text-slate-600 dark:text-slate-300">
+    <p>
+      The AI Graphing Calculator is an original, browser-based math tool for graphing functions and
+      exploring mathematics. It is an independent implementation — built from scratch, not derived
+      from any other graphing product.
+    </p>
+    <p>
+      The project is currently in its foundation phase. What exists today is real and usable:
+      expression management (multiple expressions with colors and visibility controls), viewport
+      state with zoom and reset, and a saved workspace in your browser. The interactive 2D graph
+      renderer is in active development and lands next.
+    </p>
+    <h2 class="pt-2 text-xl font-semibold text-slate-900 dark:text-white">Roadmap</h2>
+    <ul class="list-disc space-y-2 pl-5">
+      <li>
+        <strong class="font-medium text-slate-900 dark:text-white">Interactive 2D renderer</strong>—
+        zoom, pan, and adaptive grid, then real function plotting.
+      </li>
+      <li>
+        <strong class="font-medium text-slate-900 dark:text-white">AI assistance</strong>—
+        natural-language math commands and step-by-step explanations, with the AI assisting
+        exploration rather than replacing real calculation.
+      </li>
+      <li>
+        <strong class="font-medium text-slate-900 dark:text-white">Tables and sliders</strong>—
+        values tables and interactive parameter sliders.
+      </li>
+      <li>
+        <strong class="font-medium text-slate-900 dark:text-white">Sharing</strong>— save and share
+        graph states via links.
+      </li>
+    </ul>
+    <p>
+      Nothing here is presented as working before it is. When a roadmap item ships, this page will
+      say so.
+    </p>
+  </div>
+</BaseLayout>

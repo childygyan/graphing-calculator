@@ -1,0 +1,18 @@
+---
+/**
+ * The graphing calculator workspace. CalculatorPage is the only
+ * client:load island on this page (besides the header theme toggle).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { CalculatorPage } from '../../components/calculator/CalculatorPage.js';
+---
+
+<BaseLayout
+  title="Graphing Calculator"
+  description="Open the graphing calculator: manage expressions and explore the graph workspace."
+  canonicalPath="/graphing-calculator/"
+  mainClass="flex flex-col"
+>
+  <h1 class="sr-only">Graphing Calculator</h1>
+  <CalculatorPage client:load />
+</BaseLayout>
