@@ -95,6 +95,57 @@ export function PlusIcon({ className }: IconProps) {
   );
 }
 
+export function MinusIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </Svg>
+  );
+}
+
+export function ResetViewIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <polyline points="21 4 21 10 15 10" />
+      <path d="M20.5 15a9 9 0 1 1-2.1-9.4L21 10" />
+    </Svg>
+  );
+}
+
+export function FitViewIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <polyline points="15 3 21 3 21 9" />
+      <polyline points="9 21 3 21 3 15" />
+      <line x1="21" y1="3" x2="14" y2="10" />
+      <line x1="3" y1="21" x2="10" y2="14" />
+    </Svg>
+  );
+}
+
+export function GridIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+      <line x1="9" y1="3" x2="9" y2="21" />
+      <line x1="15" y1="3" x2="15" y2="21" />
+    </Svg>
+  );
+}
+
+export function AxesIcon({ className }: IconProps) {
+  return (
+    <Svg className={className}>
+      <line x1="12" y1="3" x2="12" y2="21" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <polyline points="9 6 12 3 15 6" />
+      <polyline points="18 9 21 12 18 15" />
+    </Svg>
+  );
+}
+
 export function TrashIcon({ className }: IconProps) {
   return (
     <Svg className={className}>

@@ -6,21 +6,7 @@
 import { Button } from '../ui/index.js';
 import { PlusIcon } from '../ui/icons.js';
 import { useCalculator } from './CalculatorStore.js';
-import type { GraphViewport } from '../../types/calculator.js';
-
-/** Scale a viewport's half-extents around its center. */
-function scaleViewport(viewport: GraphViewport, factor: number): GraphViewport {
-  const centerX = (viewport.xMin + viewport.xMax) / 2;
-  const centerY = (viewport.yMin + viewport.yMax) / 2;
-  const halfWidth = ((viewport.xMax - viewport.xMin) / 2) * factor;
-  const halfHeight = ((viewport.yMax - viewport.yMin) / 2) * factor;
-  return {
-    xMin: centerX - halfWidth,
-    xMax: centerX + halfWidth,
-    yMin: centerY - halfHeight,
-    yMax: centerY + halfHeight,
-  };
-}
+import { zoomViewport } from '../../lib/graph/viewport.js';
 
 export function CalculatorToolbar() {
   const { state, dispatch } = useCalculator();
@@ -48,7 +34,7 @@ export function CalculatorToolbar() {
           size="sm"
           aria-label="Zoom in"
           onClick={() =>
-            dispatch({ type: 'SET_VIEWPORT', viewport: scaleViewport(state.viewport, 0.8) })
+            dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 0.8) })
           }
         >
           Zoom in
@@ -58,7 +44,7 @@ export function CalculatorToolbar() {
           size="sm"
           aria-label="Zoom out"
           onClick={() =>
-            dispatch({ type: 'SET_VIEWPORT', viewport: scaleViewport(state.viewport, 1.25) })
+            dispatch({ type: 'SET_VIEWPORT', viewport: zoomViewport(state.viewport, 1.25) })
           }
         >
           Zoom out

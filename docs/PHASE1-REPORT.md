@@ -74,13 +74,13 @@ Zero third-party runtime scripts shipped to the browser beyond React itself.
 
 ## Commands used for validation
 
-| Command | Result |
-|---|---|
-| `npx tsc --noEmit` | exit 0, 0 errors (caught & fixed: 1 wrong import depth; 1 React 19 `JSX` namespace usage) |
-| `npx eslint .` | exit 0, 0 errors, 0 warnings |
-| `npx prettier --check .` | all files pass |
-| `npm run build` | success — **8 pages** (`/`, `/graphing-calculator/`, `/calculators/`, `/about/`, `/contact/`, `/privacy-policy/`, `/terms/`, `/404/` + `/api/health`) |
-| `dist/` inspection | canonicals absolute & correct on all pages; OG/Twitter tags present; robots `index, follow` (pages) / `noindex, nofollow` (404); theme script in `<head>`; exactly 1 `<h1>` per page; island count 1 static / 2 calculator; `dark:` classes present; skip link + `aria-current` present; `/api/health` returns `{"status":"ok","service":"ai-graphing-calculator"}` |
+| Command                  | Result                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npx tsc --noEmit`       | exit 0, 0 errors (caught & fixed: 1 wrong import depth; 1 React 19 `JSX` namespace usage)                                                                                                                                                                                                                                                                           |
+| `npx eslint .`           | exit 0, 0 errors, 0 warnings                                                                                                                                                                                                                                                                                                                                        |
+| `npx prettier --check .` | all files pass                                                                                                                                                                                                                                                                                                                                                      |
+| `npm run build`          | success — **8 pages** (`/`, `/graphing-calculator/`, `/calculators/`, `/about/`, `/contact/`, `/privacy-policy/`, `/terms/`, `/404/` + `/api/health`)                                                                                                                                                                                                               |
+| `dist/` inspection       | canonicals absolute & correct on all pages; OG/Twitter tags present; robots `index, follow` (pages) / `noindex, nofollow` (404); theme script in `<head>`; exactly 1 `<h1>` per page; island count 1 static / 2 calculator; `dark:` classes present; skip link + `aria-current` present; `/api/health` returns `{"status":"ok","service":"ai-graphing-calculator"}` |
 
 Client JS budget: React renderer 211 kB (66 kB gzip) + CalculatorPage 14.6 kB + ThemeToggle/icons ~9 kB — only loaded on pages using the islands.
 
