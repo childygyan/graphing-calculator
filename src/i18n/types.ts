@@ -636,6 +636,63 @@ export interface Graph3DStrings {
   };
 }
 
+/**
+ * Stable ids for every key on the scientific calculator keypad. The React
+ * island maps these ids to layout/insert behavior; the dictionaries map
+ * them to visible labels and accessible names. Math symbols (digits, π,
+ * ÷, …) are never translated — only the surrounding prose is.
+ */
+export type ScientificKeyId =
+  | 'sin'
+  | 'cos'
+  | 'tan'
+  | 'log'
+  | 'ln'
+  | 'pow'
+  | 'sqrt'
+  | 'square'
+  | 'reciprocal'
+  | 'abs'
+  | 'factorial'
+  | 'ncr'
+  | 'shift'
+  | 'lparen'
+  | 'rparen'
+  | 'ac'
+  | 'backspace'
+  | 'pi'
+  | 'd7'
+  | 'd8'
+  | 'd9'
+  | 'div'
+  | 'e'
+  | 'd4'
+  | 'd5'
+  | 'd6'
+  | 'mul'
+  | 'ee'
+  | 'd1'
+  | 'd2'
+  | 'd3'
+  | 'sub'
+  | 'ans'
+  | 'negate'
+  | 'd0'
+  | 'dot'
+  | 'add'
+  | 'percent'
+  | 'npr'
+  | 'equals';
+
+export interface ScientificKeyStrings {
+  label: string;
+  ariaLabel: string;
+  /** Label shown while 2nd-shift is active (only set on shiftable keys). */
+  altLabel?: string;
+  /** Accessible name shown while 2nd-shift is active. */
+  altAriaLabel?: string;
+}
+
 export interface ScientificStrings {
   seo: SeoStrings;
   crumbs: NavLinkStrings[];
@@ -646,17 +703,38 @@ export interface ScientificStrings {
   related: string[];
   island: {
     heading: string;
+    /** Short header title shown above the keypad (e.g. "Scientific"). */
+    title: string;
+    angleModeLabel: string;
     angleModeTemplate: string;
     degrees: string;
     radians: string;
     expressionLabel: string;
     expressionPlaceholder: string;
-    idleHint: string;
+    resultLabel: string;
+    fractionToggle: string;
+    copyResult: string;
+    copied: string;
+    memoryLabel: string;
+    memoryClear: string;
+    memoryRecall: string;
+    memoryAdd: string;
+    memorySubtract: string;
+    undo: string;
+    redo: string;
+    functionRowsLabel: string;
     /** ErrorBoundary fallback title when the scientific calculator fails to render. */
     loadFailedTitle: string;
     keypadLabel: string;
-    tip: string;
-    keys: Array<{ label: string; ariaLabel: string }>;
+    historyTitle: string;
+    historyEmptyTitle: string;
+    historyEmptyBody: string;
+    historyStoredNote: string;
+    historyClear: string;
+    historyReuse: string;
+    footerEnter: string;
+    footerDevice: string;
+    keys: Record<ScientificKeyId, ScientificKeyStrings>;
     errors: {
       divisionByZero: string;
       sqrtNegative: string;

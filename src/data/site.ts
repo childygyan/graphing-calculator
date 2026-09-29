@@ -31,8 +31,8 @@ export const siteConfig = {
     'manage multiple expressions, and — in future releases — explore math with AI assistance.',
   /** Production origin (Cloudflare Pages). Update + rebuild if a custom domain is attached. */
   siteUrl: 'https://graphingcalculator.online',
-  /** PLACEHOLDER — replace with a real contact address before launch. */
-  contactEmail: 'contact@example.com',
+  /** Contact address (Firoz, 2026-09-29). */
+  contactEmail: 'support@graphingcalculator.online',
   /**
    * Google Analytics 4 measurement ID (Firoz, 2026-09-29). Rendered by
    * BaseLayout on every page. Public value — it appears in page source.
