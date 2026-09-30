@@ -57,47 +57,26 @@ function base64UrlToBytes(encoded: string): Uint8Array {
 async function deflateRaw(bytes: Uint8Array): Promise<Uint8Array> {
   const stream = new CompressionStream('deflate-raw');
   const writer = stream.writable.getWriter();
+  // Start consuming the readable side BEFORE writing: awaiting writer.close()
+  // before reading can deadlock under TransformStream backpressure (the
+  // readable queue fills with compressed output, the close-flush blocks, and
+  // close() never resolves — the Share dialog hung forever on "Creating...").
+  const body = new Response(stream.readable).arrayBuffer();
   // Copy into a fresh ArrayBuffer so the stream types accept the chunk.
   await writer.write(new Uint8Array(bytes));
   await writer.close();
-  const chunks: Uint8Array[] = [];
-  const reader = stream.readable.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value as Uint8Array);
-  }
-  const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-  const out = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    out.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return out;
+  return new Uint8Array(await body);
 }
 
 async function inflateRaw(bytes: Uint8Array): Promise<Uint8Array> {
   const stream = new DecompressionStream('deflate-raw');
   const writer = stream.writable.getWriter();
+  // Consume concurrently — see deflateRaw for why close-before-read deadlocks.
+  const body = new Response(stream.readable).arrayBuffer();
   // Copy into a fresh ArrayBuffer so the stream types accept the chunk.
   await writer.write(new Uint8Array(bytes));
   await writer.close();
-  const chunks: Uint8Array[] = [];
-  const reader = stream.readable.getReader();
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value as Uint8Array);
-  }
-  const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-  const out = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    out.set(chunk, offset);
-    offset += chunk.length;
-  }
-  return out;
+  return new Uint8Array(await body);
 }
 
 /**
