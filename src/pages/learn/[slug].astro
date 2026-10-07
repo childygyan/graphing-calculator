@@ -95,6 +95,26 @@ const reviewDate = formatReviewDate(article.reviewedOn);
 
     <ArticleSections sections={article.sections} />
 
+    {
+      article.images && article.images.length > 0 && (
+        <section class="mt-10 space-y-8" aria-label="Calculator screenshots">
+          {article.images.map((image) => (
+            <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+              <img
+                src={image.src}
+                alt={image.alt}
+                loading="lazy"
+                class="h-auto w-full"
+              />
+              <figcaption class="px-5 py-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                {image.caption}
+              </figcaption>
+            </figure>
+          ))}
+        </section>
+      )
+    }
+
     {article.tryExpressions.length > 0 && (
       <section
         class="mt-10 rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800/50"

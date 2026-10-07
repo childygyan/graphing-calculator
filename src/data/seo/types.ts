@@ -42,6 +42,16 @@ export interface FunctionPageData {
 }
 
 /** A learn article, e.g. /learn/understanding-derivatives/. */
+export interface LearnArticleImage {
+  /** Public path, e.g. '/images/learn/roots-and-zeros/graph-1.png'. */
+  src: string;
+  /** Descriptive alt text for the screenshot. */
+  alt: string;
+  /** 1–2 sentence caption shown under the figure. */
+  caption: string;
+}
+
+/** A learn article, e.g. /learn/understanding-derivatives/. */
 export interface LearnArticle {
   slug: string;
   title: string;
@@ -51,6 +61,12 @@ export interface LearnArticle {
   /** Valid engine expressions (x only) readers can try in the calculator. */
   tryExpressions: string[];
   keyTakeaways: string[];
+  /**
+   * Real screenshots of the actual calculator (never AI-generated or
+   * hand-drawn). Staged at src/pages/learn/_drafts_images/<slug>/ and moved
+   * to public/images/learn/<slug>/ by the daily publisher on publish day.
+   */
+  images?: LearnArticleImage[];
   faqs: ContentFaq[];
   /** Full root-relative paths. */
   related: string[];

@@ -458,4 +458,93 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/graphing-calculator/',
     ],
   },
+  {
+    slug: 'graph-piecewise-functions',
+    title: 'How to Graph Piecewise Functions on a Graphing Calculator',
+    description: 'Learn the honest piecewise workflow on our graphing calculator: graph each piece as a parametric expression with its own t-range. Step-by-step guide.',
+    sections: [
+      {
+        heading: 'The direct answer',
+        body: [
+          'A piecewise function is a function whose rule changes depending on where you are on the x-axis — one formula for negative x, another for x greater than 2, and so on. Our calculator does not have a native piecewise entry and no comparison or indicator expressions, so the honest workflow is this: enter each piece as its own parametric expression. Choose the parametric kind, set x = t and y = the piece’s formula, then set the t-range (tMin and tMax) to that piece’s domain interval. Repeat for every piece, and the graph shows each formula only where its rule applies.',
+          'Take the classic example f(x) = x² for x < 0 and f(x) = 2x + 1 for x ≥ 0. You enter two parametric expressions: the first is x = t, y = t² with the t-range set from −5 to 0; the second is x = t, y = 2t + 1 with the t-range set from 0 to 5. Because t plays the role of x here, each piece is drawn exactly over its interval. Try the two expressions below to see this pair on one screen — the left branch is the parabola piece and the right branch is the line piece, and they meet at x = 0.',
+          'Two honest notes before you start. First, endpoints are drawn as plain continuous dots — the calculator does not mark open versus closed circles, so read boundary ownership from your definition, not the picture. Second, where two pieces share a boundary, give it to the piece that owns it and verify with the table of values.',
+        ],
+      },
+      {
+        heading: 'Step by step: your first piecewise graph',
+        body: [
+          'Start with a clean workspace and click Add expression, then choose the parametric kind. You get an x(t) field and a y(t) field. Type t into x(t) — this makes the horizontal coordinate track the parameter directly, so t behaves exactly like x. In y(t), type the first piece’s formula, for example t^2. Open the expression’s settings and find the t-range controls: set tMin = −5 and tMax = 0 for a piece defined when x < 0.',
+          'Add a second parametric expression for the next piece: x(t) = t, y(t) = 2*t + 1, with tMin = 0 and tMax = 5. Zoom out until both branches are visible. You should see the parabola on the left and the line on the right, meeting at the point (0, 1) — the value the line piece gives at the boundary. If you need a third piece, add another parametric expression the same way; there is no limit to how many pieces you can stack. If a branch does not appear, check that the t-range really covers its interval and that the expression kind is parametric, not cartesian.',
+        ],
+      },
+      {
+        heading: 'Setting each piece’s domain with the t-range',
+        body: [
+          'The t-range is the engine of this whole method, so it is worth understanding precisely. Because x = t, the interval you allow t to run over is exactly the interval over which that piece is drawn. A piece defined for x < 2 gets tMax = 2; a piece defined for x ≥ −3 gets tMin = −3. For a piece with no bound on one side — the outer pieces of most definitions — use a generous range such as −10 to 10, and let the graph window decide what is visible.',
+          'Translate the inequality carefully. The piece x > 1 starts just above 1, so its tMin is 1. The piece x ≤ 4 runs up to and including 4, so its tMax is 4. In interval notation the piece on [−2, 3) gets tMin = −2 and tMax = 3. Write each piece’s interval next to its formula before you type anything — this translation is where most mistakes happen.',
+          'When two intervals share a boundary point, only one piece may own it. For f(x) = x² when x ≤ 0 and f(x) = x when x > 0, the first piece owns the boundary: give it tMax = 0 and give the second piece tMin = 0. Your definition is the source of truth for ownership — the calculator draws no distinguishing marker.',
+        ],
+      },
+      {
+        heading: 'Endpoints: what the graph shows (and what it does not)',
+        body: [
+          'The one thing this method cannot do is draw open and closed circles. On paper you would mark a point with a filled dot when the piece includes it and an open circle when it does not; the calculator draws every endpoint the same way, as part of the continuous curve. The shape, the slope, and the position of each piece are all correct — only the open-versus-closed convention is absent, and you carry that information from your written definition.',
+          'Because of this, always verify boundary values numerically: open the table of values for each expression and look at the row for the boundary parameter value. In the jump example f(x) = 1 for x < 0 and f(x) = 2 for x ≥ 0, the first piece’s table at t = 0 shows y = 1 and the second shows y = 2 — the jump is real, and the table proves it even though both endpoints render as plain dots. If the values disagree with your definition, adjust which piece owns the boundary.',
+          'This verification habit also catches domain mistakes: a piece drawing from the wrong start means its tMin is wrong, and one ending early means its tMax is wrong. Compare the table at the boundary against your definition, and the error reveals itself.',
+        ],
+      },
+      {
+        heading: 'Worked example: the absolute value function',
+        body: [
+          'The absolute value function is the classic piecewise exercise: |x| equals −x when x < 0 and x when x ≥ 0. Enter two parametric expressions: x(t) = t, y(t) = -t with the t-range from −5 to 0, and x(t) = t, y(t) = t with the t-range from 0 to 5. The result is the familiar V shape with its corner exactly at the origin. You can check your work by comparing it with the built-in absolute-value expression abs(x) entered as a cartesian graph — the two should lie exactly on top of each other.',
+          'The corner at the origin is a good reminder of a common mistake: the two pieces must agree at a shared boundary if the function is continuous there. At t = 0, both −t and t equal 0, so the V is seamless. If your definition makes the pieces disagree at a boundary — for instance f(x) = 1 for x < 0 and f(x) = 2 for x ≥ 0 — the graph correctly shows a jump, and you read that jump from the table, not from special markers.',
+          'A jump example worth trying: f(x) = 1 for x < 0 and f(x) = 2 for x ≥ 0. Two parametric entries — x = t, y = 1 with t from −5 to 0, and x = t, y = 2 with t from 0 to 5 — produce two horizontal rays with a visible jump at x = 0. On a TI-84 you would enter pieces through the Y= menu with comparison logic; here the parametric approach replaces that logic with one expression per piece, one t-range per interval, and the table as your source of truth at every boundary.',
+        ],
+      },
+    ],
+    tryExpressions: ['t^2', '2*t + 1'],
+    keyTakeaways: [
+      'Graph each piece as a parametric expression x = t, y = piece(t), with the t-range set to that piece’s domain interval.',
+      'Because x = t, t behaves as x — so tMin and tMax are simply the interval endpoints of the piece.',
+      'Endpoints are drawn as plain dots: the calculator does not mark open versus closed circles, so read ownership from your definition.',
+      'Verify every boundary value with the table of values; it shows the exact number where the pieces meet or jump.',
+      'Pieces must agree at shared boundaries for continuity — the table at the boundary parameter exposes any mismatch.',
+    ],
+    images: [
+      {
+        src: '/images/learn/graph-piecewise-functions/graph-1.png',
+        alt: 'Two-piece parametric graph: the parabola y = t squared for negative t and the line y = 2 t plus 1 for non-negative t, meeting at x = 0.',
+        caption: 'Both try expressions plotted together as parametric pieces: y = t² for t from −5 to 0 and y = 2t + 1 for t from 0 to 5. Notice the curve changes from a parabola to a line exactly at x = 0.',
+      },
+      {
+        src: '/images/learn/graph-piecewise-functions/graph-2.png',
+        alt: 'Parametric graph of the single expression y = t squared with x = t, showing the left branch of the piecewise function.',
+        caption: 'The first try expression alone: x = t, y = t² is the parabola piece that forms the left branch (x < 0) of the piecewise function.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Can I type a piecewise function directly with curly braces or if/then logic?',
+        a: 'No — the calculator has no native piecewise entry and no comparison or indicator expressions. The supported workflow is one parametric expression per piece: x = t, y = the piece’s formula, with a t-range matching the piece’s domain interval.',
+      },
+      {
+        q: 'Why do my endpoints look filled in even when the definition excludes the point?',
+        a: 'Endpoints are always drawn as part of the continuous curve; open versus closed circles are not rendered. Use the table of values at the boundary parameter to see the exact value and confirm which piece owns the point.',
+      },
+      {
+        q: 'Can I graph a step function this way, with a different constant on each interval?',
+        a: 'Yes — each constant step is its own piece: x = t, y = the step’s constant, with the t-range covering that step’s interval. Stack as many steps as you need and confirm each jump with the table of values.',
+      },
+    ],
+    related: [
+      '/learn/parametric-vs-cartesian/',
+      '/graphing-calculator/',
+      '/learn/graphing-inequalities/',
+      '/math-functions/quadratic/',
+      '/math-functions/absolute-value/',
+      '/learn/what-is-a-function/',
+    ],
+    reviewedOn: '2026-10-07',
+  }
 ];
