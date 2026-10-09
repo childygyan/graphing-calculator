@@ -69,96 +69,12 @@
 import type { LearnArticle } from '../../data/seo/types.js';
 
 export const QUEUE: LearnArticle[] = [
-  {
-    slug: 'graph-polar-equations',
-    title: 'How to Graph Polar Equations on a Graphing Calculator',
-    description: 'Graph r = f(θ) on our calculator: switch the expression kind to polar, type the right-hand side in theta, and sweep θ over 0 to 2π.',
-    sections: [
-      {
-        heading: 'The direct answer',
-        body: [
-          'A polar equation describes a curve with r = f(θ): the distance r from the origin at angle θ. To graph one on our calculator, add an expression and switch its kind from cartesian to polar, then type the right-hand side using theta as the variable — for example 2*sin(3*theta) gives r = 2 sin(3θ). The graph is drawn by sweeping θ through its range, so a full picture typically needs θ running from 0 to 2π.',
-          'Try the three expressions below in polar mode: 2*sin(3*theta) draws a three-petaled rose, 1 + cos(theta) draws a cardioid (a heart-shaped curve), and the constant 3 draws a circle of radius 3 centered at the origin. Seeing all three together shows how different r(θ) formulas produce completely different shapes from the same mechanism.',
-          'Remember that theta is a reserved variable on this calculator — like x and t, it cannot become a slider. That is exactly what you want here: θ is the sweeping parameter, not a value you drag. If you need a tunable parameter inside a polar formula, use a free identifier such as a, and the slider appears automatically.',
-        ],
-      },
-      {
-        heading: 'Step by step: graphing a polar rose',
-        body: [
-          'Click Add expression and change the expression kind to polar — this replaces the y = field with an r = field. Type 2*sin(3*theta) into the r field, using explicit multiplication between 2 and sin. If you type 2sin(3theta) without the star, the parser will not understand it, so keep the * in every product.',
-          'Set the θ-range to a full sweep: θ from 0 to 2*pi. A partial range draws a partial rose — useful later for studying how the curve is traced, but for the complete flower you want the full 2π. Zoom so the window spans roughly −3 to 3 on both axes, since this rose extends 2 units from the origin in every direction.',
-          'Read the result: the graph traces three identical petals. The “3” in 3θ is what makes three petals — in general, r = a sin(nθ) with odd n produces n petals, and with even n it produces 2n petals. Change the 3 to a 2 and watch the rose redraw with four petals; this is the fastest way to internalize the rule.',
-        ],
-      },
-      {
-        heading: 'Classic polar shapes to know',
-        body: [
-          'A small library of shapes covers most of what you will meet. Circles centered at the origin are constants: r = 3 is a circle of radius 3. Circles through the origin come from r = a cos(θ) or r = a sin(θ), which give circles of diameter |a| lying along the x-axis and y-axis respectively.',
-          'Cardioids and limaçons live in the family r = a ± b cos(θ) (or sin). When a = b, as in 1 + cos(theta), you get the cardioid — a heart shape with its cusp at the origin. When a > b you get a dimpled or convex limaçon with no inner loop; when a < b the curve grows an inner loop.',
-          'Roses are r = a sin(nθ) or r = a cos(nθ). The amplitude a sets the petal length; the frequency n sets the petal count (n petals for odd n, 2n for even n). Spirals like r = theta need a longer θ-range — try θ from 0 to 6*pi to see the spiral wind outward.',
-        ],
-      },
-      {
-        heading: 'Window and θ-range tips',
-        body: [
-          'Polar graphs punish bad windows more than cartesian ones, because the curve wraps around the origin. If your rose looks clipped, zoom out symmetrically until the whole shape fits; the default square-ish window is usually right once scaled. Because r can be negative, the curve may extend opposite to where θ points — that is normal polar behavior, not an error.',
-          'The θ-range controls how much of the curve is drawn. A full 0 to 2π completes every standard shape; shorter ranges draw partial arcs, which is handy for seeing how the curve is traced. If a shape looks unfinished, the range is the first thing to check.',
-          'For spirals and other curves that keep growing with θ, extend the range in multiples of 2π and zoom out between extensions. Each added turn of θ adds another loop of the spiral, and you can watch the growth pattern directly.',
-        ],
-      },
-      {
-        heading: 'Common mistakes',
-        body: [
-          'The most common mistake is typing a polar formula into a cartesian expression: entering 2*sin(3*theta) as y = 2 sin(3θ) draws a sine wave, not a rose, because theta is not the horizontal axis there. Always check that the expression kind badge reads polar before judging the output.',
-          'The second is forgetting explicit multiplication. The engine needs 2*sin(3*theta), not 2sin(3theta); it needs cos(theta), and it needs theta spelled out — the symbol θ typed from a keyboard is not accepted. If an expression shows an error, missing * signs are the first suspect.',
-          'The third is a truncated θ-range leaving a shape half-drawn, which can look like a completely different curve. A three-petaled rose drawn over only 0 to π looks like a strange blob; restore the full 0 to 2π range and the petals appear. When a polar graph looks wrong, check kind, then *, then range — in that order.',
-        ],
-      },
-    ],
-    tryExpressions: ['2*sin(3*theta)', '1 + cos(theta)', '3'],
-    keyTakeaways: [
-      'Switch the expression kind to polar and type r as a function of theta, e.g. 2*sin(3*theta).',
-      'Use explicit * for every multiplication and spell out theta — theta is reserved and cannot become a slider.',
-      'Sweep θ over a full 0 to 2π for complete standard shapes; extend the range for spirals.',
-      'r = a sin(nθ) makes roses (n petals for odd n, 2n for even n); r = a ± b cos(θ) makes cardioids and limaçons.',
-      'If a polar graph looks wrong, check the expression kind first, then missing * signs, then the θ-range.',
-    ],
-    images: [
-      {
-        src: '/images/learn/graph-polar-equations/graph-1.png',
-        alt: 'Polar graph showing a three-petaled rose r = 2 sin(3 θ), a cardioid r = 1 + cos θ, and a circle r = 3, all centered at the origin.',
-        caption: 'All three try expressions in polar mode: the rose r = 2 sin(3θ) has three petals, r = 1 + cos θ traces a cardioid, and r = 3 is a circle of radius 3. Notice how each formula produces a completely different shape from the same r(θ) mechanism.',
-      },
-      {
-        src: '/images/learn/graph-polar-equations/graph-2.png',
-        alt: 'Polar graph of the single expression r = 2 sin(3 θ), a symmetric three-petaled rose centered at the origin.',
-        caption: 'The first try expression alone: r = 2 sin(3θ) sweeps θ from 0 to 2π to trace three identical petals, each 2 units long.',
-      },
-    ],
-    faqs: [
-      {
-        q: 'Why does my rose have a different number of petals than I expected?',
-        a: 'For r = a sin(nθ) or a cos(nθ), odd n gives n petals and even n gives 2n petals — so n = 3 gives three petals but n = 2 gives four. Also check that θ sweeps a full 0 to 2π, since a truncated range draws a partial flower.',
-      },
-      {
-        q: 'What does it mean when r is negative?',
-        a: 'A negative r plots the point in the opposite direction from the angle θ — at angle θ + π instead of θ. This is standard polar behavior and it is why roses and limaçons get their symmetric shapes; it is not an error.',
-      },
-      {
-        q: 'Can I animate a polar graph?',
-        a: 'Yes — put a free identifier such as a inside the formula (for example a*sin(3*theta)) and drag the slider that appears. The petals grow and shrink live, which is an excellent way to see what the amplitude controls.',
-      },
-    ],
-    related: [
-      '/learn/graph-piecewise-functions/',
-      '/learn/find-roots-and-zeros/',
-      '/examples/polar-rose/',
-      '/math-functions/sine/',
-      '/math-functions/cosine/',
-      '/learn/parametric-vs-cartesian/',
-    ],
-    reviewedOn: '2026-10-09',
-  },
+  // COUNTING NOTE (2026-10-08): all 30 commissioned articles are present in this
+  // file (2 already published + 28 below). The final 5 entries (2026-11-01 →
+  // 2026-11-05) were written in a different pass using double-quoted strings and
+  // 2-space indent, so a naive `grep -c "slug: '"` undercounts them. When counting
+  // entries, match slug headers regardless of quote style or indent — do NOT
+  // report the queue as short.
   {
     slug: 'tangent-line-at-a-point',
     title: 'How to Graph a Tangent Line to a Curve at a Point',
