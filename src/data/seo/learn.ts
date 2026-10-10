@@ -726,5 +726,95 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/learn/parametric-vs-cartesian/',
     ],
     reviewedOn: '2026-10-09',
+  },
+  {
+    slug: 'tangent-line-at-a-point',
+    title: 'How to Graph a Tangent Line to a Curve at a Point',
+    description: 'Draw the tangent line at any point on our calculator: graph y = f(x), open the analysis panel, choose the tangent tool, and read the slope.',
+    sections: [
+      {
+        heading: 'The direct answer',
+        body: [
+          'The tangent line at a point on a curve is the straight line that just touches the curve there and follows its direction — its slope equals the derivative at that point. On our calculator the workflow is: graph y = f(x) as a cartesian expression, open the analysis panel, and choose the tangent-line tool. Click a point on the curve (or drag the point along it), and the calculator draws the tangent line and reports its slope.',
+          'For y = x² at x = 1, the tangent line is y = 2x − 1 with slope 2 — exactly the derivative 2x evaluated at x = 1. You do not need to compute anything yourself: the tool measures the slope numerically and displays it. There is no nDeriv() formula to type on this calculator; the analysis panel is the derivative-at-a-point workflow.',
+          'Try the two expressions below, y = x² and y = sin(x), and run the tangent tool on each. On the parabola the slope steepens as you move away from the vertex; on the sine wave the slope oscillates between 1 and −1, going flat at every peak and valley.',
+        ],
+      },
+      {
+        heading: 'Step by step: the tangent to y = x² at x = 1',
+        body: [
+          'Enter x^2 as a cartesian expression and zoom so the point (1, 1) is comfortably visible. Open the analysis panel and select the tangent-line tool. A draggable point appears on the curve — drag it until its x-coordinate reads 1.',
+          'Read the result: the panel shows the tangent line and its slope at the point. For y = x² at x = 1 you should see slope 2 and the line y = 2x − 1. Verify with calculus if you know it: the derivative of x² is 2x, and 2(1) = 2. The tool and the theory agree.',
+          'Drag the point along the curve and watch the slope update live. At x = 0 the slope reads 0 and the tangent is horizontal; at x = −1 the slope is −2. This live dragging is the quickest way to build intuition for how the derivative changes along a curve.',
+        ],
+      },
+      {
+        heading: 'What the slope is telling you',
+        body: [
+          'The slope number the tool reports is the instantaneous rate of change of the function at that point — the value of the derivative f′(x) there. A slope of 2 at x = 1 means the function is rising 2 units of y per unit of x at that instant; a slope of −0.5 would mean it is falling gently.',
+          'Where the slope reads 0, the tangent is horizontal and you have found a stationary point — a local minimum, local maximum, or plateau. On y = x² the zero slope sits at the vertex (0, 0), the global minimum. Cross-check with the analysis panel’s local min/max markers: the extremum markers and the zero-slope points should coincide.',
+          'For y = sin(x), drag the tangent point across a full period and watch the slope trace the shape of cos(x): 1 at x = 0, 0 at the peak π/2, −1 at x = π, 0 at the valley 3π/2. You are watching the derivative function being sampled point by point — this is the idea behind the numerical derivative plot the analysis panel can also draw.',
+        ],
+      },
+      {
+        heading: 'Tangent lines on other curves',
+        body: [
+          'The tool works on any smooth curve you can graph. On y = sin(x), tangents at the peaks and valleys are horizontal with slope 0, and at the zero crossings the slope is ±1 — the steepest points of the wave. On a cubic like y = x³ − 3x, you can find the two stationary points where the tangent goes flat.',
+          'Steep slopes deserve a zoomed-out sanity check: a reported slope of 50 looks nearly vertical on a standard window, which is correct — the line really is that steep. If the drawn line looks wrong, zoom to fit the point’s neighborhood and it will resolve.',
+          'Tangent lines are also how you linearize: near the point of tangency, the line is a good approximation of the curve. Zoom in close on the point and the curve and its tangent become visually indistinguishable — this “local linearity” is the whole reason tangent lines matter in calculus.',
+        ],
+      },
+      {
+        heading: 'Where tangents break down',
+        body: [
+          'The tool needs a smooth point. At a sharp corner — the vertex of y = abs(x) at x = 0, or any corner of a piecewise graph — there is no single tangent line, because the curve arrives with one slope and leaves with another. The honest answer there is that the derivative does not exist, and no tangent drawn is the right one.',
+          'The same holds at discontinuities: a jump in the graph has no tangent at the jump point. And on a near-vertical stretch of curve the tangent would be vertical with undefined slope — such cases are better studied with the parametric form.',
+          'When the tool behaves unexpectedly — the point jumps, or the slope flickers — zoom in on that neighborhood first. Usually the curve has a corner, cusp, or near-vertical stretch there, and the close-up reveals exactly why a single tangent cannot exist.',
+        ],
+      },
+    ],
+    tryExpressions: ['x^2', 'sin(x)'],
+    keyTakeaways: [
+      'Graph y = f(x), open the analysis panel, and choose the tangent-line tool; click or drag a point on the curve.',
+      'The reported slope is the derivative at that point — no nDeriv() formula needed.',
+      'A slope of 0 means a horizontal tangent: a local minimum, maximum, or plateau — cross-check with the min/max markers.',
+      'Dragging the point along the curve shows how the derivative changes; on sin(x) it traces the shape of cos(x).',
+      'Corners, cusps, and jumps have no single tangent line — the derivative does not exist there.',
+    ],
+    images: [
+      {
+        src: '/images/learn/tangent-line-at-a-point/graph-1.png',
+        alt: 'Graphs of y = x squared and y = sin x on the same axes, with a tangent line drawn on each curve.',
+        caption: 'Both try expressions plotted together: the parabola y = x² and the wave y = sin(x). Use the tangent tool on either curve — notice the parabola’s tangents steepen away from the vertex while the sine wave’s tangents flatten at every peak and valley.',
+      },
+      {
+        src: '/images/learn/tangent-line-at-a-point/graph-2.png',
+        alt: 'Graph of the single parabola y = x squared with a tangent line drawn at the point (1, 1).',
+        caption: 'The first try expression alone: y = x² with its tangent at x = 1. The tangent has slope 2, matching the derivative 2x evaluated at x = 1.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How is the tangent slope related to the derivative?',
+        a: 'They are the same number: the slope of the tangent line at x = a is the derivative f′(a). The tool measures this slope numerically, so you get the derivative’s value at the point without differentiating by hand.',
+      },
+      {
+        q: 'Can I get the tangent line’s equation, not just the slope?',
+        a: 'Yes — the analysis panel reports the tangent line itself, from which you can read the equation in slope-intercept form. For y = x² at x = 1, that is y = 2x − 1.',
+      },
+      {
+        q: 'Why does the tangent look wrong at a sharp corner?',
+        a: 'A corner has two different one-sided slopes, so no single line is tangent there — the derivative does not exist at that point. Zoom in and you will see the curve arriving and leaving at different angles.',
+      },
+    ],
+    related: [
+      '/learn/understanding-derivatives/',
+      '/learn/find-roots-and-zeros/',
+      '/learn/graph-piecewise-functions/',
+      '/math-functions/cubic/',
+      '/scientific-calculator/',
+      '/math-functions/quadratic/',
+    ],
+    reviewedOn: '2026-10-10',
   }
 ];
