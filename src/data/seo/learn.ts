@@ -816,5 +816,95 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/math-functions/quadratic/',
     ],
     reviewedOn: '2026-10-10',
+  },
+{
+    slug: 'function-transformations',
+    title: 'How to Transform Functions: Shifts, Stretches and Reflections on a Graphing Calculator',
+    description: 'Shift, stretch and reflect functions on our calculator: graph the base, add slider variables h, k and a, and watch y = a·f(x − h) + k morph as you drag.',
+    sections: [
+      {
+        heading: 'The direct answer',
+        body: [
+          'Transforming a function means changing its graph in a predictable way: shifting it left, right, up, or down; stretching or compressing it; or reflecting it. The master formula is y = a · f(b(x − h)) + k applied to any base function f. On our calculator the fastest way to learn these is with sliders: type the base function, then type the transformed version using free identifiers like h, k, and a — they automatically become draggable sliders, and the graph morphs live as you drag.',
+          'Start with the base y = x² from the expressions below. Add y = (x - 2)^2 and watch the parabola slide 2 units right; add y = x^2 + 3 and it slides 3 units up; add y = 2*x^2 and it narrows; add y = -x^2 and it flips upside down. Each change isolates one transformation, which is exactly how you should study them — one at a time.',
+          'The slider version is even better for intuition: type (x - h)^2 with h as a free identifier, drag h from −5 to 5, and the parabola glides horizontally. The direction sometimes surprises people — (x − 2)² shifts right, not left — and seeing it move live cements the rule far better than memorizing it.',
+        ],
+      },
+      {
+        heading: 'Shifts: moving the graph with h and k',
+        body: [
+          'Horizontal shifts come from inside the function: y = f(x − h) moves the graph h units to the right, and y = f(x + h) moves it h units left. The counterintuitive part is the sign — (x − 2)² is the parabola shifted right by 2, because the value that used to occur at x = 0 now occurs at x = 2. Drag the h slider on (x - h)^2 and confirm: positive h moves right.',
+          'Vertical shifts come from outside: y = f(x) + k moves the graph up k units, y = f(x) − k moves it down. These behave exactly as you expect — x^2 + 3 lifts the vertex from (0, 0) to (0, 3). Combine both for y = (x - h)^2 + k and drag h and k independently: the vertex lands at (h, k), which is the fastest way to read any shifted parabola.',
+          'A common error is misplacing the shift: (x − 2)² is not x² − 2, and x² − 4 shifts the parabola down 4 rather than left or right. Graph both x^2 - 4 and (x - 2)^2 together to see the difference — one moves vertically, the other horizontally, and the distinction is unmistakable.',
+        ],
+      },
+      {
+        heading: 'Stretches and compressions: the multiplier a',
+        body: [
+          'Vertical stretching and compression come from multiplying the whole function: y = a · f(x). When |a| > 1 the graph stretches vertically away from the x-axis — 2*x^2 is narrower and steeper than x². When 0 < |a| < 1 it compresses toward the axis — 0.5*x^2 is wider and flatter. The x-intercepts do not move; only the y-values scale.',
+          'Horizontal stretching and compression come from multiplying inside: y = f(bx). Here the effect is inverted relative to intuition: y = (2*x)^2 compresses the parabola horizontally (it simplifies to 4x², a vertical stretch by 4), while y = (0.5*x)^2 stretches it horizontally. The rule is that replacing x with bx scales horizontal distances by 1/b.',
+          'Use a slider for a in a*x^2 and drag from 0.2 to 3 to feel the vertical scaling continuously. Notice the vertex never moves — vertical scaling pivots around the x-intercepts. Then try a*(x - h)^2 + k with all three sliders: you now control the position and shape of the parabola completely, which is the general skill behind reading any transformed quadratic.',
+        ],
+      },
+      {
+        heading: 'Reflections: flipping the graph',
+        body: [
+          'A reflection across the x-axis comes from negating the whole function: y = −f(x) flips every y-value, so -x^2 is the upside-down parabola with its maximum at the origin. A reflection across the y-axis comes from negating inside: y = f(−x) flips left and right — for x² this looks identical because the parabola is symmetric, so test it on an asymmetric base like x³, where (-x)^3 mirrors visibly.',
+          'Reflections combine with the other transformations without interference: y = -(x - 2)^2 + 1 is the parabola shifted right 2, flipped upside down, and lifted 1 — vertex at (2, 1), opening downward. Build it up one transformation at a time with sliders to watch each step land.',
+          'Sign errors are the classic pitfall: −x² (negate after squaring) is the reflection, while (−x)² equals x² and does nothing. The calculator follows standard order of operations, so -x^2 means −(x²). If your “reflection” looks unchanged, check the parentheses.',
+        ],
+      },
+      {
+        heading: 'Order matters: reading y = a·f(b(x − h)) + k',
+        body: [
+          'When several transformations combine, read them inside-out. In y = 2*(x - 3)^2 + 1: the (x − 3) shifts right 3, the 2 stretches vertically by 2, and the +1 shifts up 1. Work from the x outward: horizontal changes first (shifts, then horizontal scale), then vertical changes (vertical scale, then vertical shift).',
+          'The factored form matters for horizontal transformations. y = (2*x - 6)^2 must be read as (2*(x - 3))^2 — a horizontal compression by 2 and a right shift of 3 — not a shift of 6. Always factor the inside multiplier out before reading the shift; graphing both the factored and unfactored forms together confirms they are identical.',
+          'As a final exercise, take any base from the try expressions and predict the graph of a transformed version before typing it: choose the shift, the stretch, and the reflection, sketch mentally, then enter it and check. When your prediction matches the screen three times in a row, you have genuinely learned transformations — not memorized them.',
+        ],
+      },
+    ],
+    tryExpressions: ['x^2', '(x - 2)^2', '2*x^2', '-x^2'],
+    keyTakeaways: [
+      'y = f(x − h) + k shifts the graph: h moves it right (counterintuitively), k moves it up — the vertex of (x − h)² + k sits at (h, k).',
+      'y = a·f(x) scales vertically (|a| > 1 stretches, |a| < 1 compresses); y = f(bx) scales horizontal distances by 1/b.',
+      'y = −f(x) reflects across the x-axis; y = f(−x) reflects across the y-axis.',
+      'Free identifiers like h, k, and a become draggable sliders — drag them to watch each transformation live.',
+      'Read combined transformations inside-out, and factor horizontal multipliers out before reading the shift.',
+    ],
+    images: [
+      {
+        src: '/images/learn/function-transformations/graph-1.png',
+        alt: 'Four parabolas: y = x squared, y = (x − 2) squared shifted right, y = 2 x squared narrowed, y = −x squared flipped.',
+        caption: 'All four try expressions plotted together: the base parabola y = x² alongside its right-shifted, vertically stretched, and reflected versions. Notice each transformation changes the shape or position while keeping the parabolic character.',
+      },
+      {
+        src: '/images/learn/function-transformations/graph-2.png',
+        alt: 'Graph of the single base parabola y = x squared with its vertex at the origin.',
+        caption: 'The first try expression alone: the base function y = x², the starting point for every transformation in this article.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Why does (x − 2)² shift right instead of left?',
+        a: 'Because the graph moves so that each y-value occurs where the inside expression equals what it used to equal: (x − 2)² is zero at x = 2, where x² was zero at x = 0 — the whole shape moved right by 2. Dragging the h slider on (x - h)^2 shows this live.',
+      },
+      {
+        q: 'What is the difference between 2x² and (2x)²?',
+        a: '2x² multiplies the output by 2 (a vertical stretch), while (2x)² squares 2x to give 4x² — equivalent to a vertical stretch by 4, or a horizontal compression by 2. The parentheses decide whether the 2 scales the input or the output.',
+      },
+      {
+        q: 'Do transformations change the domain and range?',
+        a: 'Shifts and stretches can change the range: x² has range y ≥ 0, but −x² + 3 has range y ≤ 3. Horizontal transformations never change the range, and vertical shifts never change which x-values are allowed — the domain of a polynomial stays all real numbers throughout.',
+      },
+    ],
+    related: [
+      '/learn/graph-piecewise-functions/',
+      '/learn/tangent-line-at-a-point/',
+      '/math-functions/cubic/',
+      '/math-functions/quadratic/',
+      '/scientific-calculator/',
+      '/learn/parametric-vs-cartesian/',
+    ],
+    reviewedOn: '2026-10-11',
   }
 ];
