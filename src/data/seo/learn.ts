@@ -1169,5 +1169,92 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     '/math-functions/quadratic/',
     '/graphing-calculator/',
   ],
-}
+},
+  {
+    slug: 'increasing-and-decreasing-intervals',
+    title: 'How to Find Increasing and Decreasing Intervals on a Graphing Calculator',
+    description:
+      'Find where a function rises and falls: use the derivative plot and local min/max markers to split the domain into increasing and decreasing intervals.',
+    reviewedOn: '2026-10-15',
+    tryExpressions: ['x^3 - 3*x', '3*x^2 - 3'],
+    sections: [
+      {
+        heading: 'The direct answer: find the extrema, then read between them',
+        body: [
+          'A function is increasing on an interval when its graph rises from left to right, and decreasing when it falls. The quickest way to find those intervals on this calculator: mark the local extrema (peaks and valleys) with the analysis panel’s extrema tool — they are the boundary points where rising turns into falling and back again. For x^3 - 3*x the markers land at x = -1 (maximum) and x = 1 (minimum), which splits the number line into three pieces: increasing on (-∞, -1), decreasing on (-1, 1), and increasing on (1, ∞).',
+          'That is the whole method in one sentence: the extrema are the fences, and the intervals between them are the fields. Read whether the graph climbs or drops inside each field, and you have your answer.',
+        ],
+      },
+      {
+        heading: 'Step by step in this calculator',
+        body: [
+          '1. Enter the function, e.g. x^3 - 3*x. 2. Open the analysis panel, choose the extrema tool, and mark every local maximum and minimum in view. Note their x-coordinates: -1 and 1. 3. List the x-coordinates in order and read the graph between consecutive ones. Between -1 and 1 the curve falls, so the function is decreasing on (-1, 1); outside them it climbs, so it is increasing on (-∞, -1) and (1, ∞).',
+          'Write the intervals with open endpoints at the extrema — (-1, 1), not [-1, 1] — because at the exact peak or valley the function is momentarily neither increasing nor decreasing. That open-interval convention is what textbooks and exams expect.',
+        ],
+      },
+      {
+        heading: 'Confirming with the derivative plot',
+        body: [
+          'A rising graph has a positive slope and a falling graph a negative one, so the sign of the derivative is a second, independent witness. Enter 3*x^2 - 3 — the derivative of x^3 - 3*x — as a second expression. Where this curve sits above the x-axis, the original function is increasing; where it sits below, the original is decreasing. You will see it positive outside [-1, 1] and negative inside, exactly matching the intervals found from the extrema.',
+          'Alternatively, use the analysis panel’s numerical derivative plot, which draws the derivative without you typing the formula. Either way, the derivative crosses zero precisely at the marked extrema — rising-to-falling at a maximum, falling-to-rising at a minimum — tying the two views together.',
+        ],
+      },
+      {
+        heading: 'A numeric sanity check with the table of values',
+        body: [
+          'Open the table of values and read down the y-column. Pick two x-values inside (-1, 1), say 0 and 0.5: y goes from 0 to -1.375, falling — decreasing, confirmed. Pick 2 and 3, both right of 1: y goes from 2 to 18, rising — increasing, confirmed.',
+          'The table is also your backup when the graph is ambiguous: for a function that wiggles many times, the extrema markers give the boundaries and the table confirms the direction inside each one. Two x-values per interval are enough for a sanity check.',
+        ],
+      },
+      {
+        heading: 'Edge cases: flat spots, corners, and monotone functions',
+        body: [
+          'Constant stretches are neither increasing nor decreasing — the derivative plot sits on zero there, and the extrema tool finds no marker, which is the correct answer. A sharp corner, like the vertex of abs(x), can still separate a decreasing interval from an increasing one even though no smooth peak exists; the table of values resolves the direction on each side.',
+          'Some functions never change direction. x^3 is increasing everywhere — on (-∞, ∞) — and -x^3 is decreasing everywhere. If the extrema tool finds nothing on the whole visible graph, check the derivative: a derivative that never changes sign means a single interval covering the whole domain.',
+        ],
+      },
+    ],
+    keyTakeaways: [
+      'Extrema are the boundary points: the increasing and decreasing intervals lie between them.',
+      'Mark all local extrema, order their x-coordinates, and read the graph’s direction in each gap.',
+      'A positive derivative means increasing, a negative derivative means decreasing — plot the derivative to confirm.',
+      'Write intervals with open endpoints at the extrema: (-1, 1), not [-1, 1].',
+      'Flat stretches are neither increasing nor decreasing; corner points can still split intervals — check with the table of values.',
+    ],
+    images: [
+      {
+        src: '/images/learn/increasing-and-decreasing-intervals/graph-1.png',
+        alt: 'Graphs of x^3 - 3x and its derivative 3x^2 - 3 on a coordinate plane',
+        caption:
+          'x^3 - 3x with its derivative 3x^2 - 3 plotted together. Notice the derivative sits above the x-axis exactly where the cubic rises, and below it where the cubic falls.',
+      },
+      {
+        src: '/images/learn/increasing-and-decreasing-intervals/graph-2.png',
+        alt: 'Graph of x^3 - 3x rising, falling between x = -1 and x = 1, then rising again',
+        caption:
+          'x^3 - 3x on its own. The peak at x = -1 and the valley at x = 1 split the graph into increasing and decreasing intervals.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Should the interval endpoints be open or closed at the extrema?',
+        a: 'Open. At the exact peak or valley the function is momentarily neither increasing nor decreasing, so the standard convention writes (-1, 1) rather than [-1, 1].',
+      },
+      {
+        q: 'What if the derivative is zero over a whole interval?',
+        a: 'Then the function is constant there — neither increasing nor decreasing. The derivative plot will sit on the x-axis across that stretch.',
+      },
+      {
+        q: 'Can I find these intervals without calculus?',
+        a: 'Yes. The extrema markers plus the table of values are enough: the markers give the boundary x-values and the table confirms whether y-values rise or fall between them. The derivative plot is confirmation, not a requirement.',
+      },
+    ],
+    related: [
+      '/learn/understanding-derivatives/',
+      '/learn/find-local-minimum-and-maximum/',
+      '/learn/tangent-line-at-a-point/',
+      '/learn/graphing-inequalities/',
+      '/graphing-calculator/',
+    ],
+  },
 ];
