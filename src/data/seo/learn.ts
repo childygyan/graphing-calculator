@@ -1345,4 +1345,93 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/graphing-calculator/',
     ],
   },
+{
+    slug: 'graph-3d-functions',
+    title: 'How to Graph 3D Functions on an Online Graphing Calculator',
+    description:
+      'Graph 3D functions online: type z = f(x, y), rotate the view, and explore surfaces like paraboloids and saddles right in your browser.',
+    sections: [
+      {
+        heading: 'The short answer: open the 3D grapher and type z',
+        body: [
+          'To graph a 3D function, open the 3D grapher at /3d/, click the expression entry, and type a z-expression such as (x^2 + y^2)/10. The surface appears immediately: for (x^2 + y^2)/10 you get a bowl-shaped paraboloid opening upward. (I scaled it down by 10 because the plotter draws steep surfaces best when they stay near the middle of its z-range; the shape is the same paraboloid.) Then drag the surface to rotate the view and scroll or pinch to zoom in and out.',
+          'That is the whole workflow. Everything else on this page is about reading what you see: rotating the view to understand the shape, zooming to inspect a region, and connecting the surface back to the 2D graphs you already know. If you can type x^2 in the 2D calculator, you already know the syntax for the 3D one.',
+        ],
+      },
+      {
+        heading: 'Typing a 3D expression: the same syntax, plus y',
+        body: [
+          'A 3D expression is a formula for z in terms of x and y, written exactly the way you would write a 2D expression, just with y added. Use ^ for powers and always write multiplication explicitly: type (x^2 + y^2)/10, 2*x*y, or sin(x)*cos(y), never 2xy or x2. The same function library applies: sin, cos, tan, exp, log, sqrt, abs, and the constants pi and e all work inside a z-expression.',
+          'Watch the domain, because parts of a surface can legitimately be missing. The expression sqrt(9 - x^2 - y^2) describes the top half of a sphere of radius 3, but it is undefined wherever x^2 + y^2 is larger than 9, so those parts of the surface simply are not drawn. A blank patch on a surface is usually a domain issue, not a bug: the calculator refuses to plot points where the formula has no value.',
+        ],
+      },
+      {
+        heading: 'Rotating and reading the surface',
+        body: [
+          'A surface can look confusing from the default angle, so rotate it. Drag the view to the side and look straight at the paraboloid z = (x^2 + y^2)/10: from the side it looks like the familiar parabola z = x^2/10. That is no coincidence. Slicing a surface with a vertical plane (here, fixing y = 0) leaves a 2D curve, and that curve is exactly the kind of graph you already know how to read. Rotation is how you hunt for these cross-sections.',
+          'Now graph z = x^2 - y^2 and rotate it. Along the x-axis the surface curves upward like a parabola, but along the y-axis it curves downward like an upside-down parabola. The point at the origin is a saddle point: a minimum in one direction and a maximum in another. No 2D view of this surface shows the full story, which is why the 3D grapher earns its keep: rotation reveals structure that a single fixed angle hides.',
+        ],
+      },
+      {
+        heading: 'Exploring parameters with sliders',
+        body: [
+          'Free identifiers such as a, b, h, and k automatically become slider variables you can drag. On the 3D page this is a powerful way to explore families of surfaces. Enter z = a*x^2 + b*y^2 and drag the sliders: with a and b both positive you see a paraboloid, and the moment one of them goes negative the surface morphs into a saddle. You are watching the algebra turn into geometry in real time.',
+          'Sliders also handle shifts. The expression z = (x - h)^2 + y^2 is the paraboloid with its lowest point moved to x = h, and dragging h slides the whole bowl left and right. This is the same shift idea you may know from 2D parabolas, now acting on a surface. Change one parameter at a time, rotate the view, and say out loud what changed: that habit builds the connection between formulas and shapes.',
+        ],
+      },
+      {
+        heading: 'Three exercises to build 3D intuition',
+        body: [
+          'First, graph z = (x^2 + y^2)/10, rotate to a side view, and confirm that the silhouette is the parabola z = x^2/10, the 2D analog listed below as a try-it expression. Then look straight down from above: the surface is perfectly circular, symmetric in every direction. Second, graph z = x^2 - y^2 and find the saddle at the origin by rotating until you can see the upward curve one way and the downward curve the other.',
+          'Third, graph z = sin(x)*cos(y) and zoom out. You will see a repeating pattern of hills and valleys, the 3D version of the sine wave you know from 2D. Notice how each of these exercises moves between a 2D curve and its 3D counterpart: paraboloid to parabola, saddle to two opposite parabolas, wavy surface to sine wave. That 2D-to-3D connection is the real skill the 3D grapher teaches.',
+        ],
+      },
+    ],
+    tryExpressions: ['x^2', 'sin(x)', 'x^2 - 2*x'],
+    keyTakeaways: [
+      'The 3D grapher plots surfaces z = f(x, y): type the expression, drag to rotate, scroll to zoom.',
+      'Use ^ for powers and write multiplication explicitly, e.g. 2*x*y; the 2D function library works in 3D too.',
+      'Blank patches on a surface mean the expression is undefined there, for example sqrt of a negative number.',
+      'Free identifiers like a, b, and h become draggable sliders, so you can morph a paraboloid into a saddle.',
+      'Rotate to a side view to read a surface as its 2D cross-sections, which you already know how to interpret.',
+    ],
+    images: [
+      {
+        src: '/images/learn/graph-3d-functions/graph-1.png',
+        alt: '3D surface of z = (x^2 + y^2)/10, a paraboloid opening upward, viewed at an angle',
+        caption:
+          'The surface z = (x^2 + y^2)/10: a paraboloid opening upward, scaled down so it fits the plotter z-range. Drag to rotate the view and scroll to zoom in on the lowest point.',
+      },
+      {
+        src: '/images/learn/graph-3d-functions/graph-2.png',
+        alt: '3D surface of z = x^2 - y^2, a saddle that curves up along x and down along y',
+        caption:
+          'The surface z = x^2 - y^2: a saddle. It curves upward along the x-axis and downward along the y-axis, with a saddle point at the origin.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Why does my 3D surface have missing patches?',
+        a: 'The expression is undefined in those regions, so nothing is drawn there. For example, sqrt(9 - x^2 - y^2) has no values where x^2 + y^2 exceeds 9, which leaves the surface as a half-sphere. Rotate the view to check whether the missing patch matches the domain you expect.',
+      },
+      {
+        q: 'Can the 3D grapher find minimums, maximums, or integrals?',
+        a: 'No. The 3D grapher covers entering a z-expression, rotating the view, and zooming. The analysis tools (roots, extrema, tangent lines, integral shading) belong to the 2D calculator. For 3D, read shapes visually: rotate to a side view and interpret the cross-section.',
+      },
+      {
+        q: 'How is a 3D surface related to the 2D graphs I already know?',
+        a: 'Fixing one variable turns a surface into a 2D curve. Setting y = 0 in z = (x^2 + y^2)/10 leaves z = x^2/10, an ordinary parabola, which is why rotating a paraboloid to a side view shows a parabola silhouette.',
+      },
+    ],
+    related: [
+      '/3d/',
+      '/graphing-calculator/',
+      '/learn/function-transformations/',
+      '/learn/parametric-vs-cartesian/',
+      '/learn/graph-polar-equations/',
+      '/examples/lissajous-curve/',
+      '/math-functions/quadratic/',
+    ],
+    reviewedOn: '2026-10-17',
+  },
 ];
