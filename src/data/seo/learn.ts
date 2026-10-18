@@ -1434,4 +1434,93 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: '2026-10-17',
   },
+  {
+    slug: 'holes-in-rational-functions',
+    title: 'How to Find Holes in Rational Functions (Graphing Calculator)',
+    description:
+      'Find holes in rational functions with a graphing calculator: factor, simplify, then let the table of values reveal the undefined point.',
+    sections: [
+      {
+        heading: 'The short answer: the graph lies, the table tells the truth',
+        body: [
+          'A hole in a rational function is a single missing point where a factor canceled out of both the numerator and denominator. Enter (x^2 - 1)/(x - 1) in the calculator and it draws what looks like a perfectly solid line. But open the table of values and scroll to x = 1: that row is undefined. The graph looks continuous, yet the function has a hole at the point (1, 2).',
+          'That is the key lesson of this article. The graph alone will not reliably show you a hole, because a one-point gap is usually invisible at normal zoom. The reliable calculator workflow is: factor the expression, simplify it, and confirm the hole in the table of values where the undefined row appears.',
+        ],
+      },
+      {
+        heading: 'The algebra behind a hole',
+        body: [
+          'Factor the numerator of (x^2 - 1)/(x - 1) and you get (x - 1)*(x + 1). The factor (x - 1) appears in both the numerator and the denominator, so it cancels, leaving the simplified form x + 1. But the cancellation is only valid when the canceled factor is nonzero: at x = 1 the original expression divides by zero, so x = 1 is excluded from the domain even though the simplified form x + 1 is defined there.',
+          'The rule generalizes: whenever the same factor cancels from top and bottom, the original function has a hole at the x-value that makes that factor zero, and the hole sits on the graph of the simplified function. Here the simplified function is y = x + 1, so the hole is the point (1, 2), because 1 + 1 = 2. To find any hole: factor completely, cancel common factors, and plug the canceled x-value into the simplified expression for the y-coordinate.',
+        ],
+      },
+      {
+        heading: 'The calculator workflow, step by step',
+        body: [
+          'First, enter (x^2 - 1)/(x - 1) as a cartesian expression. Second, enter x + 1 as a second expression. The two graphs lie exactly on top of each other everywhere except at x = 1. Seeing the overlap confirms your factoring: the rational function behaves like the simplified line at every x where it is defined, which is exactly what a removable discontinuity means.',
+          'Third, open the table of values from the analysis panel and find the row for x = 1. It shows undefined, while the rows on either side show values approaching 2. Fourth, zoom in around x = 1 to convince yourself that nothing dramatic happens nearby: no jump, no asymptote, just a smooth line with one point missing. If you can see the overlap, the undefined row, and the calm neighborhood, you have found the hole three independent ways.',
+        ],
+      },
+      {
+        heading: 'Hole versus vertical asymptote: do not mix them up',
+        body: [
+          'A hole and a vertical asymptote both come from division by zero, but they are different animals. A hole appears when the zero factor cancels from both numerator and denominator. A vertical asymptote appears when a factor remains in the denominator after simplifying, as in (x + 1)/(x - 1): at x = 1 the denominator is zero and nothing cancels, so the graph shoots off toward positive and negative infinity instead of passing calmly through.',
+          'The table of values distinguishes them cleanly. Near a hole, the neighboring rows approach a finite number (here, values near 2). Near a vertical asymptote, the neighboring rows grow enormous in magnitude. If the neighbors stay calm, it is a hole; if they blow up, it is an asymptote. Keep the two ideas in separate boxes, and see the dedicated article on asymptotes for the full treatment of the second case.',
+        ],
+      },
+      {
+        heading: 'Three holes to practice on',
+        body: [
+          'Try (x^2 - 4)/(x - 2). Factoring gives (x - 2)*(x + 2) over (x - 2), which simplifies to x + 2 with x not equal to 2, so the hole is at (2, 4). Next try (x^2 + 2*x)/x: the numerator factors as x*(x + 2), the x cancels, and the hole is at (0, 2). In each case, overlay the simplified expression and check the table for the undefined row.',
+          'Then try one you have not been told the answer to: ((x - 3)*(x + 3))/(x - 3). Work out the canceled factor and the hole yourself, then verify with the overlay and the table. The habit to build is skepticism toward smooth-looking rational graphs: whenever you see a rational function that graphs as a clean line or curve, check the table before declaring it hole-free.',
+        ],
+      },
+    ],
+    tryExpressions: ['(x^2 - 1)/(x - 1)', 'x + 1'],
+    keyTakeaways: [
+      'A hole appears where a factor cancels from both numerator and denominator; the x-value is excluded from the domain.',
+      'The graph of a rational function with a hole looks continuous, so the graph alone is not a reliable test.',
+      'The table of values reveals the hole as an undefined row, with neighboring rows approaching a finite value.',
+      'The hole sits on the simplified function: plug the canceled x-value into the simplified expression for the y-coordinate.',
+      'A hole is not a vertical asymptote: near an asymptote the neighboring values blow up instead of staying calm.',
+    ],
+    images: [
+      {
+        src: '/images/learn/holes-in-rational-functions/graph-1.png',
+        alt: 'Graphs of (x^2 - 1)/(x - 1) and y = x + 1 overlapping, with a hole at (1, 2)',
+        caption:
+          'The expressions (x^2 - 1)/(x - 1) and x + 1 plotted together. They coincide everywhere except at x = 1, where the rational function has a hole at (1, 2).',
+      },
+      {
+        src: '/images/learn/holes-in-rational-functions/graph-2.png',
+        alt: 'Graph of (x^2 - 1)/(x - 1), a straight line with a single missing point at (1, 2)',
+        caption:
+          'The expression (x^2 - 1)/(x - 1) alone. It looks exactly like the line y = x + 1, but the point (1, 2) is missing.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Will the graphing calculator show the hole as a visible gap?',
+        a: 'Usually not. A hole is a single missing point, and at normal zoom the line looks solid. That is why the workflow in this article relies on the table of values, where the hole appears as an undefined row, rather than on spotting a gap visually.',
+      },
+      {
+        q: 'What is the difference between a hole and a vertical asymptote?',
+        a: 'A hole is one missing point where a factor canceled from both numerator and denominator; the graph passes calmly through the neighborhood. A vertical asymptote comes from a denominator factor that does not cancel, and the graph shoots toward infinity on either side. The table tells them apart: finite neighbors mean a hole, exploding neighbors mean an asymptote.',
+      },
+      {
+        q: 'Can a rational function have a hole if nothing cancels?',
+        a: 'No. If no factor cancels between numerator and denominator, there is no removable discontinuity and therefore no hole. In that case, look for vertical asymptotes at the denominator zeros instead.',
+      },
+    ],
+    related: [
+      '/learn/asymptotes-explained/',
+      '/learn/find-roots-and-zeros/',
+      '/learn/graph-piecewise-functions/',
+      '/scientific-calculator/',
+      '/graphing-calculator/',
+      '/learn/graph-3d-functions/',
+      '/math-functions/reciprocal/',
+    ],
+    reviewedOn: '2026-10-18',
+  },
 ];
