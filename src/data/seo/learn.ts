@@ -1523,4 +1523,93 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: '2026-10-18',
   },
+  {
+    slug: 'even-and-odd-functions',
+    title: 'How to Tell If a Function Is Even or Odd (Algebraically and From the Graph)',
+    description:
+      'Check even and odd functions two ways: the algebraic f(−x) test, and a graphing calculator overlay that makes the symmetry visible.',
+    sections: [
+      {
+        heading: 'The short answer: overlay three curves and watch them coincide',
+        body: [
+          'A function is even if f(-x) equals f(x) for every x, which means its graph is a mirror image across the y-axis. It is odd if f(-x) equals -f(x) for every x, which means its graph has 180-degree rotational symmetry about the origin. If neither equality holds, the function is neither even nor odd.',
+          'The calculator makes this a visual test. Enter f(x) = x^3 - x, then enter f(-x) as (-x)^3 - (-x), and -f(x) as -(x^3 - x). Two of the three curves will lie exactly on top of each other: here the f(-x) curve and the -f(x) curve coincide, which proves the function is odd. If the first two coincided instead, the function would be even.',
+        ],
+      },
+      {
+        heading: 'The algebraic test, worked out',
+        body: [
+          'Take f(x) = x^2 + 3. Replacing x with -x gives f(-x) = (-x)^2 + 3 = x^2 + 3, because squaring removes the negative sign. Since f(-x) equals f(x), the function is even. Now take g(x) = x^3 - x. Then g(-x) = (-x)^3 - (-x) = -x^3 + x, which equals -(x^3 - x), so g(-x) equals -g(x) and the function is odd.',
+          'Finally, h(x) = x^3 + x^2 gives h(-x) = -x^3 + x^2. That is neither equal to h(x) nor to -h(x), so h is neither even nor odd. Notice the pattern: terms with only even powers tend to be even, terms with only odd powers tend to be odd, and mixing the two usually destroys both symmetries.',
+        ],
+      },
+      {
+        heading: 'The overlay method, step by step',
+        body: [
+          'Enter your function as the first expression, for example x^3 - x. Then enter the second expression with every x replaced by (-x), including the parentheses: (-x)^3 - (-x). The parentheses matter, because -x^3 means -(x^3) while (-x)^3 means the negative quantity cubed, and confusing them will give you a wrong verdict. Enter the third expression as the negative of the whole function: -(x^3 - x).',
+          'Now read the overlap. If curves 1 and 2 coincide, the function is even. If curves 2 and 3 coincide, it is odd. If nothing coincides, it is neither. Try the triple on x^2: the first two curves overlap, confirming even. Try it on x^2 + x: no overlap anywhere, confirming neither. The overlay turns an algebraic identity into something you can see, and seeing it once makes the definitions stick.',
+        ],
+      },
+      {
+        heading: 'What the symmetry looks like on the graph',
+        body: [
+          'An even function is symmetric about the y-axis: fold the graph along the vertical axis and the two halves match. Cosine and x^2 are the classic examples. An odd function has rotational symmetry about the origin: rotate the graph 180 degrees and it lands on itself, which means every point (a, b) on the graph is matched by (-a, -b). Sine and x^3 are the classic examples.',
+          'One consequence worth knowing: an odd function that is defined at x = 0 must pass through the origin, because oddness forces f(0) to equal -f(0), and only zero satisfies that. So if you graph an odd function and it does not cross (0, 0), something is wrong with either the function or the classification. Even functions have no such requirement; x^2 + 3 never touches the x-axis at all.',
+        ],
+      },
+      {
+        heading: 'Try it: five functions to classify',
+        body: [
+          'Run the overlay test on x^4 - 2*x^2 (even: only even powers), x^5 (odd: a single odd power), and x^2 + x (neither: mixed powers). Then try the trigonometric pair: sin(x) is odd, because sin(-x) = -sin(x), while cos(x) is even, because cos(-x) = cos(x). Overlay sin(x) with sin(-x) written as sin(-x)... written properly as sin(-x) needs no extra parentheses, but -sin(x) for the third curve.',
+          'After the verdict, connect it to the picture. For each even result, fold the graph mentally along the y-axis; for each odd result, check the (a, b) to (-a, -b) pairing on two points of your choice. The algebraic test gives the answer and the graph gives the understanding, and the calculator lets you do both side by side.',
+        ],
+      },
+    ],
+    tryExpressions: ['x^3 - x', '(-x)^3 - (-x)', '-(x^3 - x)'],
+    keyTakeaways: [
+      'Even means f(-x) = f(x): mirror symmetry across the y-axis. Odd means f(-x) = -f(x): 180-degree rotational symmetry about the origin.',
+      'The overlay test: graph f(x), f(-x), and -f(x); whichever two coincide tells you the classification.',
+      'Write f(-x) with parentheses, as (-x)^3 - (-x): -x^3 means something different and will flip your verdict.',
+      'Only-even powers usually give even functions, only-odd powers give odd functions, and mixing them usually gives neither.',
+      'An odd function defined at x = 0 always passes through the origin; the zero function is the only function that is both even and odd.',
+    ],
+    images: [
+      {
+        src: '/images/learn/even-and-odd-functions/graph-1.png',
+        alt: 'Curves x^3 - x, (-x)^3 - (-x), and -(x^3 - x); the second and third overlap exactly, proving the function is odd',
+        caption:
+          'f(x) = x^3 - x with f(-x) and -f(x) overlaid. The f(-x) and -f(x) curves coincide exactly, which proves the function is odd.',
+      },
+      {
+        src: '/images/learn/even-and-odd-functions/graph-2.png',
+        alt: 'Graph of y = x^3 - x, an S-shaped curve with rotational symmetry about the origin',
+        caption:
+          'f(x) = x^3 - x alone. Notice the rotational symmetry about the origin: every point (a, b) is matched by (-a, -b).',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Can a function be both even and odd?',
+        a: 'Only one: the zero function, f(x) = 0. It satisfies f(-x) = f(x) and f(-x) = -f(x) simultaneously because 0 equals -0. Every other function is even, odd, or neither, but not both.',
+      },
+      {
+        q: 'Do I really need all three expressions for the overlay test?',
+        a: 'Two are enough in principle: comparing f(x) with f(-x) tells you whether it is even, and comparing f(-x) with -f(x) tells you whether it is odd. The three-curve version just makes the verdict instant, because you read it off whichever pair overlaps.',
+      },
+      {
+        q: 'Is an even function the same as an increasing or symmetric-about-a-line function?',
+        a: 'No. Even and odd describe specific symmetries: mirror symmetry about the y-axis for even, rotational symmetry about the origin for odd. A function can be symmetric about some other vertical line, like a shifted parabola, without being even.',
+      },
+    ],
+    related: [
+      '/learn/function-transformations/',
+      '/learn/graph-inverse-functions/',
+      '/learn/find-local-minimum-and-maximum/',
+      '/learn/holes-in-rational-functions/',
+      '/scientific-calculator/',
+      '/math-functions/sine/',
+      '/math-functions/cosine/',
+    ],
+    reviewedOn: '2026-10-19',
+  },
 ];
