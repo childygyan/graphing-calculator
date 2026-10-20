@@ -1612,4 +1612,93 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: '2026-10-19',
   },
+  {
+    slug: 'graph-ellipses-and-hyperbolas',
+    title: 'How to Graph Ellipses and Hyperbolas on a Graphing Calculator',
+    description:
+      'Graph ellipses and hyperbolas on a graphing calculator: solve for y, enter both plus/minus halves, and keep the view square.',
+    sections: [
+      {
+        heading: 'The short answer: solve for y and enter both halves',
+        body: [
+          'The calculator draws functions of the form y = f(x), but an ellipse or hyperbola is not a function: most x-values pair with two y-values. The fix is to solve the equation for y, which gives a plus/minus pair, and enter each half as its own expression. For the circle x^2 + y^2 = 9, solving gives y = ±sqrt(9 - x^2), so you enter sqrt(9 - x^2) for the top half and -sqrt(9 - x^2) for the bottom half. Together they draw the complete circle.',
+          'That one trick, entering both halves, handles every ellipse and hyperbola in this article. Each section below applies it to a new shape, adds the calculator steps for reading key points, and ends with the view setting that keeps your shapes honest.',
+        ],
+      },
+      {
+        heading: 'Graphing an ellipse',
+        body: [
+          'Take the ellipse x^2/25 + y^2/9 = 1. Solving for y gives y = ±(3/5)*sqrt(25 - x^2), so enter 0.6*sqrt(25 - x^2) and -0.6*sqrt(25 - x^2). The two halves meet at the ends of the domain, x = -5 and x = 5, and together they trace the full ellipse, wider than it is tall.',
+          'Now read the key points. The root markers in the analysis panel mark where each half crosses the x-axis: (-5, 0) and (5, 0), the vertices. For the top and bottom points, evaluate either half at x = 0: the table of values gives ±3, so the co-vertices are (0, 3) and (0, -3). Vertices, co-vertices, and the center at the origin fully describe this ellipse, and every one of them came from the two half-expressions.',
+        ],
+      },
+      {
+        heading: 'Graphing a hyperbola',
+        body: [
+          'The same trick works for hyperbolas, with one difference you should expect: the halves split into separate branches. For x^2 - y^2 = 1, solving gives y = ±sqrt(x^2 - 1), so enter sqrt(x^2 - 1) and -sqrt(x^2 - 1). The domain is |x| ≥ 1, because the expression under the root is negative between -1 and 1, so the calculator draws two branches opening left and right, with a gap in the middle. That gap is real mathematics, not a rendering problem.',
+          'The branches approach the lines y = x and y = -x as guides. Enter x and -x as two more expressions to see these asymptotes: the hyperbola arms get closer and closer to the lines without ever touching them. The vertices, where each branch turns around, are at (1, 0) and (-1, 0); the root markers confirm them. Notice the contrast with the ellipse: the ellipse halves joined into one closed curve, while the hyperbola halves stay apart forever.',
+        ],
+      },
+      {
+        heading: 'Keep the view square, or circles become ovals',
+        body: [
+          'If your circle looks like an oval, the math is fine and the viewing window is not. When the x-axis and y-axis use different scales, a true circle renders as an ellipse and a true ellipse renders with the wrong proportions. Open the window and zoom settings and choose a square or 1:1 aspect so that one unit looks the same length on both axes.',
+          'Make this a habit for every conic: after entering both halves, square the view before judging the shape. It is the single most common reason a correct ellipse entry looks wrong, and it takes five seconds to fix. Zoom in or out afterward as needed, but keep the axes equally scaled while you do it.',
+        ],
+      },
+      {
+        heading: 'Shortcuts: parametric form and slider shifts',
+        body: [
+          'If you prefer a single expression, the parametric kind draws a full ellipse in one entry: x = 5*cos(t), y = 3*sin(t), with the t-range from 0 to 2*pi, traces the ellipse x^2/25 + y^2/9 = 1 completely, no plus/minus needed. Each kind in the calculator has its own t-range fields, so set them when you add the parametric expression.',
+          'For shifted conics, free identifiers become sliders you can drag. Enter sqrt(9 - (x - h)^2) and -sqrt(9 - (x - h)^2): the letter h becomes a slider, and dragging it slides the whole circle left and right, drawing the family (x - h)^2 + y^2 = 9. The same idea shifts a hyperbola or stretches an ellipse, and it is the fastest way to build intuition for how the center and size parameters in the standard-form equations control the picture.',
+        ],
+      },
+    ],
+    tryExpressions: ['sqrt(9 - x^2)', '-sqrt(9 - x^2)', 'sqrt(x^2 - 1)', '-sqrt(x^2 - 1)'],
+    keyTakeaways: [
+      'The calculator draws y = f(x), so solve the conic for y and enter the + and - halves as two expressions.',
+      'Ellipse x^2/25 + y^2/9 = 1 becomes 0.6*sqrt(25 - x^2) and -0.6*sqrt(25 - x^2); the halves join into one closed curve.',
+      'Hyperbola x^2 - y^2 = 1 becomes sqrt(x^2 - 1) and -sqrt(x^2 - 1), with two separate branches and asymptotes y = ±x.',
+      'Square the viewing window (1:1 aspect) before judging any conic, or circles will render as ovals.',
+      'A parametric expression like x = 5*cos(t), y = 3*sin(t) draws a full ellipse in one entry; sliders like h shift conics.',
+    ],
+    images: [
+      {
+        src: '/images/learn/graph-ellipses-and-hyperbolas/graph-1.png',
+        alt: 'Circle x^2 + y^2 = 9 and hyperbola x^2 - y^2 = 1 drawn from four square-root halves',
+        caption:
+          'All four halves together: sqrt(9 - x^2) and -sqrt(9 - x^2) form the circle, while sqrt(x^2 - 1) and -sqrt(x^2 - 1) form the hyperbola.',
+      },
+      {
+        src: '/images/learn/graph-ellipses-and-hyperbolas/graph-2.png',
+        alt: 'Upper half of the circle x^2 + y^2 = 9: a semicircle of radius 3',
+        caption:
+          'sqrt(9 - x^2) alone: the top half of the circle. Enter -sqrt(9 - x^2) as a second expression to complete the shape.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Why is only half of my ellipse showing?',
+        a: 'You entered only one of the two halves. A square root gives the top half (positive y) or the bottom half (negative y); the full conic needs both. Add the matching negative expression and the halves join into the complete shape.',
+      },
+      {
+        q: 'Why does my circle look like an oval?',
+        a: 'Your x-axis and y-axis are scaled differently. Open the window and zoom settings and switch to a square, 1:1 view so one unit measures the same on both axes, and the oval will snap back into a circle.',
+      },
+      {
+        q: 'Can I type x^2/9 + y^2/4 = 1 directly into the calculator?',
+        a: 'No. Expression entry takes the right-hand side of y = ..., so equations in x and y must be solved for y first. Rearrange to y = ±sqrt form and enter each half, or use the parametric kind as a one-expression alternative.',
+      },
+    ],
+    related: [
+      '/learn/parametric-vs-cartesian/',
+      '/learn/find-roots-and-zeros/',
+      '/learn/even-and-odd-functions/',
+      '/graphing-calculator/',
+      '/learn/graph-polar-equations/',
+      '/learn/function-transformations/',
+      '/math-functions/square-root/',
+    ],
+    reviewedOn: '2026-10-20',
+  },
 ];

@@ -65,9 +65,9 @@ export const BATCH_4: LearnArticle[] = [
       },
       {
         src: '/images/learn/getting-started-graphing-calculator/graph-2.png',
-        alt: 'Clean default-viewport plot of the single parabola y = x^2 centered on the origin',
+        alt: 'Plot of the single parabola y = x^2 on a wider zoomed-out viewport, centered on the origin',
         caption:
-          'Your first graph: typing x^2 alone produces the familiar upward parabola. This default-viewport view is the starting point for every graph — pan and zoom from here to explore.',
+          'Your first graph: typing x^2 alone produces the familiar upward parabola. Zoom out to see how it keeps its shape at larger scales — the grid labels keep every point readable, so pan and zoom from here to explore.',
       },
     ],
     faqs: [
