@@ -1978,4 +1978,99 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: '2026-10-23',
   },
+
+  {
+    slug: 'derivative-at-a-point',
+    title: 'How to Find the Derivative at a Point on a Graphing Calculator',
+    description:
+      "Find the derivative at a point on a graphing calculator with the tangent line tool: place it at your x-value and read the slope. Worked examples.",
+    sections: [
+      {
+        heading: 'The short answer',
+        body: [
+          'To find the derivative of a function at a point on our graphing calculator, graph the function and open the analysis panel\'s tangent line tool. Place the tangent at the x-value you care about — the slope of that tangent line is the derivative at that point.',
+          'For example, graph x^3 - 3*x, put the tangent at x = 2, and read the slope: it is 9, matching the calculus rule f\'(x) = 3x² − 3 evaluated at x = 2. No formula to type — the tool measures the slope of the curve for you.',
+          'The idea behind the tool is the same definition you meet in class: the derivative is the limit of secant-line slopes as the two points merge. The tangent tool skips the limit and measures the final slope directly. That is why its number agrees with the differentiation rules — it computes the same quantity, just numerically instead of symbolically. It helps to think of the derivative as a speedometer reading. On a distance-versus-time graph, the tangent slope at a moment is the speed at that instant; on a profit curve, it is the marginal profit of one more unit. The tangent tool turns any "how fast right now" question into a number you can read off the screen.',
+        ],
+      },
+      {
+        heading: 'Step by step with the tangent tool',
+        body: [
+          'First, type the function into an expression line — use x^3 - 3*x as your practice curve. Next, open the analysis panel and select the tangent line tool, then choose (or type) the x-value where you want the derivative. A line appears hugging the curve at that point, labeled with its slope.',
+          'The slope label is your answer: it is f\'(a), the instantaneous rate of change at x = a. Move the tangent along the curve and watch the slope change — where the curve is steep the slope is large, where it flattens the slope shrinks to zero.',
+          'If your x-value is not a round number, type it exactly rather than dragging the point. For the derivative of sin(x) at x = pi/2, enter pi/2 as the point — the tangent lies flat and the slope reads 0, confirming the sine wave peaks there. Typing the point avoids the wobble of dragging and gives the cleanest reading. Make sure the tangent is attached to the right expression when several are graphed. With x^3 - 3*x, x^2, and sin(x) all on screen, select the curve first and then the point — otherwise the slope you read may belong to the wrong function. When in doubt, hide the other expressions temporarily so only your target curve is visible.',
+        ],
+      },
+      {
+        heading: 'See the whole derivative with the derivative plot',
+        body: [
+          'If instead of one point you want the derivative everywhere, use the numerical derivative plot in the analysis panel. It draws a new curve showing f\'(x) across the visible window — the slope function itself.',
+          'Read the plot the same way you would read any graph: its height at x = a is the derivative at a. For the practice curve x^3 - 3*x, the derivative plot is the upward parabola 3x² − 3, dipping below the axis between x = −1 and x = 1 where the original curve slopes downward. Hovering over the derivative plot at any x gives that point\'s derivative numerically.',
+          'The derivative plot is also the quickest way to see where a function increases or decreases: wherever the derivative curve sits above the axis, the original is rising; wherever it sits below, the original is falling. The zeros of the derivative plot are the turning points of the original — one picture answers three questions. The plot also settles a common confusion: the derivative is not the tangent line itself, but the slope of that line. The plot draws each slope as a height, converting "steepness" into an ordinary y-value you can read, compare, and even analyze further. That reframing is the whole idea of calculus in one picture.',
+        ],
+      },
+      {
+        heading: 'A worked example to check your understanding',
+        body: [
+          'Take f(x) = x². Its derivative is f\'(x) = 2x, so at x = 3 the derivative should be 6. Graph x^2, place the tangent at x = 3, and confirm the tool reports a slope of 6. This check builds trust: whenever the tool\'s number matches the power rule you learned in class, you know you are using it correctly.',
+          'Now try a point where the answer is zero. On the same graph, move the tangent to x = 0 — the bottom of the parabola. The tangent lies flat, slope 0, which is exactly where the function\'s minimum sits. Zero derivative marks the turning points of a smooth curve.',
+          'Try the same check on a trigonometric function. The derivative of sin(x) is cos(x), so at x = 0 the derivative should be cos(0) = 1. Graph sin(x), place the tangent at x = 0, and confirm the slope reads 1 — the wave crosses the origin at 45 degrees. One confirmed example per function family builds the habit of verifying before trusting. Keep a small library of verified examples: x^2 at x = 3 gives 6, sin(x) at x = 0 gives 1, and e^x at x = 0 gives 1, since the derivative of e^x is itself. Whenever a new answer looks suspicious, re-run one of these checks — if the tool agrees with the known value, the method is sound and the surprise is in your algebra, not the tool.',
+        ],
+      },
+      {
+        heading: 'Where the derivative does not exist',
+        body: [
+          'The tangent tool also exposes where calculus breaks down. Graph abs(x) — the V-shaped absolute value function — and place the tangent at x = 0. The tool cannot settle on a single slope because the curve has a sharp corner there; the slope coming from the left is −1 and from the right is +1.',
+          'This is honest mathematics, not a tool failure: the derivative at a corner or cusp genuinely does not exist. If the slope readout jumps or refuses to stabilize as you nudge the point, look at the graph — you have likely found a sharp point.',
+          'The same warning applies at vertical tangents. Near one, the slope readout grows without bound as you approach the point — the graph goes nearly vertical, and no finite number is the right answer. Whenever the readout behaves wildly, stop and look at the shape: the geometry always explains the number.',
+        ],
+      },
+    ],
+    tryExpressions: ['x^3 - 3*x', 'x^2', 'sin(x)'],
+    keyTakeaways: [
+      'The derivative at a point equals the slope of the tangent line there.',
+      'Use the analysis panel\'s tangent line tool — place it at your x-value and read the slope.',
+      'The numerical derivative plot draws the whole slope function f\'(x) at once.',
+      'Check against the power rule on a known function (x² at x = 3 → slope 6).',
+      'Sharp corners like abs(x) at x = 0 have no derivative — the tool cannot settle on one slope.',
+    ],
+    images: [
+      {
+        src: '/images/learn/derivative-at-a-point/graph-1.png',
+        alt: 'Three curves: x^3 - 3*x with a wave-like shape, the parabola x^2, and the wave sin(x), plotted together on one set of axes',
+        caption:
+          'The three practice curves — x^3 − 3x, x^2, and sin(x) — plotted together. Place the tangent tool on any of them and the slope readout gives the derivative at that point.',
+      },
+      {
+        src: '/images/learn/derivative-at-a-point/graph-2.png',
+        alt: 'The curve y = x^3 - 3*x alone, dipping to a local minimum near x = 1 and rising to a local maximum near x = -1',
+        caption:
+          'The curve y = x³ − 3x plotted alone. The derivative is zero at the two turning points (x = −1 and x = 1), positive where the curve rises, and negative where it falls — the tangent tool makes this visible point by point.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Can I just type a derivative formula like nDeriv?',
+        a: 'Our calculator has no nDeriv() function to type. Instead, use the analysis panel: the tangent line tool gives the derivative at a single point, and the numerical derivative plot draws f\'(x) across the whole window. The results are the same — only the method differs.',
+      },
+      {
+        q: 'How accurate is the slope the tool reports?',
+        a: 'It is a numerical estimate of the true derivative, accurate to several decimal places for smooth functions. For homework and checking your work it is effectively exact; if you need the symbolic answer, differentiate on paper and use the tool to verify.',
+      },
+      {
+        q: 'Why does the tangent tool act strange at a corner?',
+        a: 'Because the derivative does not exist there. At the corner of abs(x) at x = 0, the slope from the left is −1 and from the right is +1, so no single tangent slope is correct. The tool\'s refusal to settle is the right answer.',
+      },
+    ],
+    related: [
+      '/learn/understanding-derivatives/',
+      '/learn/tangent-line-at-a-point/',
+      '/learn/getting-started-graphing-calculator/',
+      '/learn/solve-quadratic-equations/',
+      '/learn/find-local-minimum-and-maximum/',
+      '/learn/increasing-and-decreasing-intervals/',
+      '/math-functions/cubic/',
+    ],
+    reviewedOn: '2026-10-24',
+  },
 ];
