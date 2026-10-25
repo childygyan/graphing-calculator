@@ -86,4 +86,54 @@ export const home: HomeStrings = {
       },
     ],
   },
+  tutorial: {
+    ariaLabel: 'Tutorial',
+    heading: 'How to use the graphing calculator',
+    lede:
+      'Five steps, using the calculator above. Every screenshot below is a real render from ' +
+      'this calculator — no mockups.',
+    steps: [
+      {
+        title: 'Type your first expression',
+        body:
+          'Click in the Expressions panel and type x^2. The parabola plots instantly as you ' +
+          'type — there is nothing to install and no account to create.',
+        image: '/images/tutorial/step-1-first-expression.png',
+        alt: 'Graphing calculator showing the parabola y = x squared',
+      },
+      {
+        title: 'Compare two curves',
+        body:
+          'Click Add and type sin(x). Each expression gets its own color, and the eye icon ' +
+          'toggles each curve on or off, so you can compare shapes side by side.',
+        image: '/images/tutorial/step-2-compare-curves.png',
+        alt: 'Graphing calculator comparing the parabola y = x squared with a sine wave',
+      },
+      {
+        title: 'Zoom and pan around the graph',
+        body:
+          'Scroll to zoom toward your cursor and drag to pan. Zooming into the vertex of ' +
+          'x^2 shows the curve flattening out at (0, 0).',
+        image: '/images/tutorial/step-3-zoom-in.png',
+        alt: 'Zoomed-in view of the parabola y = x squared around its vertex at (0, 0)',
+      },
+      {
+        title: 'Find where a curve crosses the x-axis',
+        body:
+          'For x^2 - 4, the roots show up as markers right on the graph — at x = -2 and ' +
+          'x = 2. The Analysis panel can find roots, derivatives, integrals, and more for ' +
+          'any expression.',
+        image: '/images/tutorial/step-4-roots.png',
+        alt: 'Graph of y = x squared minus 4 with root markers at x = -2 and x = 2',
+      },
+      {
+        title: 'Draw a tangent line',
+        body:
+          'Pick a point on a curve — here x = 1 on x^2 — and the tangent line appears at ' +
+          '(1, 1), with its slope computed by the math engine.',
+        image: '/images/tutorial/step-5-tangent.png',
+        alt: 'Graph of y = x squared with a tangent line at x = 1',
+      },
+    ],
+  },
 };

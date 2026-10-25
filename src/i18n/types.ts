@@ -161,6 +161,12 @@ export interface HomeStrings {
     heading: string;
     cards: Array<{ title: string; body: string; href: string }>;
   };
+  tutorial: {
+    ariaLabel: string;
+    heading: string;
+    lede: string;
+    steps: Array<{ title: string; body: string; image: string; alt: string }>;
+  };
 }
 
 export interface CalculatorStrings {

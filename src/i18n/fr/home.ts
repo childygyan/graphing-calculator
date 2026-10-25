@@ -90,4 +90,55 @@ export const home: HomeStrings = {
       },
     ],
   },
+  tutorial: {
+    ariaLabel: 'Tutoriel',
+    heading: 'Comment utiliser la calculatrice graphique',
+    lede:
+      'Cinq étapes, avec la calculatrice ci-dessus. Chaque capture d’écran est un vrai ' +
+      'rendu de cette calculatrice — aucune maquette.',
+    steps: [
+      {
+        title: 'Saisir une première expression',
+        body:
+          'Clique dans le panneau Expressions et saisis x^2. La parabole se trace ' +
+          'instantanément pendant la saisie — rien à installer, aucun compte à créer.',
+        image: '/images/tutorial/step-1-first-expression.png',
+        alt: 'Calculatrice graphique affichant la parabole y = x au carré',
+      },
+      {
+        title: 'Comparer deux courbes',
+        body:
+          'Clique sur Ajouter puis saisis sin(x). Chaque expression a sa propre couleur, ' +
+          'et l’icône en forme d’œil affiche ou masque chaque courbe pour comparer les ' +
+          'formes côte à côte.',
+        image: '/images/tutorial/step-2-compare-curves.png',
+        alt: 'Calculatrice graphique comparant la parabole y = x au carré avec une sinusoïde',
+      },
+      {
+        title: 'Zoomer et déplacer le graphique',
+        body:
+          'Fais défiler pour zoomer vers le curseur et fais glisser pour déplacer la vue. ' +
+          'En zoomant sur le sommet de x^2, on voit la courbe s’aplatir en (0, 0).',
+        image: '/images/tutorial/step-3-zoom-in.png',
+        alt: 'Vue rapprochée de la parabole y = x au carré autour de son sommet en (0, 0)',
+      },
+      {
+        title: 'Trouver les racines d’une courbe',
+        body:
+          'Pour x^2 - 4, les racines apparaissent sous forme de marqueurs directement sur ' +
+          'le graphique — en x = -2 et x = 2. Le panneau Analyse peut trouver racines, ' +
+          'dérivées, intégrales et bien plus pour n’importe quelle expression.',
+        image: '/images/tutorial/step-4-roots.png',
+        alt: 'Graphique de y = x au carré moins 4 avec des marqueurs de racine en x = -2 et x = 2',
+      },
+      {
+        title: 'Tracer une tangente',
+        body:
+          'Choisis un point sur une courbe — ici x = 1 sur x^2 — et la tangente apparaît ' +
+          'en (1, 1), avec sa pente calculée par le moteur mathématique.',
+        image: '/images/tutorial/step-5-tangent.png',
+        alt: 'Graphique de y = x au carré avec une tangente en x = 1',
+      },
+    ],
+  },
 };

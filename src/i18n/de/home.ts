@@ -87,4 +87,56 @@ export const home: HomeStrings = {
       },
     ],
   },
+  tutorial: {
+    ariaLabel: 'Anleitung',
+    heading: 'So benutzt du den Grafikrechner',
+    lede:
+      'Fünf Schritte mit dem Rechner oben. Jeder Screenshot ist eine echte Aufnahme dieses ' +
+      'Rechners — keine Mockups.',
+    steps: [
+      {
+        title: 'Gib deinen ersten Ausdruck ein',
+        body:
+          'Klicke in den Bereich Ausdrücke und gib x^2 ein. Die Parabel wird sofort beim ' +
+          'Tippen gezeichnet — nichts zu installieren, kein Konto nötig.',
+        image: '/images/tutorial/step-1-first-expression.png',
+        alt: 'Grafikrechner mit der Parabel y = x Quadrat',
+      },
+      {
+        title: 'Zwei Kurven vergleichen',
+        body:
+          'Klicke auf Hinzufügen und gib sin(x) ein. Jeder Ausdruck erhält eine eigene ' +
+          'Farbe, und das Augensymbol blendet jede Kurve ein oder aus — so lassen sich ' +
+          'Formen direkt vergleichen.',
+        image: '/images/tutorial/step-2-compare-curves.png',
+        alt: 'Grafikrechner vergleicht die Parabel y = x Quadrat mit einer Sinuskurve',
+      },
+      {
+        title: 'Zoomen und Verschieben',
+        body:
+          'Scrolle, um auf den Cursor zu zoomen, und ziehe, um die Ansicht zu verschieben. ' +
+          'Beim Heranzoomen an den Scheitelpunkt von x^2 sieht man, wie die Kurve bei ' +
+          '(0, 0) flach wird.',
+        image: '/images/tutorial/step-3-zoom-in.png',
+        alt: 'Herangezoomte Ansicht der Parabel y = x Quadrat um ihren Scheitelpunkt bei (0, 0)',
+      },
+      {
+        title: 'Nullstellen finden',
+        body:
+          'Bei x^2 - 4 erscheinen die Nullstellen als Markierungen direkt auf dem Graphen ' +
+          '— bei x = -2 und x = 2. Der Bereich Analyse findet Nullstellen, Ableitungen, ' +
+          'Integrale und mehr für jeden Ausdruck.',
+        image: '/images/tutorial/step-4-roots.png',
+        alt: 'Graph von y = x Quadrat minus 4 mit Nullstellenmarkierungen bei x = -2 und x = 2',
+      },
+      {
+        title: 'Eine Tangente zeichnen',
+        body:
+          'Wähle einen Punkt auf einer Kurve — hier x = 1 auf x^2 — und die Tangente ' +
+          'erscheint bei (1, 1), mit einer vom Mathematik-Engine berechneten Steigung.',
+        image: '/images/tutorial/step-5-tangent.png',
+        alt: 'Graph von y = x Quadrat mit einer Tangente bei x = 1',
+      },
+    ],
+  },
 };

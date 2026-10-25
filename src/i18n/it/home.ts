@@ -86,4 +86,55 @@ export const home: HomeStrings = {
       },
     ],
   },
+  tutorial: {
+    ariaLabel: 'Tutorial',
+    heading: 'Come usare la calcolatrice grafica',
+    lede:
+      'Cinque passaggi, con la calcolatrice qui sopra. Ogni screenshot è un vero rendering ' +
+      'di questa calcolatrice, non un mockup.',
+    steps: [
+      {
+        title: 'Scrivi la tua prima espressione',
+        body:
+          'Fai clic nel pannello Espressioni e scrivi x^2. La parabola viene disegnata ' +
+          'istantaneamente mentre scrivi: niente da installare e nessun account da creare.',
+        image: '/images/tutorial/step-1-first-expression.png',
+        alt: 'Calcolatrice grafica che mostra la parabola y = x al quadrato',
+      },
+      {
+        title: 'Confronta due curve',
+        body:
+          'Fai clic su Aggiungi e scrivi sin(x). Ogni espressione ha un proprio colore e ' +
+          'l’icona a forma di occhio mostra o nasconde ogni curva, così puoi confrontare ' +
+          'le forme fianco a fianco.',
+        image: '/images/tutorial/step-2-compare-curves.png',
+        alt: 'Calcolatrice grafica che confronta la parabola y = x al quadrato con un’onda sinusoidale',
+      },
+      {
+        title: 'Ingrandisci e sposta il grafico',
+        body:
+          'Scorri per ingrandire verso il cursore e trascina per spostare la vista. ' +
+          'Ingrandendo il vertice di x^2 si vede la curva appiattirsi in (0, 0).',
+        image: '/images/tutorial/step-3-zoom-in.png',
+        alt: 'Vista ingrandita della parabola y = x al quadrato intorno al vertice in (0, 0)',
+      },
+      {
+        title: 'Trova dove una curva incrocia l’asse x',
+        body:
+          'Per x^2 - 4, le radici compaiono come indicatori direttamente sul grafico: in ' +
+          'x = -2 e x = 2. Il pannello Analisi può trovare radici, derivate, integrali e ' +
+          'molto altro per qualsiasi espressione.',
+        image: '/images/tutorial/step-4-roots.png',
+        alt: 'Grafico di y = x al quadrato meno 4 con indicatori di radice in x = -2 e x = 2',
+      },
+      {
+        title: 'Disegna una retta tangente',
+        body:
+          'Scegli un punto su una curva — qui x = 1 su x^2 — e la retta tangente appare ' +
+          'in (1, 1), con la pendenza calcolata dal motore matematico.',
+        image: '/images/tutorial/step-5-tangent.png',
+        alt: 'Grafico di y = x al quadrato con una retta tangente in x = 1',
+      },
+    ],
+  },
 };

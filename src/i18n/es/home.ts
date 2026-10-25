@@ -85,4 +85,55 @@ export const home = {
       },
     ],
   },
+  tutorial: {
+    ariaLabel: 'Tutorial',
+    heading: 'Cómo usar la calculadora gráfica',
+    lede:
+      'Cinco pasos, con la calculadora de arriba. Cada captura de pantalla es una imagen ' +
+      'real de esta calculadora, sin maquetas.',
+    steps: [
+      {
+        title: 'Escribe tu primera expresión',
+        body:
+          'Haz clic en el panel Expresiones y escribe x^2. La parábola se dibuja al instante ' +
+          'mientras escribes: no hay nada que instalar ni ninguna cuenta que crear.',
+        image: '/images/tutorial/step-1-first-expression.png',
+        alt: 'Calculadora gráfica mostrando la parábola y = x al cuadrado',
+      },
+      {
+        title: 'Compara dos curvas',
+        body:
+          'Haz clic en Añadir y escribe sin(x). Cada expresión tiene su propio color, y el ' +
+          'icono del ojo muestra u oculta cada curva, para que puedas comparar formas una al ' +
+          'lado de la otra.',
+        image: '/images/tutorial/step-2-compare-curves.png',
+        alt: 'Calculadora gráfica comparando la parábola y = x al cuadrado con una onda sinusoidal',
+      },
+      {
+        title: 'Acerca y desplaza la gráfica',
+        body:
+          'Desplázate para acercar hacia el cursor y arrastra para mover la vista. Al acercar ' +
+          'el vértice de x^2 se ve cómo la curva se aplana en (0, 0).',
+        image: '/images/tutorial/step-3-zoom-in.png',
+        alt: 'Vista ampliada de la parábola y = x al cuadrado alrededor de su vértice en (0, 0)',
+      },
+      {
+        title: 'Encuentra dónde una curva cruza el eje x',
+        body:
+          'Para x^2 - 4, las raíces aparecen como marcadores directamente sobre la gráfica: ' +
+          'en x = -2 y x = 2. El panel Análisis puede encontrar raíces, derivadas, ' +
+          'integrales y más para cualquier expresión.',
+        image: '/images/tutorial/step-4-roots.png',
+        alt: 'Gráfica de y = x al cuadrado menos 4 con marcadores de raíz en x = -2 y x = 2',
+      },
+      {
+        title: 'Dibuja una recta tangente',
+        body:
+          'Elige un punto de una curva — aquí x = 1 en x^2 — y la recta tangente aparece ' +
+          'en (1, 1), con su pendiente calculada por el motor matemático.',
+        image: '/images/tutorial/step-5-tangent.png',
+        alt: 'Gráfica de y = x al cuadrado con una recta tangente en x = 1',
+      },
+    ],
+  },
 };
