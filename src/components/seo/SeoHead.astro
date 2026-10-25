@@ -19,6 +19,7 @@ import {
   stripLocale,
   type Locale,
 } from '../../i18n/index.js';
+import { learnSlugExistsInLocale, learnSlugFromPath } from '../../i18n/learn-mirrors.js';
 
 interface Props extends SeoProps {
   locale?: Locale;
@@ -44,6 +45,16 @@ const {
  */
 const englishPath = stripLocale(canonicalPath ?? Astro.url.pathname);
 const localizedPath = locale === 'en' ? englishPath : localizePath(englishPath, locale);
+/**
+ * Learn articles are only partially translated (6 of 25 slugs per locale).
+ * For a learn article page, hreflang/og alternates list only the locales
+ * that actually have that slug — otherwise the tags point at 404 pages.
+ * Every other route keeps all locales (those sections are fully mirrored).
+ */
+const learnSlug = learnSlugFromPath(englishPath);
+const alternateLocales = learnSlug
+  ? LOCALES.filter((language) => learnSlugExistsInLocale(learnSlug, language))
+  : LOCALES;
 const canonical = buildCanonical(localizedPath);
 const robotsContent = noindex ? 'noindex, nofollow' : (robots ?? 'index, follow');
 const absoluteOgImage = ogImage ? buildCanonical(ogImage) : null;
@@ -59,7 +70,7 @@ const googleVerification =
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{LOCALES.map((language) => (
+{alternateLocales.map((language) => (
   <link
     rel="alternate"
     hreflang={htmlLangFor(language)}
@@ -74,7 +85,7 @@ const googleVerification =
 <meta property="og:type" content={ogType ?? 'website'} />
 <meta property="og:site_name" content={siteConfig.name} />
 <meta property="og:locale" content={ogLocaleFor(locale)} />
-{LOCALES.filter((language) => language !== locale).map((language) => (
+{alternateLocales.filter((language) => language !== locale).map((language) => (
   <meta property="og:locale:alternate" content={ogLocaleFor(language)} />
 ))}
 {absoluteOgImage && <meta property="og:image" content={absoluteOgImage} />}

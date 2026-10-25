@@ -17,6 +17,7 @@ import {
   stripLocale,
   type Locale,
 } from '../../i18n/index.js';
+import { learnSlugExistsInLocale, learnSlugFromPath } from '../../i18n/learn-mirrors.js';
 
 interface Props {
   locale?: Locale;
@@ -32,7 +33,9 @@ const currentName = LOCALE_METADATA[currentLocale].nativeLabel;
 /**
  * English-canonical routes that exist under every locale
  * (mirrors src/pages/<locale>/). Dynamic content routes mirror every
- * single-slug sub-path; the calculators section mirrors its tool pages.
+ * single-slug sub-path — EXCEPT /learn/, where only 6 of 25 slugs are
+ * translated per locale (see learn-mirrors.ts); an untranslated learn slug
+ * falls back to the locale homepage in switcherHref below.
  * Routes outside this list (404/500 error pages, the /graph/ share route,
  * any unmatched URL) have no locale mirror.
  */
@@ -69,7 +72,14 @@ function hasMirror(canonical: string): boolean {
  * points at the current page (it exists by definition).
  */
 function switcherHref(target: Locale): string {
-  if (target === currentLocale || hasMirror(currentRoute)) {
+  if (target === currentLocale) {
+    return localizePath(currentRoute, target);
+  }
+  const learnSlug = learnSlugFromPath(currentRoute);
+  if (learnSlug && !learnSlugExistsInLocale(learnSlug, target)) {
+    return localizePath('/', target);
+  }
+  if (hasMirror(currentRoute)) {
     return localizePath(currentRoute, target);
   }
   return localizePath('/', target);
