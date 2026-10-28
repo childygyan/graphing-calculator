@@ -2351,5 +2351,95 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/math-functions/reciprocal/',
       '/graphing-calculator/',
     ],
+  },
+  {
+    slug: 'line-of-best-fit',
+    title: 'How to Find the Line of Best Fit on a Graphing Calculator',
+    description:
+      'No regression button here — plot your data as points, add y = m*x + b, and drag the sliders until the line fits. An honest hands-on workflow.',
+    reviewedOn: '2026-10-28',
+    sections: [
+      {
+        heading: 'The direct answer — and an honest limitation',
+        body: [
+          'A line of best fit is the straight line that best summarizes the trend in a scatter of data points. On some calculators you compute it with a regression command (STAT, then CALC, then LinReg); our calculator has no statistics or regression module, so it cannot compute that line for you. What it can do is better for learning: you plot your data as points, add the expression m*x + b, and drag the m and b sliders until the line threads the middle of the points by eye.',
+          'The result is a fitted line, not the least-squares line — fitting by eye is an estimate, and two people may land on slightly different lines. That honesty is the point: you see exactly what best means (the line that balances the points above and below it) instead of trusting a black-box number. For data that is roughly linear, the by-eye line and the true regression line usually end up close.',
+        ],
+      },
+      {
+        heading: 'What best fit actually means',
+        body: [
+          'The formal definition: the line of best fit, or least-squares line, is the line that minimizes the sum of the squared vertical distances — the residuals — between the line and the data points. Squaring punishes large misses more than small ones, so the line follows the overall trend rather than chasing any single outlier.',
+          'You do not need the formula to use the idea. A good fit means the points scatter evenly above and below the line with no obvious curve left over. If the points form a curve, no straight line fits well — and that is your cue that a linear model is the wrong model, something a regression button would never tell you.',
+          'The two numbers you read off the sliders have plain meanings. The slope m is the predicted change in y for each one-unit increase in x — in the study example, about 6.5 test points per study hour. The intercept b is the predicted y when x = 0, which is only meaningful if x = 0 sits near your data; predicting scores for zero study hours from this line is extrapolation, and extrapolation is where linear models most often go wrong.',
+        ],
+      },
+      {
+        heading: 'The workflow other calculators use (background knowledge)',
+        body: [
+          'On a TI-style calculator the classic workflow is: enter your data as two lists under STAT EDIT, open STAT CALC, choose LinReg(ax+b), and read off the slope a, the intercept b, and the correlation coefficient r. It is worth knowing this exists, because textbooks and exams often assume it, and the comparison helps you understand what our slider workflow replaces.',
+          'But notice what the button hides: the machine picks the line, and students copy the numbers without asking whether a line was appropriate. Our slider workflow keeps that judgment with you — you decide the fit looks right, you read m and b off the sliders, and you can immediately see when the data refuses to be straight.',
+        ],
+      },
+      {
+        heading: 'Fitting by eye in our calculator, step by step',
+        body: [
+          'First, enter your data as point expressions — one point expression per (x, y) pair. Take five students with study hours and test scores: (1, 52), (2, 58), (3, 65), (4, 71), (5, 78). The points appear as a scatter plot. Then add the cartesian expression m*x + b: because m and b are free identifiers, they automatically become slider variables you can drag.',
+          'Drag m to set the steepness and b to set the height until the line runs through the middle of the cloud, with roughly as many points above as below and no systematic curve remaining. Read the final m and b values off the sliders — those are your fitted slope and intercept. For the study-hours data above, a careful by-eye fit lands near m = 6.5 and b = 45: each extra hour of study predicts about 6.5 extra points, starting from a baseline near 45.',
+          'Two practical tips. First, start with the sliders at m = 1 and b = 0, and adjust m before b: get the tilt right, then lift or lower the line into place. Second, set the window to fit your data before fitting — if the points are squeezed into a corner, every line looks the same. A good window shows the full cloud with a little margin, which makes the by-eye judgment dramatically easier.',
+        ],
+      },
+      {
+        heading: 'Judging the fit with residuals',
+        body: [
+          'After fitting, open the table of values for your line at the data x-values and compare each predicted y with the measured y. The differences — measured minus predicted — are the residuals. Good residuals are small and show no pattern: plus, minus, plus, minus in no particular order.',
+          'A concrete residual check on the study data: with m = 6.5 and b = 45, the predictions at x = 1, 2, 3, 4, 5 are 51.5, 58, 64.5, 71, 77.5, against measured 52, 58, 65, 71, 78 — residuals 0.5, 0, 0.5, 0, 0.5. They are tiny and show no pattern, which is exactly what a trustworthy linear fit looks like. If your residuals are ten times larger or march in a clear sequence, keep adjusting the sliders.',
+          'If the residuals start negative, turn positive, then go negative again, the data curves and a straight line is the wrong model — try a quadratic instead. This residual check is the same diagnostic professional statisticians use, and it works just as well on a by-eye fit. Remember the limitation: your line is a visual estimate, so report it as an approximation (about 6.5 points per hour), not as a computed statistic.',
+        ],
+      },
+    ],
+    tryExpressions: ['m*x + b', '2*x + 1'],
+    keyTakeaways: [
+      'Our calculator has no regression command; the honest workflow is to plot the points, add y = m*x + b, and drag the m and b sliders until the line fits by eye.',
+      'The line of best fit (least squares) minimizes the sum of the squared vertical distances — the residuals — between the line and the points.',
+      'A good fit has points scattered evenly above and below the line; m is the predicted change in y per unit of x, and b is the predicted y when x = 0.',
+      'Check residuals — measured minus predicted — in the table of values; a pattern in the residuals means a straight line is the wrong model.',
+      'By-eye fits are estimates: report them as approximations, and use proper statistics software when precision matters.',
+    ],
+    images: [
+      {
+        src: '/images/learn/line-of-best-fit/graph-1.png',
+        alt: 'Scatter plot of data points with a fitted line y = m*x + b running through the middle of the points',
+        caption:
+          'Data points plotted with the fitted line y = m*x + b. Drag the m and b sliders until the line threads the middle of the cloud, balancing points above and below.',
+      },
+      {
+        src: '/images/learn/line-of-best-fit/graph-2.png',
+        alt: 'The line y = m*x + b shown alone with its slope and intercept sliders',
+        caption:
+          'The slider line y = m*x + b on its own. Adjusting m changes the steepness and b changes the height — the two controls of any linear fit.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'Why does the calculator not just compute the regression line?',
+        a: 'Our calculator is a graphing tool, not a statistics package — it has no LinReg or list-statistics module. The slider workflow replaces the button with judgment: you fit the line by eye, which teaches what best fit means instead of hiding it.',
+      },
+      {
+        q: 'Is fitting by eye accurate enough?',
+        a: 'For roughly linear data, a careful by-eye fit usually lands close to the least-squares line — close enough for homework estimates and for deciding whether a linear model makes sense. For published analysis, use proper statistics software and report the method.',
+      },
+      {
+        q: 'What if the points form a curve?',
+        a: 'Then no straight line fits well, and the residuals will show a pattern — for example, negative, then positive, then negative again. That pattern is telling you to try a curved model like a quadratic; do not force a line through curved data.',
+      },
+    ],
+    related: [
+      '/learn/estimate-limits-with-table/',
+      '/learn/how-to-use-the-table-of-values/',
+      '/learn/evaluate-functions-at-a-point/',
+      '/learn/function-transformations/',
+      '/graphing-calculator/',
+    ],
   }
 ];
