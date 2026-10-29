@@ -2441,5 +2441,97 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/learn/function-transformations/',
       '/graphing-calculator/',
     ],
-  }
+  },
+  {
+    slug: 'amplitude-period-phase-shift',
+    title: 'Amplitude, Period and Phase Shift: Graphing Sine and Cosine Transformations',
+    description:
+      'Type A*sin(B*(x − C)) + D and drag four sliders to see exactly what amplitude, period, phase shift, and vertical shift do to sine and cosine waves.',
+    reviewedOn: '2026-10-29',
+    sections: [
+      {
+        heading: 'The direct answer: one expression, four sliders',
+        body: [
+          'Type A*sin(B*(x - C)) + D as a cartesian expression. Because A, B, C, and D are free identifiers, each automatically becomes a slider you can drag — and each slider controls exactly one feature of the wave: A the height, B the frequency, C the horizontal position, D the vertical position. Drag one at a time and watch what changes; that single experiment teaches more than any definition.',
+          'The four numbers have standard names: the amplitude is |A| (half the total height of the wave), the period is 2*π/|B| (the length of one full cycle), the phase shift is C (how far the wave slides left or right), and D is the vertical shift (the midline the wave oscillates around). Everything below is just unpacking those four facts.',
+        ],
+      },
+      {
+        heading: 'Amplitude and vertical shift: A and D',
+        body: [
+          'The amplitude |A| measures how far the wave swings above and below its midline. With D = 0, the graph of 2*sin(x) reaches y = 2 and y = −2 — twice as tall as sin(x). A negative A, like −2*sin(x), flips the wave upside down; the amplitude is still |−2| = 2, because amplitude is a distance and is never negative.',
+          'D slides the whole wave up or down: the midline moves from y = 0 to y = D, and the wave oscillates between D − |A| and D + |A|. So 2*sin(x) + 1 swings between −1 and 3. Drag the D slider and notice the shape never changes — vertical shift is pure translation, independent of everything else.',
+          'Try reading one cold: for y = 3*sin(x) − 2, the amplitude is 3, the midline is y = −2, and the wave swings between −5 and 1. Enter it, then drag A from 3 down to 1 and watch the band shrink toward the midline — the midline itself never moves, because A and D are independent controls. This independence is the whole reason the four-parameter form is worth learning: each slider does exactly one job.',
+        ],
+      },
+      {
+        heading: 'Period: B squeezes and stretches',
+        body: [
+          'The period of sin(x) is 2π — one full wave every 2π units. Multiplying the input by B squeezes (|B| > 1) or stretches (|B| < 1) the wave horizontally, and the new period is 2*π/|B|. For 2*sin(3*x) the period is 2π/3, so three full waves fit into the space where one used to be.',
+          'Watch the B slider: as B grows, more waves crowd into the same window while the height never changes. A negative B, like sin(−x), mirrors the wave left to right — which for sine equals −sin(x) — and the period formula uses |B| because a period, like an amplitude, is always positive.',
+          'A frequent confusion: B is not quite the number of waves per 2π units — the precise statement is that exactly |B| full cycles fit into every 2π-wide window. For B = 3, three waves occupy 0 to 2π; for B = 0.5, a single wave stretches across 0 to 4π. If you want a wave that completes exactly 5 cycles between 0 and 2π, set B = 5 — and the period formula 2π/5 confirms each cycle is 2π/5 wide.' ,
+        ],
+      },
+      {
+        heading: 'Phase shift: C slides the wave sideways',
+        body: [
+          'The expression sin(B*(x − C)) shifts the wave horizontally by C: a positive C moves it right, a negative C moves it left. This is the same inside-the-parentheses reversal from general function transformations — what looks like subtraction moves the graph to the right. In 2*sin(3*(x − π/4)) + 1, the phase shift is π/4 to the right.',
+          'Putting it together on that example: amplitude 2, period 2π/3, phase shift π/4 right, midline y = 1, so the wave oscillates between −1 and 3. Read any transformed sine this way — A, B, C, D in order — and you can sketch it without touching the calculator.',
+          'Be careful with the factored form: the phase shift is only C when the expression is written as B*(x − C). In 2*sin(3*x − π/4), the shift is not π/4 — factor out the 3 first to get 2*sin(3*(x − π/12)), revealing a right shift of π/12. This is the single most common algebra slip with phase shifts, and the slider form A*sin(B*(x - C)) + D exists precisely to keep you in the safe factored form.',
+        ],
+      },
+      {
+        heading: 'Cosine follows the same rules',
+        body: [
+          'Everything above applies to cosine: A*cos(B*(x − C)) + D has amplitude |A|, period 2π/|B|, phase shift C, and midline y = D. The only difference is the starting shape — cosine begins at its maximum while sine begins at its midline climbing.',
+          'In fact, a phase shift turns one into the other: cos(x) = sin(x + π/2). If your data starts at a peak, reach for cosine; if it starts mid-climb, reach for sine — then tune A, B, C, D exactly the same way. Compare your transformed wave against the parent sin(x) using the expressions below to see each parameter effect in isolation.',
+          'You can also work backwards: given a graphed wave, measure the parameters. The midline D is halfway between the maximum and minimum; the amplitude A is the distance from the midline to either extreme; the period is the horizontal distance between two adjacent peaks, giving B = 2π/period; and the phase shift is how far the first peak sits from where sin(x) peaks. Use the analysis panel min and max markers to read the extremes precisely, and you can reconstruct the whole formula from the picture.',
+        ],
+      },
+    ],
+    tryExpressions: ['A*sin(B*(x - C)) + D', 'sin(x)'],
+    keyTakeaways: [
+      'y = A*sin(B*(x − C)) + D puts each wave feature on its own slider: A amplitude, B frequency, C phase shift, D vertical shift.',
+      'Amplitude = |A|, half the peak-to-trough height; period = 2π/|B|, the length of one full cycle.',
+      'Positive C shifts the wave right and negative C shifts it left; D moves the midline to y = D, so the wave spans D − |A| to D + |A|.',
+      'Cosine follows identical rules — cos(x) = sin(x + π/2), so a phase shift converts one into the other.',
+      'Read any transformed sine in A, B, C, D order to sketch amplitude, period, shift, and midline without the calculator.',
+    ],
+    images: [
+      {
+        src: '/images/learn/amplitude-period-phase-shift/graph-1.png',
+        alt: 'The transformed wave A*sin(B*(x - C)) + D plotted with the parent function sin(x) for comparison',
+        caption:
+          'A*sin(B*(x - C)) + D alongside sin(x). Drag the A, B, C, D sliders one at a time to isolate the effect of amplitude, period, phase shift, and vertical shift.',
+      },
+      {
+        src: '/images/learn/amplitude-period-phase-shift/graph-2.png',
+        alt: 'The expression A*sin(B*(x - C)) + D graphed alone as a transformed sine wave',
+        caption:
+          'A*sin(B*(x - C)) + D on its own. Amplitude |A| sets the height, 2π/|B| sets the period, C sets the phase shift, and D sets the midline.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'What is the difference between phase shift and period?',
+        a: 'The period (2π/|B|) is the length of one wave cycle — how squeezed the wave is. The phase shift (C) is where the wave starts — how far it slides left or right. Changing B never moves the wave sideways; changing C never changes its width.',
+      },
+      {
+        q: 'Can the amplitude be negative?',
+        a: 'No — amplitude is defined as |A|, a distance, so it is always non-negative. A negative A flips the wave vertically (2*sin(x) versus −2*sin(x) are mirror images), but both have amplitude 2.',
+      },
+      {
+        q: 'Why does (x − C) shift the graph right instead of left?',
+        a: 'Because the shift asks where the wave reaches the value it used to reach at 0. For sin(x − π/4) to equal sin(0), you need x = π/4 — a point to the right. Inside the parentheses, the horizontal direction always feels reversed.',
+      },
+    ],
+    related: [
+      '/learn/line-of-best-fit/',
+      '/learn/function-transformations/',
+      '/math-functions/sine/',
+      '/math-functions/cosine/',
+      '/examples/trigonometric-interference/',
+      '/graphing-calculator/',
+    ],
+  },
 ];
