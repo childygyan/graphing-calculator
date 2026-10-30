@@ -1,6 +1,9 @@
-export const prerender = false;
 /**
- * Phase 6: POST /api/ai/math — server-side AI math assistant endpoint.
+ * POST /api/ai/math — server-side AI math assistant endpoint.
+ *
+ * Pages Function port of the former Astro endpoint (same URL, same
+ * validation, rate limiting, provider selection, and response shapes).
+ * Previously: src/pages/api/ai/math.ts (POST).
  *
  * Security properties (read carefully before changing):
  * - The DeepSeek API key is read ONLY from the server environment
@@ -14,32 +17,35 @@ export const prerender = false;
  * - When no API key is configured, the deterministic mock provider
  *   answers and the response is labeled `mock: true` so the UI says so.
  *
- * NOTE — server runtime: this route runs on demand in the Cloudflare Pages
- * worker (`output: 'static'` + Cloudflare adapter; `export const prerender =
- * false` above is what keeps it server-rendered). All content pages are
- * statically prerendered; only /api/* runs in the worker. Secrets are
- * read from the runtime bindings first (`locals.runtime.env`), so a
- * DEEPSEEK_API_KEY configured on the deployed project is picked up
- * without a rebuild.
+ * NOTE — server runtime: this route runs on demand as a Cloudflare Pages
+ * Function. Secrets are read from the project's Pages env bindings
+ * (`context.env`), so a DEEPSEEK_API_KEY configured on the deployed
+ * project is picked up without a rebuild. Unlike the old Astro endpoint,
+ * `import.meta.env` is NOT consulted: it is undefined in a plain Pages
+ * Function and reading it would throw.
  */
 
-import type { APIRoute } from 'astro';
-import { validateAiRequestBody } from '../../../lib/ai/request.js';
+import { validateAiRequestBody } from '../../../src/lib/ai/request.js';
 import {
   AI_ENDPOINT_MAX_REQUESTS,
   AI_ENDPOINT_WINDOW_MS,
   SlidingWindowRateLimiter,
-} from '../../../lib/ai/rateLimit.js';
-import { buildContextSummary } from '../../../lib/ai/context.js';
-import { buildSystemPrompt, buildUserPrompt } from '../../../lib/ai/prompt.js';
-import { MockAiProvider } from '../../../lib/ai/providers.js';
-import type { AiProvider } from '../../../lib/ai/providers.js';
+} from '../../../src/lib/ai/rateLimit.js';
+import { buildContextSummary } from '../../../src/lib/ai/context.js';
+import { buildSystemPrompt, buildUserPrompt } from '../../../src/lib/ai/prompt.js';
+import { MockAiProvider } from '../../../src/lib/ai/providers.js';
+import type { AiProvider } from '../../../src/lib/ai/providers.js';
 import {
   DEEPSEEK_DEFAULT_MODEL,
   DeepSeekError,
   DeepSeekProvider,
-} from '../../../lib/ai/deepseek.js';
-import { parseAndValidateAiOutput } from '../../../lib/ai/commands.js';
+} from '../../../src/lib/ai/deepseek.js';
+import { parseAndValidateAiOutput } from '../../../src/lib/ai/commands.js';
+
+interface PagesFunctionContext {
+  request: Request;
+  env: Record<string, unknown>;
+}
 
 const limiter = new SlidingWindowRateLimiter(AI_ENDPOINT_MAX_REQUESTS, AI_ENDPOINT_WINDOW_MS);
 
@@ -55,35 +61,11 @@ function getClientIp(request: Request): string {
 }
 
 /**
- * Read the DeepSeek key from the server environment only.
- * Returns null when not configured (mock mode). Never logs the value.
+ * Read a secret from the Pages env bindings only.
+ * Returns undefined when not configured (mock mode). Never logs the value.
  */
-function readApiKey(locals: unknown): string | null {
-  return readServerEnv(locals, 'DEEPSEEK_API_KEY') ?? null;
-}
-
-function readModel(locals: unknown): string {
-  return readServerEnv(locals, 'DEEPSEEK_MODEL') ?? DEEPSEEK_DEFAULT_MODEL;
-}
-
-/**
- * Read a secret from the Cloudflare Pages runtime bindings first
- * (`context.locals.runtime.env`), so a key configured on the deployed
- * project is picked up without a rebuild. Falls back to the standard
- * Node / Astro build-time sources. Never logs the value.
- */
-function readServerEnv(locals: unknown, name: string): string | undefined {
-  try {
-    const runtime = (locals as { runtime?: { env?: Record<string, unknown> } } | undefined)
-      ?.runtime;
-    const bound = runtime?.env?.[name];
-    if (typeof bound === 'string' && bound.trim().length > 0) return bound.trim();
-  } catch {
-    /* runtime bindings unavailable — use fallbacks below */
-  }
-  const fromProcess = typeof process !== 'undefined' ? process.env[name] : undefined;
-  const fromAstro = import.meta.env[name] as string | undefined;
-  const value = fromProcess ?? fromAstro;
+function readEnv(env: Record<string, unknown>, name: string): string | undefined {
+  const value = env[name];
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
 }
 
@@ -107,7 +89,7 @@ function jsonResponse(
   });
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export async function onRequestPost({ request, env }: PagesFunctionContext): Promise<Response> {
   const ip = getClientIp(request);
   const limit = limiter.check(ip);
   if (!limit.allowed) {
@@ -131,9 +113,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
   const { message, context, history } = validated.body;
 
-  const apiKey = readApiKey(locals);
+  const apiKey = readEnv(env, 'DEEPSEEK_API_KEY');
   const provider: AiProvider = apiKey
-    ? new DeepSeekProvider({ apiKey, model: readModel(locals) })
+    ? new DeepSeekProvider({ apiKey, model: readEnv(env, 'DEEPSEEK_MODEL') ?? DEEPSEEK_DEFAULT_MODEL })
     : new MockAiProvider();
 
   const userPrompt = buildUserPrompt(message, buildContextSummary(context), history);
@@ -169,4 +151,4 @@ export const POST: APIRoute = async ({ request, locals }) => {
     provider: provider.name,
     mock: provider.name === 'mock',
   });
-};
+}
