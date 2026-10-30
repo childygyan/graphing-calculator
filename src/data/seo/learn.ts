@@ -2534,4 +2534,95 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       '/graphing-calculator/',
     ],
   },
+  {
+    slug: 'solve-systems-of-equations',
+    title: 'How to Solve a System of Equations on a Graphing Calculator',
+    description:
+      'Convert standard form to slope-intercept, graph both lines, and let the intersection markers solve the system — parallel and coincident cases included.',
+    reviewedOn: '2026-10-30',
+    sections: [
+      {
+        heading: 'The direct answer: graph both, read the intersection',
+        body: [
+          'A system of equations asks for the point or points that satisfy every equation at once — and on a graph, that is exactly where the curves cross. Enter each equation solved for y as its own cartesian expression, then open the analysis panel and use the intersection markers: every marker is a solution to the system.',
+          'For example, enter 2*x + 1 and -x + 4. The lines cross at (1, 3), and the intersection marker reads it off: x = 1, y = 3 satisfies both equations, since 2*1 + 1 = 3 and −1 + 4 = 3. Graphing turns the algebraic chore of solving simultaneously into the visual question of where the graphs meet.',
+        ],
+      },
+      {
+        heading: 'First convert to slope-intercept form',
+        body: [
+          'The calculator graphs y = expressions, so an equation in standard form like 3*x + 2*y = 12 needs one rearrangement first: subtract 3*x from both sides to get 2*y = -3*x + 12, then divide by 2 to get y = -1.5*x + 6. Enter that. The solution set is unchanged — you only rewrote the same line in a graphable form.',
+          'Slope-intercept form has a bonus: it exposes the slope immediately, which tells you which of the three cases you are in before you even graph. Same slope with a different intercept means parallel lines and no solution. Same slope with the same intercept means the same line twice and infinitely many solutions. Different slopes mean exactly one crossing and exactly one solution.',
+          'Fractions are the usual stumbling block in the conversion. Take 2*x + 3*y = 7: subtract 2*x to get 3*y = -2*x + 7, then divide every term by 3 — including the constant — to get y = (-2/3)*x + 7/3. Forgetting to divide the constant term is the classic error, and it produces a parallel line with the wrong intercept, which silently changes the solution. Convert slowly, then let the graph confirm the line sits where you expect.' ,
+        ],
+      },
+      {
+        heading: 'Step by step in the calculator',
+        body: [
+          'Add one cartesian expression per equation — for the system y = 2*x + 1 and y = -x + 4, that is two expressions. Adjust the window so the crossing is visible; here the default view works, since the lines cross at (1, 3). Then open the analysis panel and select the intersection tool, which places a marker at every point where two graphs meet.',
+          'Read the marker coordinates — those are your solution. Verify by substitution: does 3 equal 2*1 + 1? Yes. Does 3 equal −1 + 4? Yes. For a second check, open the table of values at x = 1 and confirm that both expressions output 3. Two independent checks, one answer.',
+          'The same method handles curves, where algebra gets painful: for the system y = x^2 and y = 2*x + 1, enter both expressions and place intersection markers at each crossing. The markers find every solution — including ones the quadratic formula would make you work for — because the tool does not care whether the graphs are straight.',
+        ],
+      },
+      {
+        heading: 'The two special cases: no solution and infinitely many',
+        body: [
+          'Graph 2*x + 1 and 2*x - 3 together (both are in the expressions below). The lines run side by side forever — same slope 2, different intercepts — so the intersection tool finds nothing, correctly: a system of parallel lines has no solution, because no point lies on both lines.',
+          'The opposite case: the system y = 2*x + 1 and 2*y = 4*x + 2. Divide the second equation by 2 and it becomes y = 2*x + 1 — the identical line. Every point on the line satisfies both equations, so there are infinitely many solutions. Rule of thumb: if simplifying makes one equation identical to the other, stop — the system is dependent, and no further solving is needed.',
+          'Dependent systems often hide behind different-looking equations. The pair 3*x + 2*y = 12 and 6*x + 4*y = 24 looks like two constraints, but the second is just the first doubled — one line wearing a disguise. The tell: every coefficient and the constant scale by the same factor. When you spot that, you know immediately there are infinitely many solutions without graphing anything.',
+        ],
+      },
+      {
+        heading: 'Checking your answer the careful way',
+        body: [
+          'A marker on a graph is convincing, but build the habit of verifying algebraically. Substitute the coordinates back into each original equation — not the rearranged versions — and confirm both sides match. For (1, 3) in the system above, both equations check out exactly.',
+          'The table of values gives a second verification path: enter the solution x-value and confirm every expression in the system outputs the same y. If the outputs disagree, you misread the marker or mistyped an expression — the table catches both mistakes. When all three views (graph, substitution, table) agree, the solution is certain.',
+          'A final note on word problems: systems usually arrive disguised, with x and y standing for quantities like tickets sold or liters mixed. Define your variables first, write one equation per sentence of the problem, and only then start converting and graphing. The calculator solves the system you give it — making sure it is the right system is the human part.',
+        ],
+      },
+    ],
+    tryExpressions: ['2*x + 1', '-x + 4', '2*x - 3'],
+    keyTakeaways: [
+      'A system\u2019s solutions are the graphs\u2019 intersection points — enter each equation as y = an expression and use the analysis panel\u2019s intersection markers.',
+      'Convert standard form to slope-intercept first (3*x + 2*y = 12 becomes y = -1.5*x + 6); the slope then reveals which case you are in.',
+      'y = 2*x + 1 and y = -x + 4 cross at (1, 3) — one crossing means exactly one solution.',
+      'Same slope with a different intercept means parallel lines and no solution; identical lines mean infinitely many solutions.',
+      'Always verify: substitute the coordinates into both original equations, or compare both outputs in the table of values.',
+    ],
+    images: [
+      {
+        src: '/images/learn/solve-systems-of-equations/graph-1.png',
+        alt: 'The lines y = 2*x + 1 and y = -x + 4 crossing at (1, 3), with y = 2*x - 3 running parallel to the first',
+        caption:
+          '2*x + 1, -x + 4, and 2*x - 3 plotted together. The first two cross at (1, 3) — the solution — while 2*x - 3 stays parallel to 2*x + 1 forever: no solution.',
+      },
+      {
+        src: '/images/learn/solve-systems-of-equations/graph-2.png',
+        alt: 'The line y = 2*x + 1 graphed alone',
+        caption:
+          '2*x + 1 on its own: slope 2, y-intercept 1. Each equation in a system becomes one such line before the intersection tool finds where they meet.',
+      },
+    ],
+    faqs: [
+      {
+        q: 'How is this different from the intersection-finder article?',
+        a: 'The intersection article is about the tool itself; this article is about the algebra workflow — converting standard form to slope-intercept, recognizing the parallel and coincident cases, and verifying solutions. Use the two together.',
+      },
+      {
+        q: 'Can I solve systems with three equations?',
+        a: 'Graphically, yes, for two unknowns: graph all three lines and look for a single common point. But three lines in a plane rarely meet at one point — usually there is no exact solution, and the graph shows you why instantly.',
+      },
+      {
+        q: 'The intersection tool found nothing — did I do something wrong?',
+        a: 'Probably not: no marker usually means no solution. Check the slopes — if both lines share a slope but have different intercepts, they are parallel and never meet. If the equations simplify to the same line, every point is a solution instead.',
+      },
+    ],
+    related: [
+      '/learn/find-intersection-of-two-graphs/',
+      '/learn/amplitude-period-phase-shift/',
+      '/learn/solve-quadratic-equations/',
+      '/learn/graphing-inequalities/',
+      '/graphing-calculator/',
+    ],
+  },
 ];
