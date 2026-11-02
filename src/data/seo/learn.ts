@@ -2809,4 +2809,96 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: "2026-11-01",
   },
+  {
+    slug: "window-and-zoom-settings",
+    title: "Graphing Calculator Window and Zoom Settings: A Practical Guide",
+    description:
+      "Master the graphing calculator window: zoom in on roots, zoom out for end behavior, fix stretched circles and sampling artifacts.",
+    sections: [
+      {
+        heading: "The direct answer: the window is a rectangle",
+        body: [
+          "Everything on screen is a rectangle of the x–y plane, set by four numbers: the minimum and maximum x, and the minimum and maximum y. If a graph looks wrong — blank, flat, or cut off — the window is the first suspect, not the expression. Open the window settings and think of those four numbers as choosing which slice of the infinite plane you are looking at.",
+          "Two habits cover most situations: zoom out when you want the big picture (end behavior, the full shape of a curve), and zoom in when you want detail (a root, a turning point, what happens near an asymptote). An auto-fit command — often called ZoomFit — resizes the window to frame everything you have graphed, and it is the fastest recovery when you are lost.",
+          "A classic window illusion: graph y = 0.001*x^2 in the default window and it looks like the x-axis itself — a flat line. Nothing is wrong with the expression; the parabola is just so shallow that its curve is invisible at that scale. Zoom out and the true U-shape appears. Whenever a graph looks suspiciously simple, suspect the window before suspecting the math.",
+        ],
+      },
+      {
+        heading: "Zoom out: see the big picture",
+        body: [
+          "Take y = x^2. In the default window you see a shallow bowl bottom with the arms shooting off the top of the screen — which is correct, since both ends rise toward infinity, but you cannot see the shape. Zoom out and the full U emerges: symmetric, steepening as |x| grows, exactly the end behavior the algebra predicts.",
+          "Use the same move whenever a graph looks like a straight vertical wall — you are probably seeing one steep piece of a curve whose interesting features live far outside the frame. Zoom out (or auto-fit) first, orient yourself, then zoom back into the region you care about.",
+          "One honest caveat about auto-fit: it frames everything visible, so a function with vertical asymptotes can blow the y-range up to enormous values and squash the rest of the graph flat. If auto-fit produces a pancake, narrow the y-range manually around the features you actually want to study.",
+        ],
+      },
+      {
+        heading: "Zoom in: inspect the details",
+        body: [
+          "Zooming in is how you answer “where exactly?” questions. Center the view on a suspected root and shrink the ranges: the crossing sharpens, and you can read the zero far more precisely than from the default view. The same applies to the vertex of a parabola or the behavior of a curve near an asymptote — detail lives in small windows.",
+          "A useful workflow: zoom in until the feature fills the screen, drop a root or extremum marker from the analysis panel, then zoom back out to confirm the marker sits where the big picture says it should. The two views check each other, and the marker gives you a number the picture alone cannot.",
+        ],
+      },
+      {
+        heading: "Fixing distortion: why your circle looks like an oval",
+        body: [
+          "If a circle comes out looking like an oval, nothing is broken — your x and y scales just differ. A unit circle drawn on a window where the x-axis spans twice the range of the y-axis will always stretch horizontally, because one x-unit and one y-unit occupy different numbers of pixels.",
+          "The fix is a square aspect ratio: choose ranges so that one unit is the same length on both axes. Graph a circle — for example the parametric circle x = cos(t), y = sin(t) — and adjust the window until it looks round. That is your calibrated square view, and every angle and slope you read afterward will be honest.",
+          "This matters beyond circles: on a stretched window, perpendicular lines don't look perpendicular and a 45° slope doesn't look like 45°. Whenever a geometric question depends on shape — tangency, angle measures, symmetry — verify the aspect ratio first.",
+        ],
+      },
+      {
+        heading: "When the graph lies: sampling artifacts",
+        body: [
+          "The calculator draws curves by evaluating the expression at discrete points and joining the dots. That works beautifully until the function oscillates faster than the sampling can follow. Try y = sin(100*x): its period is π/50, about 0.063, so a window spanning −10 to 10 holds more than 300 full waves — far more than the screen can draw one by one. The result looks like jagged noise or a solid band, and it is not the true graph.",
+          "The fix is to narrow the window until a few periods fill the screen — then the clean sine wave appears. Rule of thumb: if a trig graph looks noisy or shows moiré-like banding, the window is too wide for its frequency. When in doubt, check the table of values: exact numbers never suffer from sampling artifacts, so the table tells you what the graph should look like.",
+        ],
+      },
+    ],
+    tryExpressions: ["x^2", "sin(100*x)"],
+    keyTakeaways: [
+      "The window is four numbers — xMin, xMax, yMin, yMax — choosing which rectangle of the plane you see.",
+      "Zoom out for end behavior and the full shape; zoom in for roots, vertices and behavior near asymptotes.",
+      "An auto-fit (ZoomFit-style) command frames every graph at once — the fastest recovery when you are lost.",
+      "Oval-looking circles mean unequal x and y scales; set a square aspect ratio to fix them.",
+      "Noisy high-frequency graphs are sampling artifacts — narrow the window and verify with the table of values.",
+    ],
+    images: [
+      {
+        src: "/images/learn/window-and-zoom-settings/graph-1.png",
+        alt: "The parabola y = x^2 and the curve y = sin(100*x) shown in the calculator's default window.",
+        caption:
+          "The parabola y = x^2 (with y = sin(100*x) alongside) in the default window. The default view shows only the bottom of the parabola — its end behavior lies outside the frame.",
+      },
+      {
+        src: "/images/learn/window-and-zoom-settings/graph-2.png",
+        alt: "The same graphs zoomed out, revealing the full U shape of the parabola y = x^2.",
+        caption:
+          "The same parabola zoomed out, revealing its full U shape. Zooming out exposes end behavior; zooming in is for roots and turning points.",
+      },
+    ],
+    faqs: [
+      {
+        q: "My graph is completely blank. What should I check first?",
+        a: "The window. Zoom out or run auto-fit to make sure the interesting part of the graph is not sitting outside the visible rectangle. If it is still blank, check the expression for typos and check the domain — for example, asin(x) draws nothing beyond |x| > 1.",
+      },
+      {
+        q: "How do I make a circle look round instead of stretched?",
+        a: "Give x and y the same scale — a square aspect ratio. When one x-unit and one y-unit take up the same number of pixels, circles draw as circles and slopes read honestly.",
+      },
+      {
+        q: "Why does y = sin(100*x) look like random static?",
+        a: "Its period is π/50 ≈ 0.063, so a wide window packs hundreds of waves onto the screen and the sampler cannot resolve them. Narrow the x-range until a few periods fill the screen and the true sine wave appears.",
+      },
+    ],
+    related: [
+      "/learn/getting-started-graphing-calculator/",
+      "/learn/find-roots-and-zeros/",
+      "/learn/end-behavior-of-polynomial-graphs/",
+      "/learn/parametric-vs-cartesian/",
+      "/learn/how-to-use-the-table-of-values/",
+      "/learn/holes-in-rational-functions/",
+      "/learn/reciprocal-trig-functions/",
+    ],
+    reviewedOn: "2026-11-02",
+  },
 ];
