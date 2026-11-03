@@ -2901,4 +2901,94 @@ export const LEARN_ARTICLES: LearnArticle[] = [
     ],
     reviewedOn: "2026-11-02",
   },
+  {
+    slug: "find-vertex-of-parabola",
+    title: "How to Find the Vertex of a Parabola on a Graphing Calculator",
+    description:
+      "Find a parabola's vertex on a graphing calculator: read it from vertex form, compute x = -b/2a, or mark it with the extremum tool.",
+    sections: [
+      {
+        heading: "The direct answer: the vertex is the turning point",
+        body: [
+          "Type the parabola — say x^2 - 4*x + 3 — into a y = box, and look for the single point where the curve turns around. That turning point is the vertex: the lowest point if the parabola opens upward, the highest if it opens downward. For x^2 − 4x + 3 it sits at (2, −1), and you can read it straight off the graph.",
+          "Reading it off the graph is fast but approximate — the picture gives you the location, not exact coordinates. This article gives you two exact methods, vertex form and the −b/2a formula, plus a slider trick that makes the vertex visibly move, so you never have to guess.",
+        ],
+      },
+      {
+        heading: "Vertex form hands you the vertex directly",
+        body: [
+          "A parabola written as y = a(x − h)² + k has its vertex at (h, k) — no computation needed. In y = -(x - 1)^2 + 4, the vertex is (1, 4): the squared term is never positive, so the whole expression is largest exactly when the square is zero, at x = 1. The sign of a tells you which kind of vertex it is: a > 0 opens upward (the vertex is a minimum), a < 0 opens downward (a maximum).",
+          "You can convert any standard-form quadratic by completing the square. For x^2 − 4x + 3: take half of −4, square it to get 4, and rewrite as (x² − 4x + 4) − 1 = (x − 2)² − 1. There is the vertex again at (2, −1). The two forms describe the same curve — vertex form just puts the answer in the open.",
+        ],
+      },
+      {
+        heading: "From standard form: x = −b/2a",
+        body: [
+          "For y = ax² + bx + c, the vertex's x-coordinate is always x = −b/2a, and the axis of symmetry is the vertical line through it. Take x^2 + 2*x - 3: here a = 1 and b = 2, so x = −2/2 = −1. Substitute back — f(−1) = 1 − 2 − 3 = −4 — and the vertex is (−1, −4). Two steps, no graphing required.",
+          "Confirm it in the calculator with evaluate-at-a-point: evaluate your expression at x = −b/2a and check the y-value matches your hand computation. It is a ten-second sanity check that catches sign errors in the formula, which are the classic mistake here.",
+          "The axis of symmetry is worth picturing too: the parabola is a mirror image across the vertical line x = −b/2a, so f(−b/2a + d) = f(−b/2a − d) for any d. You can draw that axis as a parametric expression (for example x = −1, y = t) and watch it split the curve into mirror halves.",
+        ],
+      },
+      {
+        heading: "Watch it move: slider variables",
+        body: [
+          "Type a*(x - h)^2 + k into a y = box. The letters a, h and k are free identifiers, so the calculator turns each into a slider you can drag. Pull h left and right and the vertex slides horizontally; pull k and it slides vertically; drag a through zero and watch the parabola flip from a minimum to a maximum — the vertex jumping from the bottom of the curve to the top as a changes sign.",
+          "This is the fastest way to build intuition for transformations: the vertex of a(x − h)² + k is always (h, k), and the sliders prove it live. As a check, set a = 1, h = 2, k = −1 and confirm the curve becomes x^2 − 4x + 3 — expanding (x − 2)² − 1 gives exactly that.",
+        ],
+      },
+      {
+        heading: "Confirm with the extremum marker",
+        body: [
+          "A parabola's vertex is also its one local extremum — and its global one, since the arms run to infinity. So the analysis panel's local min/max markers find the vertex directly: drop a minimum marker on x^2 - 4*x + 3 and it lands on (2, −1). For upward-opening parabolas use the minimum marker; for downward-opening ones, the maximum marker.",
+          "Treat the marker as a numerical confirmation and the formulas as the exact answer: the marker computes from the sampled graph, while −b/2a and vertex form are exact algebra. Note the division of labor with the general min/max workflow — that covers extrema of messier curves, but for parabolas the vertex methods above are shorter and exact.",
+        ],
+      },
+    ],
+    tryExpressions: ["x^2 - 4*x + 3", "x^2 + 2*x - 3", "-(x - 1)^2 + 4"],
+    keyTakeaways: [
+      "The vertex is the parabola's turning point: a minimum if a > 0, a maximum if a < 0.",
+      "In vertex form a(x − h)² + k, the vertex is (h, k) — read it directly.",
+      "In standard form ax² + bx + c, the vertex sits at x = −b/2a on the axis of symmetry.",
+      "Type a*(x - h)^2 + k to get draggable sliders that move the vertex live.",
+      "The analysis panel's min/max marker lands exactly on the vertex — a parabola's extremum is global.",
+    ],
+    images: [
+      {
+        src: "/images/learn/find-vertex-of-parabola/graph-1.png",
+        alt: "Three parabolas y = x^2 - 4x + 3, y = x^2 + 2x - 3 and y = -(x-1)^2 + 4 plotted together, each with its vertex visible.",
+        caption:
+          "Three parabolas plotted together. The first two open upward with vertices at the bottom — (2, −1) and (−1, −4) — while the third opens downward with its vertex at the top, (1, 4).",
+      },
+      {
+        src: "/images/learn/find-vertex-of-parabola/graph-2.png",
+        alt: "The parabola y = x^2 - 4x + 3 alone, opening upward with its vertex at (2, -1).",
+        caption:
+          "y = x^2 − 4x + 3 alone. The vertex (2, −1) is the lowest point of the curve, sitting on the axis of symmetry x = 2.",
+      },
+    ],
+    faqs: [
+      {
+        q: "Is the vertex the same thing as the local minimum or maximum?",
+        a: "For a parabola, yes. Its single turning point is the vertex, and because the arms run to infinity it is also the global minimum (a > 0) or global maximum (a < 0). That is why the extremum marker finds it.",
+      },
+      {
+        q: "My quadratic is in factored form, like (x - 1)*(x - 5). Where is the vertex?",
+        a: "Use symmetry: the roots are 1 and 5, so the vertex's x-coordinate is their midpoint, 3. Then f(3) = (2)*(−2) = −4, giving the vertex (3, −4).",
+      },
+      {
+        q: "Does −b/2a work for every quadratic?",
+        a: "Yes — for any y = ax² + bx + c with a ≠ 0. But if the equation is already in vertex form a(x − h)² + k, skip the formula and read (h, k) straight off.",
+      },
+    ],
+    related: [
+      "/math-functions/quadratic/",
+      "/learn/solve-quadratic-equations/",
+      "/learn/find-local-minimum-and-maximum/",
+      "/learn/function-transformations/",
+      "/learn/evaluate-functions-at-a-point/",
+      "/learn/window-and-zoom-settings/",
+      "/examples/projectile-motion/",
+    ],
+    reviewedOn: "2026-11-03",
+  },
 ];
